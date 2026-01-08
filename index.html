@@ -521,6 +521,9 @@ const I18N = {
     btn_use: "Použít",
     btn_add_machine_small: "+ Stroj",
     label_note: "Poznámka",
+    label_contact: "Kontakt",
+    label_phone: "Telefon",
+    customers_no_machines: "Žádné stroje",
     label_machine_name: "Název stroje",
     label_machine_number_short: "Číslo (N)",
     dlg_add_customer_title: "Přidat zákazníka",
@@ -593,6 +596,9 @@ const I18N = {
     btn_use: "Verwenden",
     btn_add_machine_small: "+ Maschine",
     label_note: "Notiz",
+    label_contact: "Kontakt",
+    label_phone: "Telefon",
+    customers_no_machines: "Keine Maschinen",
     label_machine_name: "Maschinenname",
     label_machine_number_short: "Nummer (N)",
     dlg_add_customer_title: "Kunde hinzufügen",
@@ -665,6 +671,9 @@ const I18N = {
     btn_use: "Use",
     btn_add_machine_small: "+ Machine",
     label_note: "Note",
+    label_contact: "Contact",
+    label_phone: "Phone",
+    customers_no_machines: "No machines",
     label_machine_name: "Machine name",
     label_machine_number_short: "Number (N)",
     dlg_add_customer_title: "Add customer",
@@ -1127,56 +1136,122 @@ function uuid(){ return Math.random().toString(36).slice(2)+Date.now().toString(
   }catch(e){}
 })();
 
+// UI state for customers (collapse/expand)
+const customersUIState = {
+  expandedCustomers: new Set(),
+  expandedMachines: new Set(),
+};
+
+function normalizePhone(p){
+  const s = String(p||'').trim();
+  if(!s) return '';
+  // keep leading +, remove spaces and common separators
+  return s.replace(/[^\d+]/g,'');
+}
+
 function renderCustomers(filter=""){
   const raw=(filter||"").trim();
   const q=raw.toLowerCase();
   const norm = (str)=>String(str||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   const qn = norm(q);
   const list=loadCustomers();
-  // Řazení zákazníků podle abecedy (CZ), bez ohledu na diakritiku/velikost písmen
+
+  // Sort customers alphabetically (CZ), ignoring accents/case
   list.sort((a,b)=>String(a?.name||'').localeCompare(String(b?.name||''),'cs',{sensitivity:'base'}));
-  const root=document.getElementById('c-list'); root.innerHTML="";
+
+  const root=document.getElementById('c-list'); 
+  root.innerHTML="";
+
   list.forEach(c=>{
     const nameN = norm(c.name);
     const noteN = norm(c.note||"");
+    const contactN = norm(c.contactName||"");
+    const phoneS = String(c.contactPhone||"");
     const matchCustomer = (!q)
       ? true
       : (qn.length===1 && /[a-z]/i.test(qn)
           ? nameN.startsWith(qn)
-          : (nameN.includes(qn) || noteN.includes(qn)));
-    const matchedMachines=(c.machines||[]).filter(m=>{
+          : (nameN.includes(qn) || noteN.includes(qn) || contactN.includes(qn) || phoneS.includes(q)));
+
+    const machines=(c.machines||[]);
+    const matchedMachines=machines.filter(m=>{
       const labN = norm(m.label||"");
       const numS = String(m.number||"");
       if(!q) return true;
-      // for 1-letter filtering focus on customer name; machines still match by number or longer text
+      // 1-letter filtering focuses on customer names
       return (qn.length===1 && /[a-z]/i.test(qn))
         ? false
         : (labN.includes(qn) || numS.includes(q));
     });
-    if(!q||matchCustomer||matchedMachines.length){
-      const box=document.createElement('div'); box.className="card"; box.style.padding='12px'; box.style.marginBottom='10px';
+
+    if(!q || matchCustomer || matchedMachines.length){
+      const box=document.createElement('div'); 
+      box.className="card"; 
+      box.style.padding='12px'; 
+      box.style.marginBottom='10px';
+
+      const isOpen = customersUIState.expandedCustomers.has(c.id);
+      const phoneNorm = normalizePhone(c.contactPhone);
+      const contactLine = (c.contactName || c.contactPhone)
+        ? `<div style="opacity:.9;font-size:.92rem;margin-top:2px">
+             ${c.contactName ? `<span>${c.contactName}</span>` : ``}
+             ${c.contactPhone ? `<span style="margin-left:8px"><a href="tel:${phoneNorm}" style="text-decoration:underline">${c.contactPhone}</a></span>` : ``}
+           </div>`
+        : ``;
+
+      // Header (compact): name + contact + machine count, tap to expand
       box.innerHTML =
-        `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-           <div>
-             <div style="font-weight:900">${c.name}</div>
-             <div style="opacity:.9;font-size:.95rem">${c.note||""}</div>
+        `<div class="c-head" data-act="toggle-c" data-id="${c.id}" role="button" tabindex="0"
+              style="display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer">
+           <div style="min-width:0">
+             <div style="font-weight:900;word-break:break-word">${c.name}</div>
+             ${contactLine}
+             ${c.note ? `<div style="opacity:.75;font-size:.9rem;margin-top:2px">${c.note}</div>` : ``}
            </div>
-           <div style="display:flex;gap:8px;flex-wrap:wrap">
-             <button class="btn inline" data-act="edit-c" data-id="${c.id}" type="button">${t("btn_edit")}</button>
-             <button class="btn inline" data-act="add-m" data-id="${c.id}" type="button">${t("btn_add_machine_small")}</button>
-             <button class="btn inline" data-act="del-c" data-id="${c.id}" type="button">${t("btn_delete")}</button>
+           <div style="display:flex;align-items:center;gap:10px;flex:0 0 auto">
+             <div style="font-weight:800;opacity:.75">${machines.length}</div>
+             <div style="opacity:.7;font-size:1.1rem">${isOpen ? "▾" : "▸"}</div>
            </div>
-         </div>`
-        + (c.machines||[]).map(m=>`
-          <div class="row" style="margin-top:8px;border-top:1px dashed var(--border);padding-top:8px;align-items:center">
-            <div class="col" style="min-width:120px"><b>${m.label||""}</b></div>
-            <div class="col" style="min-width:120px">N: ${m.number||""}</div>
-            <div class="col" style="min-width:220px;display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn inline" data-act="use-m" data-cid="${c.id}" data-mid="${m.id}" type="button">${t("btn_use")}</button>
-              <button class="btn inline" data-act="edit-m" data-cid="${c.id}" data-mid="${m.id}" type="button">${t("btn_edit")}</button>
-              <button class="btn inline" data-act="del-m" data-cid="${c.id}" data-mid="${m.id}" type="button">${t("btn_delete")}</button>
-            </div>
-          </div>`).join('');
+         </div>`;
+
+      // Expanded content
+      if(isOpen){
+        const shownMachines = (q && !matchCustomer) ? matchedMachines : machines;
+        const machinesHtml = shownMachines.length
+          ? shownMachines.map(m=>{
+              const midKey = `${c.id}::${m.id}`;
+              const mOpen = customersUIState.expandedMachines.has(midKey);
+              return `
+                <div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)">
+                  <div data-act="toggle-m" data-cid="${c.id}" data-mid="${m.id}"
+                       style="display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer">
+                    <div style="min-width:0">
+                      <div style="font-weight:800;word-break:break-word">${m.label||""}</div>
+                      <div style="opacity:.8;font-size:.92rem">N: ${m.number||""}</div>
+                    </div>
+                    <div style="opacity:.7;font-size:1.1rem;flex:0 0 auto">${mOpen ? "▾" : "▸"}</div>
+                  </div>
+                  ${mOpen ? `
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                      <button class="btn inline" data-act="use-m" data-cid="${c.id}" data-mid="${m.id}" type="button">${t("btn_use")}</button>
+                      <button class="btn inline" data-act="edit-m" data-cid="${c.id}" data-mid="${m.id}" type="button">${t("btn_edit")}</button>
+                      <button class="btn inline" data-act="del-m" data-cid="${c.id}" data-mid="${m.id}" type="button">${t("btn_delete")}</button>
+                    </div>
+                  ` : ``}
+                </div>`;
+            }).join('')
+          : `<div style="margin-top:10px;opacity:.75">${t("customers_no_machines")}</div>`;
+
+        box.innerHTML += `
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn inline" data-act="edit-c" data-id="${c.id}" type="button">${t("btn_edit")}</button>
+            <button class="btn inline" data-act="add-m" data-id="${c.id}" type="button">${t("btn_add_machine_small")}</button>
+            <button class="btn inline" data-act="del-c" data-id="${c.id}" type="button">${t("btn_delete")}</button>
+          </div>
+          ${machinesHtml}
+        `;
+      }
+
       root.appendChild(box);
     }
   });
@@ -1197,11 +1272,11 @@ function openDialog(title, innerHTML, onSave){
 
 // Add customer
 document.getElementById('c-add').addEventListener('click', ()=>{
-  openDialog(t("dlg_add_customer_title"), `<label>${t("label_name")}</label><input id="f-name"><label>${t("label_note")}</label><input id="f-note">`, (close)=>{
+  openDialog(t("dlg_add_customer_title"), `<label>${t("label_name")}</label><input id="f-name"><label>${t("label_contact")}</label><input id="f-contact"><label>${t("label_phone")}</label><input id="f-phone" inputmode="tel"><label>${t("label_note")}</label><input id="f-note">`, (close)=>{
     const name=document.getElementById('f-name').value.trim();
     if(!name){ toast(t("err_enter_name")); return; }
     const list=loadCustomers();
-    list.push({id:uuid(), name, note:(document.getElementById('f-note').value||'').trim(), machines:[]});
+    list.push({id:uuid(), name, contactName:(document.getElementById(\'f-contact\').value||\'\').trim(), contactPhone:(document.getElementById(\'f-phone\').value||\'\').trim(), note:(document.getElementById(\'f-note\').value||\'\').trim(), machines:[]});
     if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
   });
 });
@@ -1227,8 +1302,10 @@ document.getElementById('c-import-file').addEventListener('change', (e)=>{
       if(!Array.isArray(incoming)) throw new Error('Neplatný formát');
       const list = incoming.map(c=>({
         id: c.id || uuid(),
-        name: String(c.name||'').trim(),
-        note: String(c.note||'').trim(),
+        name: String(c.name||\'\').trim(),
+        contactName: String(c.contactName||c.contact||\'\').trim(),
+        contactPhone: String(c.contactPhone||c.phone||\'\').trim(),
+        note: String(c.note||\'\').trim(),
         machines: Array.isArray(c.machines) ? c.machines.map(m=>({
           id: m.id || uuid(),
           label: String(m.label||'').trim(),
@@ -1245,11 +1322,31 @@ document.getElementById('c-import-file').addEventListener('change', (e)=>{
 // Delegated actions (robust)
 document.getElementById('c-list').addEventListener('click',(e)=>{
   const trg = e.target.closest('[data-act]'); if(!trg) return;
-  const act=trg.getAttribute('data-act'); const list=loadCustomers();
+  const act=trg.getAttribute('data-act');
+  // UI toggles (no data changes)
+  if(act==='toggle-c'){
+    const id=trg.getAttribute('data-id');
+    if(customersUIState.expandedCustomers.has(id)) customersUIState.expandedCustomers.delete(id);
+    else customersUIState.expandedCustomers.add(id);
+    renderCustomers(document.getElementById('c-search').value);
+    return;
+  }
+  if(act==='toggle-m'){
+    const cid=trg.getAttribute('data-cid');
+    const mid=trg.getAttribute('data-mid');
+    const key=`${cid}::${mid}`;
+    if(customersUIState.expandedMachines.has(key)) customersUIState.expandedMachines.delete(key);
+    else customersUIState.expandedMachines.add(key);
+    // ensure customer stays open
+    customersUIState.expandedCustomers.add(cid);
+    renderCustomers(document.getElementById('c-search').value);
+    return;
+  }
+  const list=loadCustomers();
   if(act==='del-c'){ const id=trg.getAttribute('data-id'); if(!confirm(t("confirm_delete_customer"))) return; if(saveCustomers(list.filter(c=>c.id!==id))){ renderCustomers(document.getElementById('c-search').value); toast(t("toast_deleted")); } return; }
   if(act==='edit-c'){ const id=trg.getAttribute('data-id'); const c=list.find(x=>x.id===id);
-    openDialog(t("dlg_edit_customer_title"), `<label>${t("label_name")}</label><input id="f-name" value="${c.name}"><label>${t("label_note")}</label><input id="f-note" value="${c.note||""}">`, (close)=>{
-      c.name=document.getElementById('f-name').value.trim(); c.note=document.getElementById('f-note').value.trim(); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
+    openDialog(t("dlg_edit_customer_title"), `<label>${t("label_name")}</label><input id="f-name" value="${c.name}"><label>${t("label_contact")}</label><input id="f-contact" value="${c.contactName||""}"><label>${t("label_phone")}</label><input id="f-phone" inputmode="tel" value="${c.contactPhone||""}"><label>${t("label_note")}</label><input id="f-note" value="${c.note||""}">`, (close)=>{
+      c.name=document.getElementById(\'f-name\').value.trim(); c.contactName=(document.getElementById(\'f-contact\').value||\'\').trim(); c.contactPhone=(document.getElementById(\'f-phone\').value||\'\').trim(); c.note=document.getElementById(\'f-note\').value.trim(); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
     }); return; }
   if(act==='add-m'){ const id=trg.getAttribute('data-id'); const c=list.find(x=>x.id===id);
     openDialog(t("dlg_add_machine_title"), `<label>${t("label_machine_name")}</label><input id="f-label"><label>${t("label_machine_number_short")}</label><input id="f-number" type="number" inputmode="numeric">`, (close)=>{
