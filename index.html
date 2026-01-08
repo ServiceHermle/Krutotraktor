@@ -23,6 +23,8 @@
     .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 16px; border-radius:14px; border:1px solid var(--border); background:#f8fafc; color:#000; font-weight:900; cursor:pointer; user-select:none; width:100%; }
     .btn:active { transform: translateY(1px); }
     .btn.primary { background: linear-gradient(180deg, var(--accent), var(--accent-2)); color:#fff; border:none; }
+    .btn.danger { background:#fff; border:1px solid var(--border); color:#b00020; }
+    .btn.danger:hover { border-color:#b00020; }
     .actions, .bar { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px; }
     .list { margin-top:12px; border:1px solid var(--border); border-radius:16px; overflow:hidden; }
     .row-item { display:grid; grid-template-columns: 1 fr auto auto; gap:8px; align-items:center; padding:12px; border-top:1px solid var(--border); }
@@ -43,12 +45,30 @@
     .sec { margin-top:10px; display:grid; gap:8px; grid-template-columns: 1fr 1fr; }
     .muted { opacity:.8; font-size:.9rem }
     .inline { display:inline-block }
-    .iconbtn{width:44px !important; min-width:44px !important; max-width:44px !important; padding:10px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important;}
+    .iconbtn{width:44px !important; min-width:44px !important; max-width:44px !important; height:44px !important; padding:0 !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; border-radius:999px !important; background:#fff !important; border:1px solid var(--border) !important; font-weight:900 !important; line-height:1 !important;}
+    /* Customer action menu (hidden under side edit button) */
+    .c-menu-wrap{ position:relative; }
+    .c-menu{ position:absolute; right:0; top:50px; z-index:50; min-width:180px;
+      background:#fff; border:1px solid var(--border); border-radius:16px; overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    .c-menu button{ width:100% !important; border:none; background:#fff; padding:12px 14px;
+      font-weight:900; text-align:left; cursor:pointer; }
+    .c-menu button + button{ border-top:1px solid var(--border); }
+    .c-menu button.danger{ color:#b00020; }
+    .c-menu button:hover{ background:#f8fafc; }
     dialog { border:none; border-radius:18px; padding:0; }
     .modal { background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:18px; overflow:hidden; }
     .modal-h { padding:12px 16px; font-weight:800; border-bottom:1px solid var(--border) }
     .modal-b { padding:16px }
     .modal-f { padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end }
+
+    /* Modal footer: Danger left, primary actions right (mobile friendly) */
+    .modal-f{justify-content:flex-end;}
+    .modal-f .danger{order:0; margin-right:auto;}
+    .modal-f .btn.primary{order:2;}
+    .modal-f .btn:not(.danger):not(.primary){order:1;}
+
   
 /* --- Universal mobile overflow fix --- */
 input:not([type="checkbox"]):not([type="radio"]), select, textarea, button {
@@ -390,6 +410,8 @@ input[type="search"] {
           </div>
           <div class="modal-f">
             <button value="cancel" class="btn" type="button" onclick="this.closest('dialog').close()"><span data-i18n="btn_close">Zavřít</span></button>
+            <button id="fDlg-copy" class="btn hidden" type="button" data-i18n="btn_copy">Kopírovat</button>
+            <button id="fDlg-delete" class="btn danger hidden" type="button" data-i18n="btn_delete">Smazat</button>
             <button id="fDlg-save" class="btn primary" type="button" data-i18n="btn_save">Uložit</button>
           </div>
         </form>
@@ -415,6 +437,7 @@ input[type="search"] {
           <div class="modal-b" id="dlg-body"></div>
           <div class="modal-f">
             <button value="cancel" class="btn" type="button" onclick="this.closest('dialog').close()"><span data-i18n="btn_close">Zavřít</span></button>
+            <button id="dlg-delete" class="btn danger hidden" type="button" data-i18n="btn_delete">Smazat</button>
             <button id="dlg-save" class="btn primary" type="button" data-i18n="btn_save">Uložit</button>
           </div>
         </form>
@@ -1141,6 +1164,7 @@ function uuid(){ return Math.random().toString(36).slice(2)+Date.now().toString(
 const customersUIState = {
   expandedCustomers: new Set(),
   expandedMachines: new Set(),
+  openMenuCustomerId: null,
 };
 
 function normalizePhone(p){
@@ -1210,6 +1234,7 @@ function renderCustomers(filter=""){
              ${c.note ? `<div style="opacity:.75;font-size:.9rem;margin-top:2px">${c.note}</div>` : ``}
            </div>
            <div style="display:flex;align-items:center;gap:10px;flex:0 0 auto">
+             <button class="btn iconbtn" data-act="edit-c-btn" data-id="${c.id}" type="button" aria-label="Upravit">✎</button>
              <div style="font-weight:800;opacity:.75">${machines.length}</div>
              <div style="opacity:.7;font-size:1.1rem">${isOpen ? "▾" : "▸"}</div>
            </div>
@@ -1225,8 +1250,8 @@ function renderCustomers(filter=""){
                   <div style="display:flex;align-items:center;gap:10px">
                     <div data-act="use-m" data-cid="${c.id}" data-mid="${m.id}" role="button" tabindex="0"
                          style="flex:1;min-width:0;cursor:pointer;padding:10px;border:1px solid var(--border);border-radius:14px;background:#fff">
-                      <div style="font-weight:800;word-break:break-word">${m.label||""}</div>
-                      <div style="opacity:.85;font-size:.92rem">N: ${m.number||""}</div>
+                      <div style="font-weight:900;font-size:1.15rem;line-height:1.1">N: ${m.number||""}</div>
+                      <div style="opacity:.85;font-size:.92rem;word-break:break-word">${m.label||""}</div>
                     </div>
                     <button class="btn iconbtn" data-act="edit-m" data-cid="${c.id}" data-mid="${m.id}" type="button" aria-label="Upravit">✎</button>
                   </div>
@@ -1234,14 +1259,7 @@ function renderCustomers(filter=""){
             }).join('')
           : `<div style="margin-top:10px;opacity:.75">${t("customers_no_machines")}</div>`;
 
-        box.innerHTML += `
-          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn inline" data-act="edit-c" data-id="${c.id}" type="button">${t("btn_edit")}</button>
-            <button class="btn inline" data-act="add-m" data-id="${c.id}" type="button">${t("btn_add_machine_small")}</button>
-            <button class="btn inline" data-act="del-c" data-id="${c.id}" type="button">${t("btn_delete")}</button>
-          </div>
-          ${machinesHtml}
-        `;
+        box.innerHTML += `${machinesHtml}`;
       }
 
       root.appendChild(box);
@@ -1251,14 +1269,31 @@ function renderCustomers(filter=""){
 renderCustomers();
 document.getElementById('c-search').addEventListener('input', (e)=>renderCustomers(e.target.value));
 
-const clientsDlg=document.getElementById('clientsDlg'); let dlgSaveHandler=null;
-function openDialog(title, innerHTML, onSave){
+// (customer actions are opened as a dialog, no dropdown menu)
+
+const clientsDlg=document.getElementById('clientsDlg'); let dlgSaveHandler=null; let dlgDeleteHandler=null;
+// openDialog(title, bodyHTML, onSave, onDelete?)
+function openDialog(title, innerHTML, onSave, onDelete=null){
   document.getElementById('dlg-title').textContent=title;
   document.getElementById('dlg-body').innerHTML=innerHTML;
   const save=document.getElementById('dlg-save');
+  const del=document.getElementById('dlg-delete');
   if(dlgSaveHandler) save.removeEventListener('click', dlgSaveHandler);
   dlgSaveHandler=(ev)=>{ ev.preventDefault(); onSave(()=>clientsDlg.close()); };
   save.addEventListener('click', dlgSaveHandler, { once:true });
+
+  // delete button is optional
+  if(dlgDeleteHandler && del) del.removeEventListener('click', dlgDeleteHandler);
+  if(del){
+    if(typeof onDelete === 'function'){
+      del.classList.remove('hidden');
+      dlgDeleteHandler=(ev)=>{ ev.preventDefault(); onDelete(()=>clientsDlg.close()); };
+      del.addEventListener('click', dlgDeleteHandler, { once:true });
+    } else {
+      del.classList.add('hidden');
+      dlgDeleteHandler=null;
+    }
+  }
   clientsDlg.showModal();
 }
 
@@ -1315,6 +1350,69 @@ document.getElementById('c-import-file').addEventListener('change', (e)=>{
 document.getElementById('c-list').addEventListener('click',(e)=>{
   const trg = e.target.closest('[data-act]'); if(!trg) return;
   const act=trg.getAttribute('data-act');
+
+  // Customer edit (opens as modal like machine edit)
+  if(act==='edit-c-btn'){
+    e.preventDefault();
+    e.stopPropagation();
+    const id = trg.getAttribute('data-id');
+    const list = loadCustomers();
+    const c = list.find(x=>x.id===id);
+    if(!c) return;
+
+    const body = `
+      <label>${t("label_name")}</label>
+      <input id="f-name" value="${c.name}">
+      <label>${t("label_contact")}</label>
+      <input id="f-contact" value="${c.contactName||""}">
+      <label>${t("label_phone")}</label>
+      <input id="f-phone" inputmode="tel" value="${c.contactPhone||""}">
+      <label>${t("label_note")}</label>
+      <input id="f-note" value="${c.note||""}">
+      <div style="display:flex;justify-content:flex-end;margin-top:12px">
+        <button id="dlg-add-machine" type="button" class="btn inline">${t("btn_add_machine_small")}</button>
+      </div>
+    `;
+
+    openDialog(
+      t("dlg_edit_customer_title"),
+      body,
+      (close)=>{
+        c.name=document.getElementById('f-name').value.trim();
+        c.contactName=(document.getElementById('f-contact').value||'').trim();
+        c.contactPhone=(document.getElementById('f-phone').value||'').trim();
+        c.note=(document.getElementById('f-note').value||'').trim();
+        if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
+      },
+      (close)=>{
+        if(!confirm(t("confirm_delete_customer"))) return;
+        if(saveCustomers(list.filter(cc=>cc.id!==id))){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_deleted")); }
+      }
+    );
+
+    // Hook "+ Stroj" button inside dialog body
+    const addBtn = document.getElementById('dlg-add-machine');
+    if(addBtn){
+      addBtn.addEventListener('click', (ev)=>{
+        ev.preventDefault();
+        clientsDlg.close();
+        // open add-machine dialog for this customer
+        const fresh = loadCustomers();
+        const cc = fresh.find(x=>x.id===id);
+        if(!cc) return;
+        openDialog(t("dlg_add_machine_title"),
+          `<label>${t("label_machine_name")}</label><input id="f-label"><label>${t("label_machine_number_short")}</label><input id="f-number" type="number" inputmode="numeric">`,
+          (close2)=>{
+            cc.machines=cc.machines||[];
+            cc.machines.push({id:uuid(), label:(document.getElementById('f-label').value||'').trim(), number: parseInt(document.getElementById('f-number').value||'0',10)});
+            if(saveCustomers(fresh)){ renderCustomers(document.getElementById('c-search').value); close2(); toast(t("toast_saved")); }
+          }
+        );
+      }, { once:true });
+    }
+    return;
+  }
+
   // UI toggles (no data changes)
   if(act==='toggle-c'){
     const id=trg.getAttribute('data-id');
@@ -1347,9 +1445,22 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
     }); return; }
   if(act==='del-m'){ const cid=trg.getAttribute('data-cid'); const mid=trg.getAttribute('data-mid'); const c=list.find(x=>x.id===cid); if(!confirm(t("confirm_delete_machine"))) return; c.machines=(c.machines||[]).filter(m=>m.id!==mid); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); toast(t("toast_deleted")); } return; }
   if(act==='edit-m'){ const cid=trg.getAttribute('data-cid'); const mid=trg.getAttribute('data-mid'); const c=list.find(x=>x.id===cid); const m=(c.machines||[]).find(x=>x.id===mid);
-    openDialog(t("dlg_edit_machine_title"), `<label>${t("label_machine_name")}</label><input id="f-label" value="${m.label||""}"><label>${t("label_machine_number_short")}</label><input id="f-number" type="number" inputmode="numeric" value="${m.number||""}">`, (close)=>{
-      m.label=(document.getElementById('f-label').value||'').trim(); m.number=parseInt(document.getElementById('f-number').value||'0',10); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
-    }); return; }
+    openDialog(
+      t("dlg_edit_machine_title"),
+      `<label>${t("label_machine_name")}</label><input id="f-label" value="${m.label||""}"><label>${t("label_machine_number_short")}</label><input id="f-number" type="number" inputmode="numeric" value="${m.number||""}">`,
+      (close)=>{
+        m.label=(document.getElementById('f-label').value||'').trim();
+        m.number=parseInt(document.getElementById('f-number').value||'0',10);
+        if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
+      },
+      (close)=>{
+        if(!confirm(t("confirm_delete_machine"))) return;
+        c.machines=(c.machines||[]).filter(mm=>mm.id!==mid);
+        if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_deleted")); }
+      }
+    );
+    return;
+  }
   if(act==='use-m'){ const cid=trg.getAttribute('data-cid'); const mid=trg.getAttribute('data-mid'); const c=list.find(x=>x.id===cid); const m=(c.machines||[]).find(x=>x.id===mid);
     if(m&&m.number){ document.getElementById('machine').value=m.number; tabs.forEach(x=>x.classList.remove('active')); document.querySelector('.tab[data-tab="single"]').classList.add('active'); showTab('single'); toast(t("toast_filled_calc")); } return; }
 });
@@ -1385,16 +1496,12 @@ function renderFixed(filter=""){
     box.style.marginBottom = '8px';
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div>
-          <div style="font-weight:900">${k.label||""}</div>
-          <div style="opacity:.85;font-family:ui-monospace,Menlo,Consolas,monospace">${k.code||""}</div>
-          <div style="opacity:.75;font-size:.9rem">${k.description||""}</div>
+        <div style="min-width:0">
+          <div style="font-weight:900;font-size:1.15rem;line-height:1.1;font-family:ui-monospace,Menlo,Consolas,monospace">${k.code||""}</div>
+          <div style="opacity:.85;font-weight:800;word-break:break-word">${k.label||""}</div>
+          ${k.description ? `<div style="opacity:.75;font-size:.9rem;word-break:break-word">${k.description}</div>` : ``}
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn inline" data-act="copy-fixed" data-id="${k.id}">Kopírovat</button>
-          <button class="btn inline" data-act="edit-fixed" data-id="${k.id}">Edit</button>
-          <button class="btn inline" data-act="del-fixed" data-id="${k.id}">${t("btn_delete")}</button>
-        </div>
+        <button class="btn iconbtn" data-act="edit-fixed-btn" data-id="${k.id}" type="button" aria-label="Upravit">✎</button>
       </div>`;
     root.appendChild(box);
   });
@@ -1412,12 +1519,18 @@ if(fAddBtn){
   fAddBtn.addEventListener('click', ()=>{
     const dlg = document.getElementById('fDlg');
     document.getElementById('fDlg-title').textContent = "Přidat kód";
+    dlg.dataset.id = "";
     document.getElementById('fk-label').value = "";
     document.getElementById('fk-code').value = "";
     document.getElementById('fk-desc').value = "";
+    // hide extra actions (copy/delete) in add mode
+    const copyBtn = document.getElementById('fDlg-copy');
+    const delBtn  = document.getElementById('fDlg-delete');
+    if(copyBtn) copyBtn.classList.add('hidden');
+    if(delBtn)  delBtn.classList.add('hidden');
     dlg.showModal();
     const saveBtn = document.getElementById('fDlg-save');
-    const handler = (ev)=>{
+    saveBtn.onclick = (ev)=>{
       ev.preventDefault();
       const label = document.getElementById('fk-label').value.trim();
       const code = document.getElementById('fk-code').value.trim();
@@ -1430,9 +1543,7 @@ if(fAddBtn){
         renderFixed(document.getElementById('f-search').value);
         toast('Uloženo');
       }
-      saveBtn.removeEventListener('click', handler);
     };
-    saveBtn.addEventListener('click', handler, { once:true });
   });
 }
 
@@ -1448,41 +1559,61 @@ if(fListRoot){
     const item = list.find(x=>x.id===id);
     if(!item) return;
 
-    if(act === 'copy-fixed'){
-      copyText(item.code||"");
-      return;
-    }
-    if(act === 'del-fixed'){
-      if(!confirm('Opravdu smazat kód?')) return;
-      const nl = list.filter(x=>x.id!==id);
-      if(saveFixed(nl)){
-        renderFixed(document.getElementById('f-search').value);
-        toast(t("toast_deleted"));
-      }
-      return;
-    }
-    if(act === 'edit-fixed'){
+    if(act === 'edit-fixed-btn'){
       const dlg = document.getElementById('fDlg');
+      dlg.dataset.id = id;
       document.getElementById('fDlg-title').textContent = "Upravit kód";
       document.getElementById('fk-label').value = item.label||"";
       document.getElementById('fk-code').value = item.code||"";
       document.getElementById('fk-desc').value = item.description||"";
-      dlg.showModal();
+
+      // show extra actions (copy/delete) in edit mode
+      const copyBtn = document.getElementById('fDlg-copy');
+      const delBtn  = document.getElementById('fDlg-delete');
+      if(copyBtn) copyBtn.classList.remove('hidden');
+      if(delBtn)  delBtn.classList.remove('hidden');
+
+      // wire actions (use onclick to avoid double-binding)
+      if(copyBtn){
+        copyBtn.onclick = (ev)=>{
+          ev.preventDefault();
+          const code = (document.getElementById('fk-code').value||"").trim();
+          copyText(code);
+        };
+      }
+      if(delBtn){
+        delBtn.onclick = (ev)=>{
+          ev.preventDefault();
+          if(!confirm('Opravdu smazat kód?')) return;
+          const nl = loadFixed().filter(x=>x.id!==id);
+          if(saveFixed(nl)){
+            dlg.close();
+            renderFixed(document.getElementById('f-search').value);
+            toast(t("toast_deleted"));
+          }
+        };
+      }
+
       const saveBtn = document.getElementById('fDlg-save');
-      const handler = (ev)=>{
+      saveBtn.onclick = (ev)=>{
         ev.preventDefault();
-        item.label = document.getElementById('fk-label').value.trim();
-        item.code = document.getElementById('fk-code').value.trim();
-        item.description = document.getElementById('fk-desc').value.trim();
-        if(!item.label || !item.code){ toast('Vyplňte název i kód'); return; }
-        if(saveFixed(list)){
+        // re-load to avoid stale reference
+        const cur = loadFixed();
+        const it = cur.find(x=>x.id===id);
+        if(!it) { dlg.close(); renderFixed(document.getElementById('f-search').value); return; }
+        it.label = document.getElementById('fk-label').value.trim();
+        it.code  = document.getElementById('fk-code').value.trim();
+        it.description = document.getElementById('fk-desc').value.trim();
+        if(!it.label || !it.code){ toast('Vyplňte název i kód'); return; }
+        if(saveFixed(cur)){
           dlg.close();
           renderFixed(document.getElementById('f-search').value);
           toast('Uloženo');
         }
-        saveBtn.removeEventListener('click', handler);
       };
-      saveBtn.addEventListener('click', handler, { once:true });
+
+      dlg.showModal();
+      return;
     }
   });
 }
