@@ -1276,7 +1276,7 @@ document.getElementById('c-add').addEventListener('click', ()=>{
     const name=document.getElementById('f-name').value.trim();
     if(!name){ toast(t("err_enter_name")); return; }
     const list=loadCustomers();
-    list.push({id:uuid(), name, contactName:(document.getElementById('f-contact').value||'').trim(), contactPhone:(document.getElementById('f-phone').value||'').trim(), note:(document.getElementById('f-note').value||'').trim(), machines:[]});
+    list.push({id:uuid(), name, contactName:(document.getElementById(\'f-contact\').value||\'\').trim(), contactPhone:(document.getElementById(\'f-phone\').value||\'\').trim(), note:(document.getElementById(\'f-note\').value||\'\').trim(), machines:[]});
     if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
   });
 });
@@ -1302,10 +1302,10 @@ document.getElementById('c-import-file').addEventListener('change', (e)=>{
       if(!Array.isArray(incoming)) throw new Error('Neplatný formát');
       const list = incoming.map(c=>({
         id: c.id || uuid(),
-        name: String(c.name||'').trim(),
-        contactName: String(c.contactName||c.contact||'').trim(),
-        contactPhone: String(c.contactPhone||c.phone||'').trim(),
-        note: String(c.note||'').trim(),
+        name: String(c.name||\'\').trim(),
+        contactName: String(c.contactName||c.contact||\'\').trim(),
+        contactPhone: String(c.contactPhone||c.phone||\'\').trim(),
+        note: String(c.note||\'\').trim(),
         machines: Array.isArray(c.machines) ? c.machines.map(m=>({
           id: m.id || uuid(),
           label: String(m.label||'').trim(),
@@ -1346,7 +1346,7 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
   if(act==='del-c'){ const id=trg.getAttribute('data-id'); if(!confirm(t("confirm_delete_customer"))) return; if(saveCustomers(list.filter(c=>c.id!==id))){ renderCustomers(document.getElementById('c-search').value); toast(t("toast_deleted")); } return; }
   if(act==='edit-c'){ const id=trg.getAttribute('data-id'); const c=list.find(x=>x.id===id);
     openDialog(t("dlg_edit_customer_title"), `<label>${t("label_name")}</label><input id="f-name" value="${c.name}"><label>${t("label_contact")}</label><input id="f-contact" value="${c.contactName||""}"><label>${t("label_phone")}</label><input id="f-phone" inputmode="tel" value="${c.contactPhone||""}"><label>${t("label_note")}</label><input id="f-note" value="${c.note||""}">`, (close)=>{
-      c.name=document.getElementById('f-name').value.trim(); c.contactName=(document.getElementById('f-contact').value||'').trim(); c.contactPhone=(document.getElementById('f-phone').value||'').trim(); c.note=document.getElementById('f-note').value.trim(); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
+      c.name=document.getElementById(\'f-name\').value.trim(); c.contactName=(document.getElementById(\'f-contact\').value||\'\').trim(); c.contactPhone=(document.getElementById(\'f-phone\').value||\'\').trim(); c.note=document.getElementById(\'f-note\').value.trim(); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
     }); return; }
   if(act==='add-m'){ const id=trg.getAttribute('data-id'); const c=list.find(x=>x.id===id);
     openDialog(t("dlg_add_machine_title"), `<label>${t("label_machine_name")}</label><input id="f-label"><label>${t("label_machine_number_short")}</label><input id="f-number" type="number" inputmode="numeric">`, (close)=>{
