@@ -174,31 +174,8 @@ input[type="search"] {
 
     input, select, textarea { font-size:16px !important; }
 
-/* === action3: make +Add / Export / Import look like top tabs (ONLY these rows) === */
-.action3{display:flex; gap:10px; margin-top:10px; flex-wrap:nowrap; align-items:stretch}
-.action3 > .btn.inline,
-.action3 > label.btn.inline{
-  flex:1;
-  height:44px;
-  padding:0 12px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#fff;
-  cursor:pointer;
-  text-align:center;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-weight:800;
-  line-height:1;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  min-width:0;
-}
-/* iOS: prevent default button styling differences */
-.action3 > button.btn.inline{ -webkit-appearance:none; appearance:none; }
+/* iOS/Safari: prevent default button styling differences */
+button.btn{ -webkit-appearance:none; appearance:none; }
 
 </style>
 <style id="mobile-override">
@@ -331,31 +308,8 @@ input[type="search"] {
 }
 
 
-/* === action3: make +Add / Export / Import look like top tabs (ONLY these rows) === */
-.action3{display:flex; gap:10px; margin-top:10px; flex-wrap:nowrap; align-items:stretch}
-.action3 > .btn.inline,
-.action3 > label.btn.inline{
-  flex:1;
-  height:44px;
-  padding:0 12px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#fff;
-  cursor:pointer;
-  text-align:center;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-weight:800;
-  line-height:1;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  min-width:0;
-}
-/* iOS: prevent default button styling differences */
-.action3 > button.btn.inline{ -webkit-appearance:none; appearance:none; }
+/* iOS/Safari: prevent default button styling differences */
+button.btn{ -webkit-appearance:none; appearance:none; }
 
 </style>
 </head>
@@ -457,7 +411,7 @@ input[type="search"] {
 <div class="logo" style="margin-top:2px"><img alt="Hermle" src="icon-192.png" style="width:120px"/></div>
 <label data-i18n="label_search">Vyhledávání</label>
 <input data-i18n-placeholder="placeholder_search" id="f-search" placeholder="Hledat…" type="text"/>
-<div class="btnrow action3">
+<div class="btnrow">
 <button class="btn inline" data-i18n="btn_add_code" id="f-add" type="button">+ Přidat kód</button>
 <button class="btn inline" data-i18n="btn_export_json" id="f-export" type="button">Export</button>
 <label class="btn inline" data-i18n="btn_import_json" for="f-import-file" id="f-import-btn" style="cursor:pointer">Import</label>
@@ -1190,31 +1144,8 @@ input[type="search"] {
 }
 
 
-/* === action3: make +Add / Export / Import look like top tabs (ONLY these rows) === */
-.action3{display:flex; gap:10px; margin-top:10px; flex-wrap:nowrap; align-items:stretch}
-.action3 > .btn.inline,
-.action3 > label.btn.inline{
-  flex:1;
-  height:44px;
-  padding:0 12px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#fff;
-  cursor:pointer;
-  text-align:center;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-weight:800;
-  line-height:1;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  min-width:0;
-}
-/* iOS: prevent default button styling differences */
-.action3 > button.btn.inline{ -webkit-appearance:none; appearance:none; }
+/* iOS/Safari: prevent default button styling differences */
+button.btn{ -webkit-appearance:none; appearance:none; }
 
 </style></head><body><h1>HDH CODE – hromadný export</h1><p>Stroj N: <b>${N}</b> | Období: <b>${from}</b> – <b>${to}</b></p>${tableHTML}<script>window.onload=()=>window.print();<\/script>
 <!-- Popup Add Machine -->
@@ -2076,6 +2007,19 @@ document.addEventListener("DOMContentLoaded", ()=>{
         closeAddMachinePopup();
     });
 });
+
+
+// Make Import buttons behave like file-labels, but keep identical styling to Export button
+(function(){
+  function hookImport(btnId, fileId){
+    const btn = document.getElementById(btnId);
+    const file = document.getElementById(fileId);
+    if(!btn || !file) return;
+    btn.addEventListener('click', () => file.click());
+  }
+  hookImport('f-import-btn','f-import-file');
+  hookImport('c-import-btn','c-import-file');
+})();
 
 </script>
 <!-- Popup Add Machine -->
