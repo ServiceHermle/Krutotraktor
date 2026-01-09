@@ -174,8 +174,16 @@ input[type="search"] {
 
     input, select, textarea { font-size:16px !important; }
 
-/* iOS/Safari: prevent default button styling differences */
-button.btn{ -webkit-appearance:none; appearance:none; }
+/* Ensure Import text matches Export exactly (iOS can style buttons differently) */
+#f-import-btn, #c-import-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  font-family: inherit;
+  font-weight: 900;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
 
 </style>
 <style id="mobile-override">
@@ -308,8 +316,16 @@ input[type="search"] {
 }
 
 
-/* iOS/Safari: prevent default button styling differences */
-button.btn{ -webkit-appearance:none; appearance:none; }
+/* Ensure Import text matches Export exactly (iOS can style buttons differently) */
+#f-import-btn, #c-import-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  font-family: inherit;
+  font-weight: 900;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
 
 </style>
 </head>
@@ -1144,8 +1160,16 @@ input[type="search"] {
 }
 
 
-/* iOS/Safari: prevent default button styling differences */
-button.btn{ -webkit-appearance:none; appearance:none; }
+/* Ensure Import text matches Export exactly (iOS can style buttons differently) */
+#f-import-btn, #c-import-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  font-family: inherit;
+  font-weight: 900;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
 
 </style></head><body><h1>HDH CODE – hromadný export</h1><p>Stroj N: <b>${N}</b> | Období: <b>${from}</b> – <b>${to}</b></p>${tableHTML}<script>window.onload=()=>window.print();<\/script>
 <!-- Popup Add Machine -->
@@ -2009,16 +2033,16 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 
 
-// Make Import buttons behave like file-labels, but keep identical styling to Export button
+// Import buttons: open hidden file input (keeps exact same look as Export)
 (function(){
-  function hookImport(btnId, fileId){
-    const btn = document.getElementById(btnId);
-    const file = document.getElementById(fileId);
-    if(!btn || !file) return;
-    btn.addEventListener('click', () => file.click());
+  function hook(btnId, fileId){
+    const btn=document.getElementById(btnId);
+    const file=document.getElementById(fileId);
+    if(!btn||!file) return;
+    btn.addEventListener('click', ()=>file.click());
   }
-  hookImport('f-import-btn','f-import-file');
-  hookImport('c-import-btn','c-import-file');
+  hook('f-import-btn','f-import-file');
+  hook('c-import-btn','c-import-file');
 })();
 
 </script>
