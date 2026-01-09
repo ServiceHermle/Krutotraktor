@@ -1,6 +1,6 @@
 {
-  "name": "Hermle",
-  "short_name": "HDH",
+  "name": "HDH",
+  "short_name": "Hermle",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f7f7f9",
