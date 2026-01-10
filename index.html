@@ -42,7 +42,7 @@
     .footer { text-align:center; color:var(--text); font-size:.95rem; margin-top:12px; font-weight:800; }
     .tabs { display:flex; gap:8px; margin: 0 0 8px; align-items:stretch; }
     /* Tabs: keep the same height even when a label would wrap to 2 lines */
-    .tab { flex:1; height:44px; padding:0 12px; border-radius:999px; font-weight:700; font-size:.9rem; color:#000; border:1px solid var(--border); background:#fff; cursor:pointer; text-align:center;
+    .tab { flex:1; height:44px; padding:0 12px; border-radius:999px; font-weight:900; color:#000; border:1px solid var(--border); background:#fff; cursor:pointer; text-align:center;
            display:flex; align-items:center; justify-content:center; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
     .tab.active { background:#ffecec; border-color:#f3b1b1; }
     .hidden { display:none }
@@ -200,15 +200,15 @@ input[type="search"] {
 :root{ --radius:18px; }
 html, body { color:#000 !important; }
 .logo img{ width:120px !important; height:auto !important; }
-label{ font-size:.85rem !important; color:#000 !important; }
+label{ font-size:.95rem !important; color:#000 !important; }
 .label{ color:#000 !important; font-size:.85rem !important; letter-spacing:.1px !important; }
 .value{ font-size: clamp(1.0rem, 4vw, 1.12rem) !important; }
-.footer{ color:#000 !important; font-size:.82rem !important; }
+.footer{ color:#000 !important; font-size:.9rem !important; }
 .btn, .btn *{ color:#000 !important; }
 .btn.primary{ color:#000 !important; /* keep bg as-is, only text black */ }
 .tabs{ gap:6px !important; margin-bottom:6px !important; align-items:stretch !important; }
 /* Force equal-size tabs on iPhone: no wrapping, fixed height */
-.tab{ height:44px !important; padding:0 10px !important; font-size:.85rem !important;
+.tab{ height:44px !important; padding:0 10px !important; font-size:.95rem !important;
   display:flex !important; align-items:center !important; justify-content:center !important;
   line-height:1 !important; white-space:nowrap !important; overflow:hidden !important;
   text-overflow:ellipsis !important; min-width:0 !important; }
@@ -231,7 +231,7 @@ input[type="date"], input[type="number"], input[type="password"], input[type="te
 @media (max-width: 430px){
   .wrap{ max-width: 420px !important; padding:8px !important; }
   .logo img{ width:108px !important; }
-  .tab{ height:42px !important; padding:0 8px !important; font-size:.82rem !important; }
+  .tab{ height:42px !important; padding:0 8px !important; font-size:.9rem !important; }
   .value{ font-size: clamp(0.98rem, 4.2vw, 1.08rem) !important; }
   .label{ font-size:.82rem !important; }
   .footer{ font-size:.85rem !important; }
@@ -1435,7 +1435,7 @@ let customersImportMode = 'override';
   const dlg = document.getElementById('importModeDlg');
   if(btn && dlg && fileInput){
     btn.addEventListener('click', (e)=>{
-      // Prevent the <label for="..."> from opening the file picker immediately
+      // Open import mode dialog first (then file picker)
       e.preventDefault();
       dlg.showModal();
     });
@@ -1446,8 +1446,7 @@ let customersImportMode = 'override';
       customersImportMode = b.getAttribute('data-mode') || 'override';
       dlg.close();
       // Open file picker after mode selection
-      fileInput.value="";
-      setTimeout(()=>fileInput.click(), 150);
+      setTimeout(()=>fileInput.click(), 0);
     });
   }
 })();
@@ -1841,7 +1840,7 @@ let fixedImportMode = 'override';
   const dlg = document.getElementById('fixedImportModeDlg');
   if(btn && dlg && fileInput){
     btn.addEventListener('click', (e)=>{
-      // Prevent the <label for="..."> from opening the file picker immediately
+      // Open import mode dialog first (then file picker)
       e.preventDefault();
       dlg.showModal();
     });
@@ -1852,8 +1851,7 @@ let fixedImportMode = 'override';
       fixedImportMode = b.getAttribute('data-mode') || 'override';
       dlg.close();
       // Open file picker after mode selection
-      fileInput.value="";
-      setTimeout(()=>fileInput.click(), 150);
+      setTimeout(()=>fileInput.click(), 0);
     });
   }
 })();
@@ -2063,6 +2061,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 
 
+
+;
 
 </script>
 <!-- Popup Add Machine -->
