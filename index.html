@@ -449,7 +449,7 @@ input[type="search"] {
 <div id="f-list" style="margin-top:12px"></div>
 <div class="btnrow" style="margin-top:14px">
 <button class="btn inline" data-i18n="btn_export_json" id="f-export" type="button">Export</button>
-<label class="btn inline" data-i18n="btn_import_json" for="f-import-file" id="f-import-btn" style="cursor:pointer">Import</label>
+<button class="btn inline" data-i18n="btn_import_json" id="f-import-btn" type="button">Import</button>
 <input accept="application/json" id="f-import-file" style="display:none" type="file"/>
 </div>
 <dialog id="fDlg">
@@ -504,7 +504,7 @@ input[type="search"] {
 <div id="c-list" style="margin-top:10px"></div>
 <div class="btnrow" style="margin-top:14px">
 <button class="btn inline" data-i18n="btn_export_json" id="c-export" type="button">Export</button>
-<label class="btn inline" data-i18n="btn_import_json" for="c-import-file" id="c-import-btn" style="cursor:pointer">Import</label>
+<button class="btn inline" data-i18n="btn_import_json" id="c-import-btn" type="button">Import</button>
 <input accept="application/json" id="c-import-file" style="display:none" type="file"/>
 </div>
 <dialog id="clientsDlg">
@@ -1446,7 +1446,8 @@ let customersImportMode = 'override';
       customersImportMode = b.getAttribute('data-mode') || 'override';
       dlg.close();
       // Open file picker after mode selection
-      setTimeout(()=>fileInput.click(), 0);
+      fileInput.value="";
+      setTimeout(()=>fileInput.click(), 150);
     });
   }
 })();
@@ -1851,7 +1852,8 @@ let fixedImportMode = 'override';
       fixedImportMode = b.getAttribute('data-mode') || 'override';
       dlg.close();
       // Open file picker after mode selection
-      setTimeout(()=>fileInput.click(), 0);
+      fileInput.value="";
+      setTimeout(()=>fileInput.click(), 150);
     });
   }
 })();
@@ -2061,17 +2063,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 
 
-// Import buttons: open hidden file input (keeps exact same look as Export)
-(function(){
-  function hook(btnId, fileId){
-    const btn=document.getElementById(btnId);
-    const file=document.getElementById(fileId);
-    if(!btn||!file) return;
-    btn.addEventListener('click', ()=>file.click());
-  }
-  hook('f-import-btn','f-import-file');
-  hook('c-import-btn','c-import-file');
-})();
 
 </script>
 <!-- Popup Add Machine -->
