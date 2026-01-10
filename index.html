@@ -42,7 +42,7 @@
     .footer { text-align:center; color:var(--text); font-size:.95rem; margin-top:12px; font-weight:800; }
     .tabs { display:flex; gap:8px; margin: 0 0 8px; align-items:stretch; }
     /* Tabs: keep the same height even when a label would wrap to 2 lines */
-    .tab { flex:1; height:44px; padding:0 12px; border-radius:999px; font-weight:900; color:#000; border:1px solid var(--border); background:#fff; cursor:pointer; text-align:center;
+    .tab { flex:1; height:44px; padding:0 12px; border-radius:999px; font-weight:700; font-size:.9rem; color:#000; border:1px solid var(--border); background:#fff; cursor:pointer; text-align:center;
            display:flex; align-items:center; justify-content:center; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
     .tab.active { background:#ffecec; border-color:#f3b1b1; }
     .hidden { display:none }
@@ -200,15 +200,15 @@ input[type="search"] {
 :root{ --radius:18px; }
 html, body { color:#000 !important; }
 .logo img{ width:120px !important; height:auto !important; }
-label{ font-size:.95rem !important; color:#000 !important; }
+label{ font-size:.85rem !important; color:#000 !important; }
 .label{ color:#000 !important; font-size:.85rem !important; letter-spacing:.1px !important; }
 .value{ font-size: clamp(1.0rem, 4vw, 1.12rem) !important; }
-.footer{ color:#000 !important; font-size:.9rem !important; }
+.footer{ color:#000 !important; font-size:.82rem !important; }
 .btn, .btn *{ color:#000 !important; }
 .btn.primary{ color:#000 !important; /* keep bg as-is, only text black */ }
 .tabs{ gap:6px !important; margin-bottom:6px !important; align-items:stretch !important; }
 /* Force equal-size tabs on iPhone: no wrapping, fixed height */
-.tab{ height:44px !important; padding:0 10px !important; font-size:.95rem !important;
+.tab{ height:44px !important; padding:0 10px !important; font-size:.85rem !important;
   display:flex !important; align-items:center !important; justify-content:center !important;
   line-height:1 !important; white-space:nowrap !important; overflow:hidden !important;
   text-overflow:ellipsis !important; min-width:0 !important; }
@@ -231,7 +231,7 @@ input[type="date"], input[type="number"], input[type="password"], input[type="te
 @media (max-width: 430px){
   .wrap{ max-width: 420px !important; padding:8px !important; }
   .logo img{ width:108px !important; }
-  .tab{ height:42px !important; padding:0 8px !important; font-size:.9rem !important; }
+  .tab{ height:42px !important; padding:0 8px !important; font-size:.82rem !important; }
   .value{ font-size: clamp(0.98rem, 4.2vw, 1.08rem) !important; }
   .label{ font-size:.82rem !important; }
   .footer{ font-size:.85rem !important; }
@@ -445,11 +445,13 @@ input[type="search"] {
 <input data-i18n-placeholder="placeholder_search" id="f-search" placeholder="Hledat…" type="text"/>
 <div class="btnrow">
 <button class="btn inline" data-i18n="btn_add_code" id="f-add" type="button">+ Přidat kód</button>
+</div>
+<div id="f-list" style="margin-top:12px"></div>
+<div class="btnrow" style="margin-top:14px">
 <button class="btn inline" data-i18n="btn_export_json" id="f-export" type="button">Export</button>
 <label class="btn inline" data-i18n="btn_import_json" for="f-import-file" id="f-import-btn" style="cursor:pointer">Import</label>
 <input accept="application/json" id="f-import-file" style="display:none" type="file"/>
 </div>
-<div id="f-list" style="margin-top:12px"></div>
 <dialog id="fDlg">
 <form class="modal" method="dialog">
 <div class="modal-h" data-i18n="dlg_edit_code_title" id="fDlg-title">Upravit kód</div>
@@ -497,12 +499,14 @@ input[type="search"] {
 <div class="col"><label data-i18n="label_search">Vyhledávání</label><input data-i18n-placeholder="placeholder_client_search" id="c-search" inputmode="search" placeholder="Hledat zákazníka nebo N…" type="text"/><div class="muted" data-i18n="customers_filter_hint">Zadejte 1 písmeno pro filtr A–Z</div></div>
 <div class="col btnrow" style="align-items:flex-end">
 <button class="btn inline" data-i18n="btn_add_client" id="c-add" type="button">+ Přidat</button>
+</div>
+</div>
+<div id="c-list" style="margin-top:10px"></div>
+<div class="btnrow" style="margin-top:14px">
 <button class="btn inline" data-i18n="btn_export_json" id="c-export" type="button">Export</button>
 <label class="btn inline" data-i18n="btn_import_json" for="c-import-file" id="c-import-btn" style="cursor:pointer">Import</label>
 <input accept="application/json" id="c-import-file" style="display:none" type="file"/>
 </div>
-</div>
-<div id="c-list" style="margin-top:10px"></div>
 <dialog id="clientsDlg">
 <form class="modal" method="dialog">
 <div class="modal-h" data-i18n="dlg_edit_title" id="dlg-title">Upravit</div>
