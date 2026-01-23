@@ -1438,17 +1438,19 @@ function renderCustomers(filter=""){
 
       // Header (compact): name + contact + machine count, tap to expand
       box.innerHTML =
-        `<div class="c-head" data-act="toggle-c" data-id="${c.id}" role="button" tabindex="0"
-              style="display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer">
-           <div style="min-width:0">
-             <div style="font-weight:900;word-break:break-word">${c.name}</div>
-             ${contactLine}
-             ${c.note ? `<div style="opacity:.75;font-size:.9rem;margin-top:2px">${c.note}</div>` : ``}
-           </div>
-           <div style="display:flex;align-items:center;gap:10px;flex:0 0 auto">
-             <button class="btn iconbtn" data-act="edit-c-btn" data-id="${c.id}" type="button" aria-label="Upravit">✎</button>
-             <div style="font-weight:800;opacity:.75">${machines.length}</div>
-             <div style="opacity:.7;font-size:1.1rem">${isOpen ? "▾" : "▸"}</div>
+        `<div class="c-row" style="display:flex;align-items:center;gap:10px">
+           <button class="btn iconbtn" data-act="edit-c-btn" data-id="${c.id}" type="button" aria-label="Upravit">✎</button>
+           <div class="c-head" data-act="toggle-c" data-id="${c.id}" role="button" tabindex="0"
+                style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer">
+             <div style="min-width:0">
+               <div style="font-weight:900;word-break:break-word">${c.name}</div>
+               ${contactLine}
+               ${c.note ? `<div style="opacity:.75;font-size:.9rem;margin-top:2px">${c.note}</div>` : ``}
+             </div>
+             <div style="display:flex;align-items:center;gap:10px;flex:0 0 auto">
+               <div style="font-weight:800;opacity:.75">${machines.length}</div>
+               <div style="opacity:.7;font-size:1.1rem">${isOpen ? "▾" : "▸"}</div>
+             </div>
            </div>
          </div>`;
 
@@ -1792,13 +1794,13 @@ function renderFixed(filter=""){
     box.style.padding = '12px';
     box.style.marginBottom = '8px';
     box.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div style="min-width:0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn iconbtn" data-act="edit-fixed-btn" data-id="${k.id}" type="button" aria-label="Upravit">✎</button>
+        <div style="min-width:0;flex:1">
           <div style="font-weight:900;font-size:1.15rem;line-height:1.1;font-family:ui-monospace,Menlo,Consolas,monospace">${k.code||""}</div>
           <div style="opacity:.85;font-weight:800;word-break:break-word">${k.label||""}</div>
           ${k.description ? `<div style="opacity:.75;font-size:.9rem;word-break:break-word">${k.description}</div>` : ``}
         </div>
-        <button class="btn iconbtn" data-act="edit-fixed-btn" data-id="${k.id}" type="button" aria-label="Upravit">✎</button>
       </div>`;
     root.appendChild(box);
   });
