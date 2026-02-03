@@ -1251,10 +1251,10 @@ function fillRangeTable(){
   for(let d=new Date(start); d<=end; d=addDays(d,1)){ 
     const dateIso=formatISO(d); const F=baseF(dateIso);
     const dateUi=formatDateShort(d);
-    const isWeekend = (d.getDay()===0 || d.getDay()===6);
-    if(isWeekend) tr.classList.add('weekend');
     const mp=computeCode(N,F,11,1777); const ma=computeCode(N,F,12,2888); const plc=computeCode(N,F,13,3999); 
-    const tr=document.createElement('tr'); 
+    const tr=document.createElement('tr');
+    const isWeekend = (d.getDay()===0 || d.getDay()===6);
+    if(isWeekend) tr.classList.add('weekend'); 
     tr.innerHTML=`<td style="padding:6px 6px;border-bottom:1px solid var(--border);white-space:nowrap">${dateUi}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(mp)}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(ma)}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(plc)}</td>`; 
     tBody.appendChild(tr); 
   } 
