@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v2_8_0-soft-ux2';
+const CACHE_VER = 'hdh-code-v2_8_1-soft-ux3';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>Hermle (v5.8.50 Thomas Pospisil)</title>
+<title>Hermle (v5.8.51 Thomas Pospisil)</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#f7f7f9" name="theme-color"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
@@ -677,6 +677,7 @@ input[type="search"] {
 </form>
 </dialog>
 <script>
+
 let refreshed = false;
 navigator.serviceWorker && navigator.serviceWorker.addEventListener('controllerchange', () => { if (refreshed) return; refreshed = true; location.reload(); });
 
@@ -1207,16 +1208,41 @@ PLC Access: ${plc}`;
 // Range panel
 function formatISO(d){ return d.toISOString().slice(0,10); }
 function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function formatDateShort(d){
+  const dd=String(d.getDate()).padStart(2,'0');
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const yy=String(d.getFullYear()).slice(-2);
+  return `${dd}/${mm}/${yy}`;
+}
+function getCurrentWeek(){
+  const today=new Date();
+  const day=(today.getDay()+6)%7; // 0=Mon ... 6=Sun
+  const monday=addDays(today, -day);
+  monday.setHours(0,0,0,0);
+  const sunday=addDays(monday, 6);
+  return { monday, sunday };
+}
+function setCurrentWeek(){
+  const {monday, sunday}=getCurrentWeek();
+  const fromEl=document.getElementById('r-from');
+  const toEl=document.getElementById('r-to');
+  if(fromEl && toEl){
+    fromEl.value=formatISO(monday);
+    toEl.value=formatISO(sunday);
+  }
+}
+
 function fillRangeTable(){ 
   const N=parseInt(document.getElementById('r-machine').value,10); const from=document.getElementById('r-from').value; const to=document.getElementById('r-to').value; 
   if(isNaN(N)||!from||!to){ toast("Zadejte N i data"); return; } 
   const tBody=document.querySelector('#r-table tbody'); tBody.innerHTML="";
   const start=new Date(from); const end=new Date(to); if(end<start){ toast("Datum 'Do' dříve než 'Od'"); return; } 
   for(let d=new Date(start); d<=end; d=addDays(d,1)){ 
-    const dateStr=formatISO(d); const F=baseF(dateStr); 
+    const dateIso=formatISO(d); const F=baseF(dateIso);
+    const dateUi=formatDateShort(d);
     const mp=computeCode(N,F,11,1777); const ma=computeCode(N,F,12,2888); const plc=computeCode(N,F,13,3999); 
     const tr=document.createElement('tr'); 
-    tr.innerHTML=`<td style="padding:8px;border-bottom:1px solid var(--border)">${dateStr}</td><td style="padding:8px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(mp)}</td><td style="padding:8px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(ma)}</td><td style="padding:8px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(plc)}</td>`; 
+    tr.innerHTML=`<td style="padding:8px;border-bottom:1px solid var(--border);white-space:nowrap">${dateUi}</td><td style="padding:8px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(mp)}</td><td style="padding:8px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(ma)}</td><td style="padding:8px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(plc)}</td>`; 
     tBody.appendChild(tr); 
   } 
 }
@@ -1227,6 +1253,7 @@ function setWeek(delta){
   fillRangeTable(); 
 }
 document.getElementById('r-gen').addEventListener('click', fillRangeTable);
+document.addEventListener('DOMContentLoaded', setCurrentWeek);
 document.getElementById('r-week-prev').addEventListener('click', ()=> setWeek(-1));
 document.getElementById('r-week-next').addEventListener('click', ()=> setWeek(1));
 document.getElementById('r-print').addEventListener('click', ()=>{ 
@@ -2245,6 +2272,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
         closeAddMachinePopup();
     });
 });
+
 
 
 
