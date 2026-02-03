@@ -298,6 +298,13 @@ input[type="search"] {
     tr.weekend td { background: rgba(211, 37, 37, 0.08); }
     tr.weekend td:first-child { font-weight: 900; }
 
+
+    /* obdobI table cleanup */
+    #r-table td { white-space: nowrap; }
+    #r-table td:nth-child(2),
+    #r-table td:nth-child(3),
+    #r-table td:nth-child(4) { text-align: right; }
+
 </style>
 <style id="mobile-override">
 
@@ -542,7 +549,7 @@ input[type="search"] {
 <div style="overflow:auto; margin-top:10px">
 <table id="r-table" style="width:100%; border-collapse:collapse; table-layout:fixed">
 <thead>
-<tr style="background:#f3f4f6"><th data-i18n="th_date" style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border);width:28%">Datum</th><th data-i18n="th_mp_access" style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border);width:24%">MP</th><th data-i18n="th_mp_acceptance" style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border);width:24%">MP&nbsp;Ac</th><th data-i18n="th_plc_access" style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border);width:24%">PLC</th></tr>
+<tr style="background:#f3f4f6"><th style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border)">Datum</th><th style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border)">MP</th><th style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border)">MP&nbsp;Ac</th><th style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border)">PLC</th></tr>
 </thead>
 <tbody></tbody>
 </table>
@@ -1255,7 +1262,7 @@ function fillRangeTable(){
     const tr=document.createElement('tr');
     const isWeekend = (d.getDay()===0 || d.getDay()===6);
     if(isWeekend) tr.classList.add('weekend'); 
-    tr.innerHTML=`<td style="padding:6px 6px;border-bottom:1px solid var(--border);white-space:nowrap">${dateUi}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(mp)}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(ma)}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(plc)}</td>`; 
+    tr.innerHTML=`<td style="padding:6px 6px;border-bottom:1px solid var(--border);white-space:nowrap;font-size:14px">${dateUi}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(mp)}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(ma)}</td><td style="padding:6px 6px;border-bottom:1px solid var(--border)">${formatCodeUiNoSpace(plc)}</td>`; 
     tBody.appendChild(tr); 
   } 
 }
