@@ -117,6 +117,8 @@ let hotels = load();
   function syncIconTitle(){
     const btn = document.getElementById("hotelViewBtn");
     if(btn) btn.setAttribute("title", t("tab_hotels"));
+    const c = document.getElementById("hvCloseBtn");
+    if(c){ c.setAttribute("title", t("btn_close")); c.setAttribute("aria-label", t("btn_close")); }
   }
 
   function ensureOverlay(){
@@ -130,15 +132,10 @@ let hotels = load();
       <div class="hv-card">
         <div class="hv-header">
           <div class="hv-title" data-i18n="hotels_title"></div>
-          <div class="hv-actions">
-            <button class="btn inline" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
-            <button class="btn inline" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
-            <button class="btn inline" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
-            <button class="btn inline" type="button" id="hvCloseBtn" data-i18n="btn_close"></button>
-          </div>
+          <button class="hv-closebtn" type="button" id="hvCloseBtn" aria-label="Close" title="Close">🚪</button>
         </div>
 
-        <input accept="application/json" id="hvImportFile" style="display:none" type="file" />
+        <input accept="application/json" id="hvImportFile" style="display:none" type="file" /> style="display:none" type="file" />
 
         <dialog id="hvImportModeDlg">
           <form class="modal" method="dialog">
@@ -181,6 +178,13 @@ let hotels = load();
             <button class="btn inline" type="button" id="hvSave" data-i18n="btn_save"></button>
             <button class="btn inline" type="button" id="hvCancel" data-i18n="btn_back"></button>
           </div>
+        </div>
+
+        <div class="hv-footer">
+          <button class="btn hv-footbtn" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
+          <div class="hv-footsp"></div>
+          <button class="btn hv-footbtn" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
+          <button class="btn hv-footbtn" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
         </div>
       </div>
     `;
@@ -361,26 +365,26 @@ let hotels = load();
 
     list.innerHTML = filtered.map(h=>{
       const phone=(h.phone||"").toString().trim();
+      const note=(h.notes||"").toString().trim();
       return `
         <div class="hv-item">
-          <div class="hv-item__top">
-            <div>
+          <div class="hv-item__line">
+            <div class="hv-left">
               <div class="hv-city">${esc(h.city||"—")}</div>
               <div class="hv-name">${esc(h.name||"—")}</div>
-              ${h.notes ? `<div class="hv-name" style="opacity:.7;margin-top:6px">${esc(h.notes)}</div>` : ""}
+              ${phone ? `<div class="hv-sub">${esc(phone)}</div>` : ``}
+              ${note ? `<div class="hv-sub" style="opacity:.75">${esc(note)}</div>` : ``}
             </div>
-            <div class="hv-phone">${esc(phone)}</div>
-          </div>
-          <div class="hv-item__btns">
-            ${phone ? `<a class="btn inline" href="tel:${esc(phone)}">${esc(btnCall)}</a>` : ""}
-            <button class="btn inline" type="button" data-act="map" data-idx="${h.__idx}">${esc(btnMap)}</button>
-            ${phone ? `<button class="btn inline" type="button" data-act="copy" data-idx="${h.__idx}">${esc(btnCopy)}</button>` : ""}
-            <button class="btn inline" type="button" data-act="edit" data-idx="${h.__idx}">${esc(btnEdit)}</button>
-            <button class="btn inline" type="button" data-act="del" data-idx="${h.__idx}">${esc(btnDel)}</button>
+            <div class="hv-actionsrow">
+              ${phone ? `<a class="hv-iconbtn" href="tel:${esc(phone)}" title="${esc(btnCall)}" aria-label="${esc(btnCall)}">📞</a>` : ``}
+              <button class="hv-iconbtn" type="button" data-act="map" data-idx="${h.__idx}" title="${esc(btnMap)}" aria-label="${esc(btnMap)}">🗺️</button>
+              <button class="hv-iconbtn" type="button" data-act="edit" data-idx="${h.__idx}" title="${esc(btnEdit)}" aria-label="${esc(btnEdit)}">✏️</button>
+              <button class="hv-iconbtn danger" type="button" data-act="del" data-idx="${h.__idx}" title="${esc(btnDel)}" aria-label="${esc(btnDel)}">🗑️</button>
+            </div>
           </div>
         </div>
       `;
-    }).join("") || `<div style="opacity:.75;padding:6px 2px">${esc(t("toast_done"))}</div>`;
+    })}).join("") || `<div style="opacity:.75;padding:6px 2px">${esc(t("toast_done"))}</div>`;
   }
 
   // Keep icon title in sync after language changes
