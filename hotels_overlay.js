@@ -30,7 +30,42 @@
     return encodeURIComponent([h.name,h.city].filter(Boolean).join(", "));
   }
 
-  let hotels = load();
+  
+  function downloadFile(filename, content, mime){
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportHotelsJSON(list){
+    const payload = { exportedAt: new Date().toISOString(), hotels: list };
+    downloadFile("hotels-export.json", JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+  }
+
+  function toCsvValue(v){
+    const s = (v ?? "").toString().replace(/"/g, '""');
+    return `"${s}"`;
+  }
+
+  function exportHotelsCSV(list){
+    const header = ["city","name","phone","notes"];
+    const rows = list.map(h => [
+      toCsvValue(h.city),
+      toCsvValue(h.name),
+      toCsvValue(h.phone),
+      toCsvValue(h.notes),
+    ].join(","));
+    const csv = [header.join(","), ...rows].join("\n");
+    downloadFile("hotels-export.csv", csv, "text/csv;charset=utf-8");
+  }
+
+let hotels = load();
   let editingIndex = null;
 
   function syncIconTitle(){
@@ -51,6 +86,7 @@
           <div class="hv-title" data-i18n="hotels_title"></div>
           <div class="hv-actions">
             <button class="btn inline" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
+            <button class="btn inline" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
             <button class="btn inline" type="button" id="hvCloseBtn" data-i18n="btn_close"></button>
           </div>
         </div>
@@ -82,6 +118,12 @@
 
     ov.querySelector("#hvCloseBtn").addEventListener("click", closeOverlay);
     ov.querySelector("#hvAddBtn").addEventListener("click", ()=>openEditor(null));
+    ov.querySelector("#hvExportBtn").addEventListener("click", ()=>{
+      // JSON = backup, CSV = Excel
+      exportHotelsJSON(hotels);
+      // Uncomment if you also want CSV every time:
+      // exportHotelsCSV(hotels);
+    });
     ov.querySelector("#hvCancel").addEventListener("click", closeEditor);
     ov.querySelector("#hvSave").addEventListener("click", saveEditor);
     ov.querySelector("#hvSearch").addEventListener("input", render);
