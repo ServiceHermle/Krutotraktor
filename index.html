@@ -305,6 +305,22 @@ input[type="search"] {
     #r-table td:nth-child(3),
     #r-table td:nth-child(4) { text-align: right; }
 
+
+/* footer disclaimer fixed to bottom */
+.footer{
+  position:fixed;
+  left:0; right:0;
+  bottom:0;
+  z-index:9999;
+  background:var(--card);
+  border-top:1px solid var(--border);
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+  font-size:12px;
+  opacity:.9;
+}
+/* keep content above footer */
+.wrap{ padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+
 </style>
 <style id="mobile-override">
 
@@ -483,8 +499,6 @@ input[type="search"] {
 <button class="langbtn" data-lang="cs" type="button">CZ</button>
 <button class="langbtn" data-lang="de" type="button">DE</button>
 <button class="langbtn" data-lang="en" type="button">EN</button>
-<button class="langbtn" id="hotelViewBtn" type="button" title="Hotely">🛌</button>
-
 <span style="width:10px"></span>
 <!-- mini logout (device) -->
 <button class="langbtn logout-mini" data-i18n="btn_logout" id="logoutBtn" type="button">Odhlásit</button>
@@ -535,6 +549,11 @@ input[type="search"] {
 </div>
 <button class="btn" data-i18n="btn_add_machine" id="addMachine" style="grid-column: span 2; width:100%; margin-top:10px; font-weight:900;">${t("btn_add_machine_small")}</button>
 <div class="footer"><span data-i18n="footer_disclaimer">Použití a sdílení mimo společnost Hermle je přísně zakázáno.</span></div>
+
+<div class="divider" style="height:1px;background:var(--border);margin:14px 0;"></div>
+<div class="hotels-inline">
+  <button class="btn" id="hotelViewBtn" type="button" style="width:100%;">🛌 <span data-i18n="tab_hotels">Hotely</span></button>
+</div>
 </div>
 <!-- RANGE -->
 <div class="card hidden" id="panel-range">
