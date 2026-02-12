@@ -27,7 +27,7 @@
     }
   }
   function mapsQuery(h){
-    return encodeURIComponent([h.name,h.city].filter(Boolean).join(", "));
+    return encodeURIComponent([h.name,h.address,h.city].filter(Boolean).join(", "));
   }
 
   
@@ -73,6 +73,7 @@
       name: String(obj.name||obj.hotel||'').trim(),
       phone: String(obj.phone||obj.tel||'').trim(),
       notes: String(obj.notes||obj.note||'').trim(),
+      address: String(obj.address||obj.addr||'').trim(),
     };
   }
 
@@ -101,17 +102,18 @@
       if(k === '|') return;
       const cur = byKey.get(k);
       if(!cur){
-        existing.push({city:inc.city, name:inc.name, phone:inc.phone||'', notes:inc.notes||''});
+        existing.push({city:inc.city, name:inc.name, address:inc.address||"", phone:inc.phone||"", notes:inc.notes||""});
         byKey.set(k, existing[existing.length-1]);
         return;
       }
       if(!cur.phone && inc.phone) cur.phone = inc.phone;
+      if(!cur.address && inc.address) cur.address = inc.address;
       if(!cur.notes && inc.notes) cur.notes = inc.notes;
     });
     return existing;
   }
 
-let hotels = load();
+let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")}));
   let editingIndex = null;
 
   function syncIconTitle(){
@@ -175,7 +177,8 @@ let hotels = load();
           <div class="hv-grid">
             <input class="input" id="hv-city" data-i18n-placeholder="label_city" />
             <input class="input" id="hv-name" data-i18n-placeholder="label_hotel" />
-            <input class="input" id="hv-phone" data-i18n-placeholder="label_phone" />
+                          <input class="input" id="hv-address" placeholder="Address" />
+<input class="input" id="hv-phone" data-i18n-placeholder="label_phone" />
           </div>
           <textarea class="input hv-notes" id="hv-notes" data-i18n-placeholder="label_note"></textarea>
           <div class="hv-item__btns" style="justify-content:flex-end">
@@ -308,6 +311,7 @@ let hotels = load();
     const h = (idx===null || idx===undefined) ? {city:"",name:"",phone:"",notes:""} : hotels[idx];
     ov.querySelector("#hv-city").value = h.city || "";
     ov.querySelector("#hv-name").value = h.name || "";
+      ov.querySelector("#hv-address").value = (h.address||"");
     ov.querySelector("#hv-phone").value = h.phone || "";
     ov.querySelector("#hv-notes").value = h.notes || "";
     setTimeout(()=>ov.querySelector("#hv-city").focus(),0);
@@ -324,10 +328,11 @@ let hotels = load();
     const ov=ensureOverlay();
     const city=ov.querySelector("#hv-city").value.trim();
     const name=ov.querySelector("#hv-name").value.trim();
+    const address=ov.querySelector("#hv-address").value.trim();
     const phone=ov.querySelector("#hv-phone").value.trim();
     const notes=ov.querySelector("#hv-notes").value.trim();
     if(!city || !name){ alert(t("err_enter_name")); return; }
-    const item={city,name,phone,notes};
+    const item={city,name,address,phone,notes};
     if(editingIndex===null){
       hotels.push(item);
     }else{
@@ -348,7 +353,7 @@ let hotels = load();
       .map((h, idx)=>({...h, __idx: idx}))
       .filter(h=>{
         if(!q) return true;
-        const blob = norm(`${h.city||""} ${h.name||""} ${h.phone||""} ${h.notes||""}`);
+        const blob = norm(`${h.city||""} ${h.name||""} ${h.address||""} ${h.phone||""} ${h.notes||""}`);
         return blob.includes(q);
       })
       .sort((a,b)=> (a.city||"").localeCompare(b.city||"", undefined, {sensitivity:"base"}));
@@ -360,25 +365,40 @@ let hotels = load();
     const btnDel  = t("btn_delete");
     const empty   = t("hotels_hint") ? "" : ""; // keep unused
 
-    list.innerHTML = filtered.map(h=>{
-      const phone=(h.phone||"").toString().trim();
-      return `
-        <div class="hv-item hv-item--row">
-          <div class="hv-left">
-            <div class="hv-city">${esc(h.city||"—")}</div>
-            <div class="hv-name">${esc(h.name||"—")}</div>
-            ${h.notes ? `<div class="hv-notes">${esc(h.notes)}</div>` : ""}
+    
+    // Group by city so multiple hotels are shown under one city
+    const groups = new Map();
+    for(const h of filtered){
+      const c = (h.city||"—");
+      if(!groups.has(c)) groups.set(c, []);
+      groups.get(c).push(h);
+    }
+
+    let html = "";
+    for(const [city, arr] of groups.entries()){
+      html += `<div class="hv-citygroup"><div class="hv-citygroup__title">${esc(city)}</div></div>`;
+      for(const h of arr){
+        const phone=(h.phone||"").toString().trim();
+        const address=(h.address||"").toString().trim();
+        html += `
+          <div class="hv-item hv-item--row">
+            <div class="hv-left">
+              <div class="hv-name">${esc(h.name||"—")}</div>
+              ${address ? `<div class="hv-address">${esc(address)}</div>` : ""}
+              ${h.notes ? `<div class="hv-notes">${esc(h.notes)}</div>` : ""}
+            </div>
+            <div class="hv-right">
+              ${phone ? `<a class="hv-iconbtn" href="tel:${esc(phone)}" title="${esc(btnCall)}" aria-label="${esc(btnCall)}">📞</a>` : `<span class="hv-iconbtn hv-iconbtn--disabled" aria-hidden="true">📞</span>`}
+              <button class="hv-iconbtn" type="button" data-act="map" data-idx="${h.__idx}" title="${esc(btnMap)}" aria-label="${esc(btnMap)}">🗺️</button>
+              <button class="hv-iconbtn" type="button" data-act="edit" data-idx="${h.__idx}" title="${esc(btnEdit)}" aria-label="${esc(btnEdit)}">✏️</button>
+              <button class="hv-iconbtn danger" type="button" data-act="del" data-idx="${h.__idx}" title="${esc(btnDel)}" aria-label="${esc(btnDel)}">🗑️</button>
+            </div>
           </div>
-          <div class="hv-right">
-            ${phone ? `<a class="hv-iconbtn" href="tel:${esc(phone)}" title="${esc(btnCall)}" aria-label="${esc(btnCall)}">📞</a>` : `<span class="hv-iconbtn hv-iconbtn--disabled" aria-hidden="true">📞</span>`}
-            <button class="hv-iconbtn" type="button" data-act="map" data-idx="${h.__idx}" title="${esc(btnMap)}" aria-label="${esc(btnMap)}">🗺️</button>
-            <button class="hv-iconbtn" type="button" data-act="edit" data-idx="${h.__idx}" title="${esc(btnEdit)}" aria-label="${esc(btnEdit)}">✏️</button>
-            <button class="hv-iconbtn danger" type="button" data-act="del" data-idx="${h.__idx}" title="${esc(btnDel)}" aria-label="${esc(btnDel)}">🗑️</button>
-          </div>
-        </div>
-      `;
-    }).join("") || `<div style="opacity:.75;padding:6px 2px">${esc(t("toast_done"))}</div>`;
-  }
+        `;
+      }
+    }
+    list.innerHTML = html || `<div style="opacity:.75;padding:6px 2px">${esc(t("toast_done"))}</div>`;
+}
 
   // Keep icon title in sync after language changes
   document.addEventListener("click", (e)=>{

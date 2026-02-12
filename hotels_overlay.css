@@ -114,3 +114,8 @@
   padding:0;
 }
 .hv-iconbtn--disabled{opacity:.35;}
+
+/* --- City grouping + address --- */
+.hv-citygroup{margin-top:6px;}
+.hv-citygroup__title{font-weight:900;margin:6px 2px 2px 2px;}
+.hv-address{opacity:.85;margin-top:4px;font-size:13px;line-height:1.25;}
