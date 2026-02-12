@@ -65,6 +65,52 @@
     downloadFile("hotels-export.csv", csv, "text/csv;charset=utf-8");
   }
 
+  // Import helpers (supports both raw array and {hotels:[...]})
+  function normalizeHotel(h){
+    const obj = h && typeof h === 'object' ? h : {};
+    return {
+      city: String(obj.city||'').trim(),
+      name: String(obj.name||obj.hotel||'').trim(),
+      phone: String(obj.phone||obj.tel||'').trim(),
+      notes: String(obj.notes||obj.note||'').trim(),
+    };
+  }
+
+  function parseHotelsPayload(text){
+    const raw = JSON.parse(text);
+    const arr = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.hotels) ? raw.hotels : null);
+    if(!arr) throw new Error('Neplatný formát');
+    const out = arr.map(normalizeHotel).filter(h=>h.city && h.name);
+    return out;
+  }
+
+  function normKey(s){
+    return (s??"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  }
+
+  function mergeHotels(existing, incoming){
+    // UPDATE: merge by city+name (case-insensitive). Only fill missing fields.
+    const byKey = new Map();
+    existing.forEach(h=>{
+      const k = normKey(h.city)+'|'+normKey(h.name);
+      if(k !== '|') byKey.set(k, h);
+    });
+
+    incoming.forEach(inc=>{
+      const k = normKey(inc.city)+'|'+normKey(inc.name);
+      if(k === '|') return;
+      const cur = byKey.get(k);
+      if(!cur){
+        existing.push({city:inc.city, name:inc.name, phone:inc.phone||'', notes:inc.notes||''});
+        byKey.set(k, existing[existing.length-1]);
+        return;
+      }
+      if(!cur.phone && inc.phone) cur.phone = inc.phone;
+      if(!cur.notes && inc.notes) cur.notes = inc.notes;
+    });
+    return existing;
+  }
+
 let hotels = load();
   let editingIndex = null;
 
@@ -87,9 +133,36 @@ let hotels = load();
           <div class="hv-actions">
             <button class="btn inline" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
             <button class="btn inline" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
+            <button class="btn inline" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
             <button class="btn inline" type="button" id="hvCloseBtn" data-i18n="btn_close"></button>
           </div>
         </div>
+
+        <input accept="application/json" id="hvImportFile" style="display:none" type="file" />
+
+        <dialog id="hvImportModeDlg">
+          <form class="modal" method="dialog">
+            <div class="modal-h">Import hotelů</div>
+            <div class="modal-b">
+              <div style="display:grid; gap:10px">
+                <div class="muted">Vyber režim importu:</div>
+                <div class="card" style="padding:10px">
+                  <div style="font-weight:700">Override (přepsat)</div>
+                  <div class="muted">Smaže všechny hotely a nahraje data ze souboru znovu.</div>
+                </div>
+                <div class="card" style="padding:10px">
+                  <div style="font-weight:700">Update (doplnit)</div>
+                  <div class="muted">Zachová stávající hotely, přidá jen chybějící položky (podle město + hotel).</div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-f">
+              <button class="btn" type="button" data-act="hvImportCancel">Zrušit</button>
+              <button class="btn" type="button" data-act="hvImportMode" data-mode="override">Override</button>
+              <button class="btn primary" type="button" data-act="hvImportMode" data-mode="update">Update</button>
+            </div>
+          </form>
+        </dialog>
 
         <div class="hv-row">
           <input class="input" id="hvSearch" type="text" data-i18n-placeholder="hotels_search_ph" />
@@ -124,6 +197,56 @@ let hotels = load();
       // Uncomment if you also want CSV every time:
       // exportHotelsCSV(hotels);
     });
+
+    // Import (mode dialog + file picker)
+    let hotelsImportMode = 'override';
+    const importBtn = ov.querySelector('#hvImportBtn');
+    const importFile = ov.querySelector('#hvImportFile');
+    const importDlg = ov.querySelector('#hvImportModeDlg');
+
+    if(importBtn && importDlg && importFile){
+      importBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        importDlg.showModal();
+      });
+
+      importDlg.addEventListener('click', (e)=>{
+        const cancel = e.target.closest('[data-act="hvImportCancel"]');
+        if(cancel){ importDlg.close(); return; }
+        const b = e.target.closest('[data-act="hvImportMode"]');
+        if(!b) return;
+        hotelsImportMode = b.getAttribute('data-mode') || 'override';
+        importDlg.close();
+        importFile.value = '';
+        setTimeout(()=>importFile.click(), 150);
+      });
+
+      importFile.addEventListener('change', (e)=>{
+        const file = e.target.files && e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev)=>{
+          try{
+            const incoming = parseHotelsPayload(String(ev.target.result||''));
+            if(hotelsImportMode === 'override'){
+              if(!confirm('Import přepíše existující hotely. Pokračovat?')) return;
+              hotels = incoming;
+            }else{
+              hotels = mergeHotels(load(), incoming);
+            }
+            save(hotels);
+            closeEditor();
+            render();
+            toast(hotelsImportMode === 'override' ? 'Import hotov (Override)' : 'Import hotov (Update)');
+          }catch(err){
+            alert('Import selhal: ' + (err && err.message ? err.message : err));
+          }finally{
+            e.target.value = '';
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
     ov.querySelector("#hvCancel").addEventListener("click", closeEditor);
     ov.querySelector("#hvSave").addEventListener("click", saveEditor);
     ov.querySelector("#hvSearch").addEventListener("input", render);
