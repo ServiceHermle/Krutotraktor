@@ -1,10 +1,12 @@
-const CACHE_VER = 'hdh-code-v2_8_1-soft-ux3';
+const CACHE_VER = 'hdh-code-v2_8_1-soft-ux3-hotels1';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  './service-worker.js'
+  './service-worker.js',
+  './hotels_overlay.js',
+  './hotels_overlay.css'
 ];
 
 self.addEventListener('install', (event) => {
