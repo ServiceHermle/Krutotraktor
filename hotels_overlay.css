@@ -74,55 +74,43 @@
 }
 
 
-/* --- Sketch layout (Hotels) --- */
-.hv-header{position:relative;}
+/* --- Buttons + close fix --- */
+.hv-actions{display:none !important;}
+.hv-header{position:relative; padding-right:44px; min-height:40px;}
 .hv-close-mini{
+  position:absolute;
+  right:6px; top:6px;
+  width:30px; height:30px;
+  border-radius:10px;
   border:1px solid var(--border,#e8e8ef);
   background:var(--card,#fff);
-  border-radius:10px;
-  width:34px;
-  height:34px;
+  font-size:14px;
+  line-height:1;
   padding:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
-.hv-bottom{
+.hv-bottombar{
   position:sticky;
   bottom:0;
   background:var(--card,#fff);
   border-top:1px solid var(--border,#e8e8ef);
-  padding:10px;
+  padding:8px 10px;
   display:flex;
   gap:10px;
-  justify-content:space-between;
-  border-bottom-left-radius:18px;
-  border-bottom-right-radius:18px;
+  margin-top:10px;
 }
-.hv-bottom-btn{flex:1; padding:10px 12px; font-size:14px; border-radius:14px;}
-.hv-card{padding-bottom:10px;} /* bottom bar handles spacing */
-
-.hv-item-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-.hv-item__main{min-width:0; flex:1;}
-.hv-notes-line{opacity:.7; margin-top:6px; font-size:13px;}
-.hv-item__side{display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
-.hv-item__actions{display:flex; gap:8px; align-items:center;}
-.hv-icon-btn{
-  width:40px;
-  height:40px;
+.btn.small{flex:1; padding:8px 10px; font-size:13px; border-radius:14px;}
+.hv-item--row{display:flex; justify-content:space-between; align-items:center; gap:12px;}
+.hv-left{min-width:0; flex:1;}
+.hv-right{display:flex; gap:8px; flex-shrink:0;}
+.hv-iconbtn{
+  width:40px; height:36px;
+  display:inline-flex; align-items:center; justify-content:center;
   border-radius:12px;
   border:1px solid var(--border,#e8e8ef);
-  background:var(--bg2,#f3f3f6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
+  background:var(--bg,#f7f7f9);
   font-size:18px;
+  text-decoration:none;
+  color:inherit;
+  padding:0;
 }
-.hv-icon-btn--danger{background: #fff3f3;}
-.hv-icon-btn--disabled{opacity:.35;}
+.hv-iconbtn--disabled{opacity:.35;}
