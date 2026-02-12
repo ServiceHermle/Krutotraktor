@@ -74,39 +74,55 @@
 }
 
 
-/* --- Sketch layout override --- */
-.hv-card{padding-bottom:90px;position:relative;}
-.hv-actions{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#ffffff;
-  padding:10px;
-  border-top:1px solid #e8e8ef;
-  justify-content:space-around;
-  z-index:10001;
-}
-.hv-actions button{
-  flex:1;
-  max-width:140px;
-}
-/* small close button top right */
-.hv-header button:last-child{
-  position:absolute;
-  top:10px;
-  right:10px;
-  width:32px;
-  height:32px;
+/* --- Sketch layout (Hotels) --- */
+.hv-header{position:relative;}
+.hv-close-mini{
+  border:1px solid var(--border,#e8e8ef);
+  background:var(--card,#fff);
+  border-radius:10px;
+  width:34px;
+  height:34px;
   padding:0;
-  font-size:14px;
-}
-/* item actions inline icons */
-.hv-item__actions{
   display:flex;
-  gap:6px;
+  align-items:center;
+  justify-content:center;
 }
-.hv-item__actions button{
-  padding:6px 8px;
-  font-size:14px;
+.hv-bottom{
+  position:sticky;
+  bottom:0;
+  background:var(--card,#fff);
+  border-top:1px solid var(--border,#e8e8ef);
+  padding:10px;
+  display:flex;
+  gap:10px;
+  justify-content:space-between;
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
 }
+.hv-bottom-btn{flex:1; padding:10px 12px; font-size:14px; border-radius:14px;}
+.hv-card{padding-bottom:10px;} /* bottom bar handles spacing */
+
+.hv-item-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.hv-item__main{min-width:0; flex:1;}
+.hv-notes-line{opacity:.7; margin-top:6px; font-size:13px;}
+.hv-item__side{display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
+.hv-item__actions{display:flex; gap:8px; align-items:center;}
+.hv-icon-btn{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  border:1px solid var(--border,#e8e8ef);
+  background:var(--bg2,#f3f3f6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  font-size:18px;
+}
+.hv-icon-btn--danger{background: #fff3f3;}
+.hv-icon-btn--disabled{opacity:.35;}

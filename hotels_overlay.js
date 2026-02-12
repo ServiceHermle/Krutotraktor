@@ -130,12 +130,7 @@ let hotels = load();
       <div class="hv-card">
         <div class="hv-header">
           <div class="hv-title" data-i18n="hotels_title"></div>
-          <div class="hv-actions">
-            <button class="btn inline" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
-            <button class="btn inline" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
-            <button class="btn inline" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
-            <button class="btn inline" type="button" id="hvCloseBtn" data-i18n="btn_close"></button>
-          </div>
+          <button class="hv-close-mini" type="button" id="hvCloseBtn" aria-label="Close" title="Close">🚪</button>
         </div>
 
         <input accept="application/json" id="hvImportFile" style="display:none" type="file" />
@@ -170,6 +165,12 @@ let hotels = load();
 
         <div class="hv-list" id="hvList"></div>
 
+        <div class="hv-bottom">
+          <button class="btn inline hv-bottom-btn" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
+          <button class="btn inline hv-bottom-btn" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
+          <button class="btn inline hv-bottom-btn" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
+        </div>
+
         <div class="hv-editor" id="hvEditor">
           <div class="hv-grid">
             <input class="input" id="hv-city" data-i18n-placeholder="label_city" />
@@ -190,6 +191,8 @@ let hotels = load();
     try{ if(typeof window.applyI18n === "function") window.applyI18n(); }catch(e){}
 
     ov.querySelector("#hvCloseBtn").addEventListener("click", closeOverlay);
+    try{ const cb=ov.querySelector('#hvCloseBtn'); const lbl=t('btn_close'); if(cb){ cb.title=lbl; cb.setAttribute('aria-label', lbl); } }catch(e){}
+
     ov.querySelector("#hvAddBtn").addEventListener("click", ()=>openEditor(null));
     ov.querySelector("#hvExportBtn").addEventListener("click", ()=>{
       // JSON = backup, CSV = Excel
@@ -362,24 +365,24 @@ let hotels = load();
     list.innerHTML = filtered.map(h=>{
       const phone=(h.phone||"").toString().trim();
       return `
-        <div class="hv-item">
-          <div class="hv-item__top">
-            <div>
-              <div class="hv-city">${esc(h.city||"—")}</div>
-              <div class="hv-name">${esc(h.name||"—")}</div>
-              ${h.notes ? `<div class="hv-name" style="opacity:.7;margin-top:6px">${esc(h.notes)}</div>` : ""}
-            </div>
-            <div class="hv-phone">${esc(phone)}</div>
+        <div class="hv-item hv-item-row">
+          <div class="hv-item__main">
+            <div class="hv-city">${esc(h.city||"—")}</div>
+            <div class="hv-name">${esc(h.name||"—")}</div>
+            ${h.notes ? `<div class="hv-notes-line">${esc(h.notes)}</div>` : ""}
           </div>
-          <div class="hv-item__btns">
-            ${phone ? `<a class="btn inline" href="tel:${esc(phone)}">${esc(btnCall)}</a>` : ""}
-            <button class="btn inline" type="button" data-act="map" data-idx="${h.__idx}">${esc(btnMap)}</button>
-            ${phone ? `<button class="btn inline" type="button" data-act="copy" data-idx="${h.__idx}">${esc(btnCopy)}</button>` : ""}
-            <button class="btn inline" type="button" data-act="edit" data-idx="${h.__idx}">${esc(btnEdit)}</button>
-            <button class="btn inline" type="button" data-act="del" data-idx="${h.__idx}">${esc(btnDel)}</button>
+
+          <div class="hv-item__side">
+            <div class="hv-phone">${esc(phone)}</div>
+            <div class="hv-item__actions">
+              ${phone ? `<a class="hv-icon-btn" href="tel:${esc(phone)}" title="${esc(btnCall)}" aria-label="${esc(btnCall)}">📞</a>` : `<span class="hv-icon-btn hv-icon-btn--disabled" aria-hidden="true">📞</span>`}
+              <button class="hv-icon-btn" type="button" data-act="map" data-idx="${h.__idx}" title="${esc(btnMap)}" aria-label="${esc(btnMap)}">🗺️</button>
+              <button class="hv-icon-btn" type="button" data-act="edit" data-idx="${h.__idx}" title="${esc(btnEdit)}" aria-label="${esc(btnEdit)}">✏️</button>
+              <button class="hv-icon-btn hv-icon-btn--danger" type="button" data-act="del" data-idx="${h.__idx}" title="${esc(btnDel)}" aria-label="${esc(btnDel)}">🗑️</button>
+            </div>
           </div>
         </div>
-      `;
+      `;      `;
     }).join("") || `<div style="opacity:.75;padding:6px 2px">${esc(t("toast_done"))}</div>`;
   }
 
