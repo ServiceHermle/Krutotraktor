@@ -74,58 +74,58 @@
 }
 
 
-/* --- Hotels UI per sketch (list + icon actions + bottom bar) --- */
-.hv-closebtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:38px;
-  height:38px;
-  border-radius:12px;
+/* Sketch layout tweaks */
+.hv-header{position:relative;}
+.hv-close{
   border:1px solid var(--border,#e8e8ef);
   background:var(--card,#fff);
-  cursor:pointer;
+  border-radius:14px;
+  width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
   font-size:18px;
-  line-height:1;
 }
-.hv-closebtn:active{transform:scale(.98);}
+.hv-actions{display:none !important;}
 
-.hv-item__line{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.hv-left{min-width:0;flex:1;}
-.hv-sub{margin-top:4px;font-size:12px;opacity:.8;word-break:break-word;}
-.hv-actionsrow{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.hv-iconbtn{
-  display:inline-flex;
+.hv-rowitem{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
   align-items:center;
-  justify-content:center;
-  width:38px;
-  height:38px;
-  border-radius:12px;
+  background:var(--card,#fff);
+  border:1px solid var(--border,#e8e8ef);
+  border-radius:18px;
+  padding:12px;
+}
+.hv-left{min-width:0;}
+.hv-notesline{opacity:.75;margin-top:6px;word-break:break-word;}
+.hv-phoneline{opacity:.85;margin-top:6px;font-size:14px;white-space:nowrap;}
+.hv-right{display:flex;gap:8px;flex-shrink:0;}
+.hv-ibtn{
+  width:44px;height:44px;
+  border-radius:14px;
   border:1px solid var(--border,#e8e8ef);
   background:var(--card,#fff);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
   text-decoration:none;
-  cursor:pointer;
-  font-size:18px;
-  line-height:1;
+  color:inherit;
 }
-.hv-iconbtn.danger{border-color:rgba(211,37,37,.35);}
-.hv-iconbtn:active{transform:scale(.98);}
+.hv-ibtn--disabled{opacity:.35;}
 
-.hv-footer{
+.hv-bottom{
   position:sticky;
   bottom:0;
   margin-top:12px;
-  padding-top:10px;
-  border-top:1px solid var(--border,#e8e8ef);
+  padding-top:12px;
+  background:linear-gradient(to bottom, rgba(255,255,255,0), var(--card,#fff) 35%);
   display:flex;
   gap:10px;
-  align-items:center;
-  background:var(--card,#fff);
+  justify-content:space-between;
 }
-.hv-footsp{flex:1;}
-.hv-footbtn{min-height:38px;padding:8px 12px;border-radius:14px;font-size:13px;}
-@media(max-width:420px){
-  .hv-iconbtn{width:36px;height:36px;border-radius:12px;font-size:17px;}
-  .hv-closebtn{width:36px;height:36px;border-radius:12px;font-size:17px;}
-  .hv-footbtn{min-height:36px;padding:7px 10px;font-size:12.5px;}
+.btn.hv-sm{
+  min-height:42px;
+  padding:8px 12px;
+  font-size:14px;
+  border-radius:16px;
+  flex:1;
 }

@@ -117,8 +117,6 @@ let hotels = load();
   function syncIconTitle(){
     const btn = document.getElementById("hotelViewBtn");
     if(btn) btn.setAttribute("title", t("tab_hotels"));
-    const c = document.getElementById("hvCloseBtn");
-    if(c){ c.setAttribute("title", t("btn_close")); c.setAttribute("aria-label", t("btn_close")); }
   }
 
   function ensureOverlay(){
@@ -132,10 +130,10 @@ let hotels = load();
       <div class="hv-card">
         <div class="hv-header">
           <div class="hv-title" data-i18n="hotels_title"></div>
-          <button class="hv-closebtn" type="button" id="hvCloseBtn" aria-label="Close" title="Close">🚪</button>
+          <button class="hv-close" type="button" id="hvCloseBtn" title="Close" aria-label="Close">🚪</button>
         </div>
 
-        <input accept="application/json" id="hvImportFile" style="display:none" type="file" /> style="display:none" type="file" />
+        <input accept="application/json" id="hvImportFile" style="display:none" type="file" />
 
         <dialog id="hvImportModeDlg">
           <form class="modal" method="dialog">
@@ -167,6 +165,12 @@ let hotels = load();
 
         <div class="hv-list" id="hvList"></div>
 
+        <div class="hv-bottom">
+          <button class="btn hv-sm" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
+          <button class="btn hv-sm" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
+          <button class="btn hv-sm" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
+        </div>
+
         <div class="hv-editor" id="hvEditor">
           <div class="hv-grid">
             <input class="input" id="hv-city" data-i18n-placeholder="label_city" />
@@ -179,19 +183,15 @@ let hotels = load();
             <button class="btn inline" type="button" id="hvCancel" data-i18n="btn_back"></button>
           </div>
         </div>
-
-        <div class="hv-footer">
-          <button class="btn hv-footbtn" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
-          <div class="hv-footsp"></div>
-          <button class="btn hv-footbtn" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
-          <button class="btn hv-footbtn" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
-        </div>
       </div>
     `;
     document.body.appendChild(ov);
 
     // Apply translations immediately (overlay is dynamic)
     try{ if(typeof window.applyI18n === "function") window.applyI18n(); }catch(e){}
+
+    // Close button label
+    try{ const c=ov.querySelector("#hvCloseBtn"); if(c){ const lbl=t("btn_close"); c.title=lbl; c.setAttribute("aria-label", lbl); } }catch(e){}
 
     ov.querySelector("#hvCloseBtn").addEventListener("click", closeOverlay);
     ov.querySelector("#hvAddBtn").addEventListener("click", ()=>openEditor(null));
@@ -265,8 +265,6 @@ let hotels = load();
 
       if(act==="map"){
         window.open("https://www.google.com/maps/search/?api=1&query=" + mapsQuery(h), "_blank");
-      }else if(act==="copy"){
-        await copyText((h.phone||"").toString());
       }else if(act==="edit"){
         openEditor(idx);
       }else if(act==="del"){
@@ -358,33 +356,33 @@ let hotels = load();
 
     const btnCall = t("btn_call");
     const btnMap  = t("btn_map");
-    const btnCopy = t("btn_copy");
     const btnEdit = t("btn_edit");
     const btnDel  = t("btn_delete");
     const empty   = t("hotels_hint") ? "" : ""; // keep unused
 
     list.innerHTML = filtered.map(h=>{
       const phone=(h.phone||"").toString().trim();
-      const note=(h.notes||"").toString().trim();
+      const city=esc(h.city||"—");
+      const name=esc(h.name||"—");
+      const notes=h.notes ? `<div class="hv-notesline">${esc(h.notes)}</div>` : "";
+      const phoneLine=phone ? `<div class="hv-phoneline">${esc(phone)}</div>` : "";
       return `
-        <div class="hv-item">
-          <div class="hv-item__line">
-            <div class="hv-left">
-              <div class="hv-city">${esc(h.city||"—")}</div>
-              <div class="hv-name">${esc(h.name||"—")}</div>
-              ${phone ? `<div class="hv-sub">${esc(phone)}</div>` : ``}
-              ${note ? `<div class="hv-sub" style="opacity:.75">${esc(note)}</div>` : ``}
-            </div>
-            <div class="hv-actionsrow">
-              ${phone ? `<a class="hv-iconbtn" href="tel:${esc(phone)}" title="${esc(btnCall)}" aria-label="${esc(btnCall)}">📞</a>` : ``}
-              <button class="hv-iconbtn" type="button" data-act="map" data-idx="${h.__idx}" title="${esc(btnMap)}" aria-label="${esc(btnMap)}">🗺️</button>
-              <button class="hv-iconbtn" type="button" data-act="edit" data-idx="${h.__idx}" title="${esc(btnEdit)}" aria-label="${esc(btnEdit)}">✏️</button>
-              <button class="hv-iconbtn danger" type="button" data-act="del" data-idx="${h.__idx}" title="${esc(btnDel)}" aria-label="${esc(btnDel)}">🗑️</button>
-            </div>
+        <div class="hv-rowitem">
+          <div class="hv-left">
+            <div class="hv-city">${city}</div>
+            <div class="hv-name">${name}</div>
+            ${notes}
+            ${phoneLine}
+          </div>
+          <div class="hv-right">
+            ${phone ? `<a class="hv-ibtn" href="tel:${esc(phone)}" title="${esc(btnCall)}" aria-label="${esc(btnCall)}">📞</a>` : `<span class="hv-ibtn hv-ibtn--disabled" aria-hidden="true">📞</span>`}
+            <button class="hv-ibtn" type="button" data-act="map" data-idx="${h.__idx}" title="${esc(btnMap)}" aria-label="${esc(btnMap)}">🗺️</button>
+            <button class="hv-ibtn" type="button" data-act="edit" data-idx="${h.__idx}" title="${esc(btnEdit)}" aria-label="${esc(btnEdit)}">✏️</button>
+            <button class="hv-ibtn" type="button" data-act="del" data-idx="${h.__idx}" title="${esc(btnDel)}" aria-label="${esc(btnDel)}">🗑️</button>
           </div>
         </div>
       `;
-    })}).join("") || `<div style="opacity:.75;padding:6px 2px">${esc(t("toast_done"))}</div>`;
+    }).join("")}).join("") || `<div style="opacity:.75;padding:6px 2px">${esc(t("toast_done"))}</div>`;
   }
 
   // Keep icon title in sync after language changes
@@ -403,6 +401,9 @@ let hotels = load();
       syncIconTitle();
       openOverlay();
       try{ if(typeof window.applyI18n === "function") window.applyI18n(); }catch(e){}
+
+    // Close button label
+    try{ const c=ov.querySelector("#hvCloseBtn"); if(c){ const lbl=t("btn_close"); c.title=lbl; c.setAttribute("aria-label", lbl); } }catch(e){}
       render();
     }
   });
