@@ -74,58 +74,39 @@
 }
 
 
-/* Sketch layout tweaks */
-.hv-header{position:relative;}
-.hv-close{
-  border:1px solid var(--border,#e8e8ef);
-  background:var(--card,#fff);
-  border-radius:14px;
-  width:44px;height:44px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;
-}
-.hv-actions{display:none !important;}
-
-.hv-rowitem{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  align-items:center;
-  background:var(--card,#fff);
-  border:1px solid var(--border,#e8e8ef);
-  border-radius:18px;
-  padding:12px;
-}
-.hv-left{min-width:0;}
-.hv-notesline{opacity:.75;margin-top:6px;word-break:break-word;}
-.hv-phoneline{opacity:.85;margin-top:6px;font-size:14px;white-space:nowrap;}
-.hv-right{display:flex;gap:8px;flex-shrink:0;}
-.hv-ibtn{
-  width:44px;height:44px;
-  border-radius:14px;
-  border:1px solid var(--border,#e8e8ef);
-  background:var(--card,#fff);
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;
-  text-decoration:none;
-  color:inherit;
-}
-.hv-ibtn--disabled{opacity:.35;}
-
-.hv-bottom{
-  position:sticky;
+/* --- Sketch layout override --- */
+.hv-card{padding-bottom:90px;position:relative;}
+.hv-actions{
+  position:fixed;
   bottom:0;
-  margin-top:12px;
-  padding-top:12px;
-  background:linear-gradient(to bottom, rgba(255,255,255,0), var(--card,#fff) 35%);
-  display:flex;
-  gap:10px;
-  justify-content:space-between;
+  left:0;
+  right:0;
+  background:#ffffff;
+  padding:10px;
+  border-top:1px solid #e8e8ef;
+  justify-content:space-around;
+  z-index:10001;
 }
-.btn.hv-sm{
-  min-height:42px;
-  padding:8px 12px;
-  font-size:14px;
-  border-radius:16px;
+.hv-actions button{
   flex:1;
+  max-width:140px;
+}
+/* small close button top right */
+.hv-header button:last-child{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:32px;
+  height:32px;
+  padding:0;
+  font-size:14px;
+}
+/* item actions inline icons */
+.hv-item__actions{
+  display:flex;
+  gap:6px;
+}
+.hv-item__actions button{
+  padding:6px 8px;
+  font-size:14px;
 }
