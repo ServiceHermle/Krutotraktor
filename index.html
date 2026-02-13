@@ -393,106 +393,45 @@ input[type="search"] {
 }
 
 
-/* --- Fixed codes: sticky Export/Import on mobile --- */
-@media (max-width:430px){
-  #panel-fixed{ display:flex; flex-direction:column; }
-  #panel-fixed .logo{ display:none !important; }
-  #panel-fixed .f-list-scroll{
-    flex:1 1 auto;
-    overflow:auto;
-    max-height:58vh;
-    padding-bottom:100px;
-  }
-  #panel-fixed .f-footer{
-    position:sticky;
-    bottom: env(safe-area-inset-bottom);
-    background: var(--card);
-    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
-    border-top:1px solid var(--border);
-    z-index:50;
-  }
-}
 
 
-/* --- Fixed codes: list scroll + bottom bar sticky (like clients) --- */
+
+
+
+
+
+
+
+
+
+
+/* --- Fixed codes EXACTLY like Clients --- */
 @media (max-width:430px){
+
   #panel-fixed{
-    display:flex;
+    display:flex !important;
     flex-direction:column;
-  }
-  #panel-fixed #f-list{
-    flex:1 1 auto;
-    overflow:auto;
-    padding-bottom:100px;
-    margin-top:12px; /* keep spacing when inline style removed */
-  }
-  #panel-fixed .f-footer{
-    position:sticky !important;
-    bottom: env(safe-area-inset-bottom);
-    background: var(--card);
-    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
-    border-top:1px solid var(--border);
-    z-index:50;
-    margin-top:10px !important;
-  }
-}
-
-
-/* --- Fixed codes layout like clients (scroll list + sticky bottom bar) --- */
-@media (max-width:430px){
-  #panel-fixed{ display:flex; flex-direction:column; }
-  #panel-fixed{ min-height:0; }
-  #panel-fixed .btnrow{ flex:0 0 auto; }
-  #panel-fixed #f-list{
-    flex:1 1 auto;
-    min-height:0;          /* important for iOS flex scroll */
-    overflow:auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom:110px;  /* space for sticky bar */
-  }
-  #panel-fixed .f-footer{
-    position:sticky !important;
-    bottom: env(safe-area-inset-bottom);
-    background: var(--card);
-    border-top:1px solid var(--border);
-    z-index:60;
-    padding:12px 0 calc(12px + env(safe-area-inset-bottom));
-    margin-top:0 !important;
-  }
-  /* match clients: hide logo for more room */
-  #panel-fixed .logo{ display:none !important; }
-}
-
-
-
-
-
-/* --- Fixed codes: footer same level as Clients (full-height card + inner scroll) --- */
-@media (max-width:430px){
-  #panel-fixed{
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-    /* force the card to take the available viewport height */
     height: calc(100svh - 190px);
-    height: calc(100vh - 190px); /* fallback */
+    height: calc(100vh - 190px);
+    overflow:hidden;
   }
+
   #panel-fixed #f-list{
-    flex: 1 1 auto;
-    min-height: 0; /* IMPORTANT for iOS flex overflow */
+    flex:1 1 auto;
+    min-height:0;
     overflow:auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 90px;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:90px;
   }
+
   #panel-fixed .f-footer{
-    flex: 0 0 auto;
-    position: sticky !important;
-    bottom: env(safe-area-inset-bottom);
-    background: var(--card);
-    margin-top: auto !important; /* push to bottom like Clients */
-    padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border);
-    z-index: 80;
+    flex:0 0 auto;
+    position:sticky;
+    bottom:0;
+    background:var(--card);
+    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+    z-index:100;
   }
 }
 </style>
