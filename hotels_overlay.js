@@ -165,28 +165,32 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
           <input class="input" id="hvSearch" type="text" data-i18n-placeholder="hotels_search_ph" />
         </div>
 
-        <div class="hv-list" id="hvList"></div>
+        <div class="hv-list-scroll" id="hvListScroll"><div class="hv-list" id="hvList"></div></div>
         <div class="hv-bottombar">
           <button class="btn small" type="button" id="hvAddBtn" data-i18n="btn_add_hotel"></button>
           <button class="btn small" type="button" id="hvExportBtn" data-i18n="btn_export"></button>
           <button class="btn small" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
         </div>
 
-
-        <div class="hv-editor" id="hvEditor">
-          <div class="hv-grid">
-            <input class="input" id="hv-city" data-i18n-placeholder="label_city" />
-            <input class="input" id="hv-name" data-i18n-placeholder="label_hotel" />
-                          <input class="input" id="hv-address" placeholder="Address" />
-<input class="input" id="hv-phone" data-i18n-placeholder="label_phone" />
-          </div>
-          <textarea class="input hv-notes" id="hv-notes" data-i18n-placeholder="label_note"></textarea>
-          <div class="hv-item__btns" style="justify-content:flex-end">
-            <button class="btn inline" type="button" id="hvSave" data-i18n="btn_save"></button>
-            <button class="btn inline" type="button" id="hvCancel" data-i18n="btn_back"></button>
-          </div>
-        </div>
-      </div>
+        <dialog id="hvHotelDlg">
+          <form class="modal" method="dialog">
+            <div class="modal-h" id="hv-dlg-title" data-i18n="dlg_hotel_title">Hotel</div>
+            <div class="modal-b" id="hv-dlg-body">
+              <div class="hv-grid">
+                <input class="input" id="hv-city" data-i18n-placeholder="label_city" />
+                <input class="input" id="hv-name" data-i18n-placeholder="label_hotel" />
+                <input class="input" id="hv-address" data-i18n-placeholder="label_address" />
+                <input class="input" id="hv-phone" data-i18n-placeholder="label_phone" />
+                <textarea class="input hv-notes" id="hv-notes" data-i18n-placeholder="label_note"></textarea>
+              </div>
+            </div>
+            <div class="modal-f">
+              <button class="btn" type="button" id="hv-dlg-close"><span data-i18n="btn_close">Zavřít</span></button>
+              <button class="btn danger hidden" id="hv-dlg-delete" type="button" data-i18n="btn_delete">Smazat</button>
+              <button class="btn primary" id="hv-dlg-save" type="button" data-i18n="btn_save">Uložit</button>
+            </div>
+          </form>
+        </dialog>
     `;
     document.body.appendChild(ov);
 
@@ -251,9 +255,34 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
         reader.readAsText(file);
       });
     }
-    ov.querySelector("#hvCancel").addEventListener("click", closeEditor);
-    ov.querySelector("#hvSave").addEventListener("click", saveEditor);
-    ov.querySelector("#hvSearch").addEventListener("input", render);
+    
+    // Hotel dialog buttons
+    const hvDlg = ov.querySelector("#hvHotelDlg");
+    const hvClose = ov.querySelector("#hv-dlg-close");
+    const hvSave = ov.querySelector("#hv-dlg-save");
+    const hvDel = ov.querySelector("#hv-dlg-delete");
+
+    if(hvClose) hvClose.addEventListener("click", (e)=>{ e.preventDefault(); closeEditor(); });
+
+    if(hvSave) hvSave.addEventListener("click", (e)=>{ e.preventDefault(); saveEditor(); });
+
+    if(hvDel) hvDel.addEventListener("click", (e)=>{
+      e.preventDefault();
+      if(editingIndex===null || editingIndex===undefined) return;
+      if(confirm(t("confirm_delete_hotel"))){
+        hotels.splice(editingIndex,1);
+        save(hotels);
+        closeEditor();
+        render();
+      }
+    });
+
+    if(hvDlg){
+      hvDlg.addEventListener("close", ()=>{ editingIndex = null; });
+      hvDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeEditor(); });
+    }
+
+ov.querySelector("#hvSearch").addEventListener("input", render);
 
     ov.addEventListener("click", async (e)=>{
       const btn=e.target.closest("[data-act]");
@@ -305,22 +334,43 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
 
   function openEditor(idx){
     const ov=ensureOverlay();
-    const ed=ov.querySelector("#hvEditor");
-    ed.classList.add("is-open");
-    editingIndex = idx;
-    const h = (idx===null || idx===undefined) ? {city:"",name:"",phone:"",notes:""} : hotels[idx];
+    const dlg=ov.querySelector("#hvHotelDlg");
+    const delBtn=ov.querySelector("#hv-dlg-delete");
+    const title=ov.querySelector("#hv-dlg-title");
+    editingIndex = (idx===null || idx===undefined) ? null : idx;
+
+    const h = (editingIndex===null) ? {city:"",name:"",address:"",phone:"",notes:""} : (hotels[editingIndex] || {});
     ov.querySelector("#hv-city").value = h.city || "";
     ov.querySelector("#hv-name").value = h.name || "";
-      ov.querySelector("#hv-address").value = (h.address||"");
+    ov.querySelector("#hv-address").value = h.address || "";
     ov.querySelector("#hv-phone").value = h.phone || "";
     ov.querySelector("#hv-notes").value = h.notes || "";
+
+    // title + delete visibility
+    if(editingIndex===null){
+      title.textContent = t("dlg_hotel_add_title") || t("dlg_hotel_title") || "Hotel";
+      delBtn.classList.add("hidden");
+    }else{
+      title.textContent = t("dlg_hotel_edit_title") || t("dlg_hotel_title") || "Hotel";
+      delBtn.classList.remove("hidden");
+    }
+
+    if(typeof dlg.showModal === "function"){
+      dlg.showModal();
+    }else{
+      // fallback: toggle attribute
+      dlg.setAttribute("open","");
+    }
     setTimeout(()=>ov.querySelector("#hv-city").focus(),0);
   }
 
   function closeEditor(){
     const ov=document.getElementById("hvOverlay");
     if(!ov) return;
-    ov.querySelector("#hvEditor").classList.remove("is-open");
+    const dlg=ov.querySelector("#hvHotelDlg");
+    if(!dlg) return;
+    if(typeof dlg.close === "function") dlg.close();
+    else dlg.removeAttribute("open");
     editingIndex = null;
   }
 
