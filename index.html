@@ -365,6 +365,32 @@ input[type="search"] {
     max-height: 62vh;
   }
 }
+
+
+/* --- Clients footer higher + always visible --- */
+@media (max-width:430px){
+  #panel-clients{
+    display:flex;
+    flex-direction:column;
+  }
+  #panel-clients .card{
+    display:flex;
+    flex-direction:column;
+  }
+  #panel-clients .c-list-scroll{
+    flex:1 1 auto;
+    overflow:auto;
+    padding-bottom:100px;
+  }
+  #panel-clients .c-footer{
+    position:sticky;
+    bottom: env(safe-area-inset-bottom);
+    background: var(--card);
+    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+    z-index:50;
+  }
+}
 </style>
 <style id="mobile-override">
 
