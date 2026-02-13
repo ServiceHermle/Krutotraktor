@@ -173,43 +173,19 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
         </div>
 
 
-        <dialog id="hvHotelDlg">
-          <form class="modal" method="dialog">
-            <div class="modal-h" id="hv-dlg-title" data-i18n="dlg_hotel_title">Hotel</div>
-            <div class="modal-b">
-              <div style="display:grid; gap:10px">
-                <div style="display:grid; gap:8px">
-                  <label style="font-weight:700" data-i18n="label_city">Město</label>
-                  <input class="input" id="hv-city" data-i18n-placeholder="label_city" placeholder="Město" />
-                </div>
-
-                <div style="display:grid; gap:8px">
-                  <label style="font-weight:700" data-i18n="label_hotel">Hotel</label>
-                  <input class="input" id="hv-name" data-i18n-placeholder="label_hotel" placeholder="Hotel" />
-                </div>
-
-                <div style="display:grid; gap:8px">
-                  <label style="font-weight:700">Adresa</label>
-                  <input class="input" id="hv-address" placeholder="Adresa" />
-                </div>
-
-                <div style="display:grid; gap:8px">
-                  <label style="font-weight:700" data-i18n="label_phone">Telefon</label>
-                  <input class="input" id="hv-phone" data-i18n-placeholder="label_phone" placeholder="Telefon" />
-                </div>
-
-                <div style="display:grid; gap:8px">
-                  <label style="font-weight:700" data-i18n="label_note">Poznámka</label>
-                  <textarea class="input" id="hv-notes" rows="4" data-i18n-placeholder="label_note" placeholder="Poznámka"></textarea>
-                </div>
-              </div>
-            </div>
-            <div class="modal-f">
-              <button class="btn" type="button" id="hvCancel" data-i18n="btn_back">Zpět</button>
-              <button class="btn primary" type="button" id="hvSave" data-i18n="btn_save">Uložit</button>
-            </div>
-          </form>
-        </dialog>
+        <div class="hv-editor" id="hvEditor">
+          <div class="hv-grid">
+            <input class="input" id="hv-city" data-i18n-placeholder="label_city" />
+            <input class="input" id="hv-name" data-i18n-placeholder="label_hotel" />
+                          <input class="input" id="hv-address" placeholder="Address" />
+<input class="input" id="hv-phone" data-i18n-placeholder="label_phone" />
+          </div>
+          <textarea class="input hv-notes" id="hv-notes" data-i18n-placeholder="label_note"></textarea>
+          <div class="hv-item__btns" style="justify-content:flex-end">
+            <button class="btn inline" type="button" id="hvSave" data-i18n="btn_save"></button>
+            <button class="btn inline" type="button" id="hvCancel" data-i18n="btn_back"></button>
+          </div>
+        </div>
       </div>
     `;
     document.body.appendChild(ov);
@@ -329,33 +305,22 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
 
   function openEditor(idx){
     const ov=ensureOverlay();
+    const ed=ov.querySelector("#hvEditor");
+    ed.classList.add("is-open");
     editingIndex = idx;
-    const dlg = ov.querySelector("#hvHotelDlg");
-    const title = ov.querySelector("#hv-dlg-title");
-    if(title){
-      // Keep i18n key, but allow visual distinction when possible
-      title.textContent = (idx===null || idx===undefined) ? (t("btn_add_hotel") || "Hotel") : (t("btn_edit") || "Hotel");
-    }
-
-    const h = (idx===null || idx===undefined) ? {city:"",name:"",address:"",phone:"",notes:""} : hotels[idx];
+    const h = (idx===null || idx===undefined) ? {city:"",name:"",phone:"",notes:""} : hotels[idx];
     ov.querySelector("#hv-city").value = h.city || "";
     ov.querySelector("#hv-name").value = h.name || "";
       ov.querySelector("#hv-address").value = (h.address||"");
     ov.querySelector("#hv-phone").value = h.phone || "";
     ov.querySelector("#hv-notes").value = h.notes || "";
-    if(dlg){
-      try{ dlg.showModal(); }catch(e){ dlg.setAttribute('open',''); }
-    }
-    setTimeout(()=>ov.querySelector("#hv-city")?.focus(),0);
+    setTimeout(()=>ov.querySelector("#hv-city").focus(),0);
   }
 
   function closeEditor(){
     const ov=document.getElementById("hvOverlay");
     if(!ov) return;
-    const dlg = ov.querySelector("#hvHotelDlg");
-    if(dlg){
-      try{ dlg.close(); }catch(e){ dlg.removeAttribute('open'); }
-    }
+    ov.querySelector("#hvEditor").classList.remove("is-open");
     editingIndex = null;
   }
 
