@@ -93,26 +93,40 @@
     .c-menu button + button{ border-top:1px solid var(--border); }
     .c-menu button.danger{ color:#b00020; }
     .c-menu button:hover{ background:#f8fafc; }
-    dialog { border:none; border-radius:18px; padding:0; }
+    dialog { border:none; border-radius:18px; padding:0; width: min(420px, calc(100vw - 32px)); }
     /* Dialog overlay: keep popup solid, blur the page behind */
     dialog::backdrop{
       background: rgba(0,0,0,0.35);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
-    /* Dialog content container */
-    .modal { background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:18px; overflow:hidden; }
-    .modal-h { padding:12px 16px; font-weight:800; border-bottom:1px solid var(--border) }
-    .modal-b { padding:16px }
-    .modal-f { padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end }
+    /* Dialog content container (matches iOS-style sheet) */
+    .modal {
+      background:var(--card);
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      width: min(420px, calc(100vw - 32px));
+      max-height: min(92dvh, 720px);
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-h { padding:16px; font-weight:900; border-bottom:1px solid var(--border) }
+    .modal-b { padding:16px; flex:1 1 auto; min-height:0; overflow:auto; -webkit-overflow-scrolling:touch; }
+    .modal-f {
+      padding:12px 16px;
+      border-top:1px solid var(--border);
+      background: var(--card);
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+    }
+    .modal-f .btn{ flex:1 1 0; }
 
-    /* Modal footer: Danger left, primary actions right (mobile friendly) */
-    .modal-f{justify-content:flex-end;}
-    .modal-f .danger{order:0; margin-right:auto;}
-    .modal-f .btn.primary{order:2;}
-    .modal-f .btn:not(.danger):not(.primary){order:1;}
-
-  
+    /* Modal footer ordering (only when delete is shown) */
+    .modal-f .danger{ }
 /* --- Universal mobile overflow fix --- */
 input:not([type="checkbox"]):not([type="radio"]), select, textarea, button {
     max-width: 100% !important;
@@ -581,12 +595,13 @@ input[type="search"] {
 
 /* --- Hotels: sticky header + footer, list scrolls between --- */
 @media (max-width: 430px){
+  /* Constrain Hotels panel to viewport so footer menu stays visible */
   #panel-hotels:not(.hidden){
     display:flex;
     flex-direction:column;
     overflow:hidden;
-    min-height: calc(100svh - 190px);
-    min-height: calc(100vh - 190px);
+    height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
   #panel-hotels:not(.hidden) .logo{ display:none !important; }
 
@@ -604,13 +619,13 @@ input[type="search"] {
     min-height:0;
     overflow:auto;
     -webkit-overflow-scrolling:touch;
-    padding-bottom:100px;
+    padding-bottom:16px;
   }
 
   #panel-hotels:not(.hidden) .h-footer{
     flex:0 0 auto;
     position:sticky;
-    bottom: env(safe-area-inset-bottom);
+    bottom:0;
     background: var(--card);
     padding:14px 0 calc(14px + env(safe-area-inset-bottom));
     border-top:1px solid var(--border);
