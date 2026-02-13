@@ -172,8 +172,9 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
           <button class="btn small" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
         </div>
 
-        <dialog id="hvHotelDlg">
-          <form class="modal" method="dialog">
+        <div id="hvHotelDlg" class="hv-modal hidden" role="dialog" aria-modal="true">
+          <div class="hv-modal-backdrop" data-act="hvModalClose"></div>
+          <div class="hv-modal-window modal">
             <div class="modal-h" id="hv-dlg-title" data-i18n="dlg_hotel_title">Hotel</div>
             <div class="modal-b" id="hv-dlg-body">
               <div class="hv-grid">
@@ -189,8 +190,8 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
               <button class="btn danger hidden" id="hv-dlg-delete" type="button" data-i18n="btn_delete">Smazat</button>
               <button class="btn primary" id="hv-dlg-save" type="button" data-i18n="btn_save">Uložit</button>
             </div>
-          </form>
-        </dialog>
+          </div>
+        </div>
     `;
     document.body.appendChild(ov);
 
@@ -278,8 +279,12 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
     });
 
     if(hvDlg){
-      hvDlg.addEventListener("close", ()=>{ editingIndex = null; });
-      hvDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeEditor(); });
+      // close when tapping backdrop
+      const back = hvDlg.querySelector(".hv-modal-backdrop");
+      if(back) back.addEventListener("click", (e)=>{ e.preventDefault(); closeEditor(); });
+      // prevent clicks inside window from closing
+      const win = hvDlg.querySelector(".hv-modal-window");
+      if(win) win.addEventListener("click", (e)=>{ e.stopPropagation(); });
     }
 
 ov.querySelector("#hvSearch").addEventListener("input", render);
@@ -369,8 +374,8 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
     if(!ov) return;
     const dlg=ov.querySelector("#hvHotelDlg");
     if(!dlg) return;
-    if(typeof dlg.close === "function") dlg.close();
-    else dlg.removeAttribute("open");
+    dlg.classList.add("hidden");
+    document.body.classList.remove("hv-modal-open");
     editingIndex = null;
   }
 

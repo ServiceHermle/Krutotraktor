@@ -115,3 +115,11 @@
 .hv-address{opacity:.85;margin-top:4px;font-size:13px;line-height:1.25;}
 
 .hv-list-scroll{flex:1; overflow:auto; padding-bottom:8px;}
+
+
+/* Hotels editor modal (custom, works without <dialog> support) */
+body.hv-modal-open{overflow:hidden;}
+.hv-modal.hidden{display:none;}
+.hv-modal{position:fixed;inset:0;z-index:20000;display:block;}
+.hv-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.hv-modal-window{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92%,420px);max-height:calc(100vh - 80px);overflow:auto;-webkit-overflow-scrolling:touch;}
