@@ -464,16 +464,7 @@ input[type="search"] {
 }
 
 
-/* --- Fixed codes: behave like Clients (inner scroll + bottom bar) --- */
-@media (max-width:430px){
-  /* Give the card a viewport-bound height so inner list can scroll */
-  #panel-fixed{
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-    max-height: calc(100vh - 190px); /* top bars + safe area */
-  }
-  #panel-fixed #f-list{
+#panel-fixed #f-list{
     flex: 1 1 auto;
     min-height: 0; /* IMPORTANT for flex overflow on iOS */
     overflow:auto;
@@ -493,10 +484,11 @@ input[type="search"] {
 }
 
 
-/* --- Fixed codes: footer level same as Clients (non-destructive) --- */
+/* --- Fixed codes: like Clients (respect .hidden) --- */
 @media (max-width:430px){
-  #panel-fixed{
-    display:flex !important;
+  /* Apply flex only when panel is visible */
+  #panel-fixed:not(.hidden){
+    display:flex;
     flex-direction:column;
     height: calc(100svh - 190px);
     height: calc(100vh - 190px);
