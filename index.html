@@ -565,6 +565,61 @@ input[type="search"] {
     z-index:50;
   }
 }
+
+
+/* --- Fixed codes: force full-height panel so footer sits on screen bottom (like Clients) --- */
+@media (max-width: 430px){
+  #panel-fixed:not(.hidden){
+    min-height: calc(100svh - 190px);
+    min-height: calc(100vh - 190px);
+  }
+  #panel-fixed:not(.hidden) .f-footer{
+    margin-top: auto !important;
+  }
+}
+
+
+/* --- Hotels: sticky header + footer, list scrolls between --- */
+@media (max-width: 430px){
+  #panel-hotels:not(.hidden){
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    min-height: calc(100svh - 190px);
+    min-height: calc(100vh - 190px);
+  }
+  #panel-hotels:not(.hidden) .logo{ display:none !important; }
+
+  #panel-hotels:not(.hidden) .h-head{
+    flex:0 0 auto;
+    position:sticky;
+    top:0;
+    background: var(--card);
+    z-index:60;
+    padding-top:2px;
+  }
+
+  #panel-hotels:not(.hidden) .h-scroll{
+    flex:1 1 auto;
+    min-height:0;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:100px;
+  }
+
+  #panel-hotels:not(.hidden) .h-footer{
+    flex:0 0 auto;
+    position:sticky;
+    bottom: env(safe-area-inset-bottom);
+    background: var(--card);
+    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+    z-index:60;
+    display:flex;
+    justify-content:center;
+  }
+  #panel-hotels:not(.hidden) .h-footer .btn{ width:min(320px, 100%); }
+}
 </style>
 <style id="mobile-override">
 
@@ -937,19 +992,21 @@ input[type="search"] {
 <div class="card hidden" id="panel-hotels">
   <div class="logo" style="margin-top:2px"><img alt="Hermle" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAA19UlEQVR4nO3deXwkZ33n8c/zVPWl+xjNjMZzj+e0d2zjAxvHNoe5TcJuEhLMJiyBZIFk2YWwiSEEQsIalvUu4UXIbnhBsCFZTLJkCZCDDZDEEIKD8XhsfMx9eA7NIc2Mzj6qnmf/eKq6W1JLI43UUkv1e79esjWt7qrq6u5vP/WcylprEUKIBNKLfQBCCLFYJACFEIklASiESCwJQCFEYkkACiESSwJQCJFYEoBCiMSSABRCJJYEoBAisSQAhRCJJQEohEgsCUAhRGJJAAohEksCUAiRWBKAQojEkgAUQiSWBKAQIrEkAIUQiSUBKIRILAlAIURiSQAKIRJLAlAIkVgSgEKIxJIAFEIklgSgECKxJACFEIklASiESCwJQCFEYkkACiESSwJQCJFYEoBCiMSSABRCJJYEoBAisSQAhRCJJQEohEgsCUAhRGJJAAohEksCUAiRWBKAQojEkgAUQiSWBKAQIrEkAIUQiSUBKIRILAlAIURiSQAKIRJLAlAIkVgSgEKIxJIAFEIklgSgECKxJACFEIklASiESCwJQCFEYkkACiESSwJQCJFYEoBCiMSSABRCJJYEoBAisSQAhRCJJQEohEgsCUAhRGJJAAohEksCUAiRWBKAQojEkgAUQiSWBKAQIrEkAIUQiSUBKIRILAlAIURiSQAKIRJLAlAIkVgSgEKIxJIAFEIklgSgECKxJACFEIn1/wEiZPSdvyORkwAAAABJRU5ErkJggg==" style="width:120px"/></div>
 
+  <div class="h-head">
   <div class="row">
     <div class="col">
       <label data-i18n="hotels_search">Vyhledávání</label>
       <input id="h-search" inputmode="search" data-i18n-placeholder="hotels_search_ph" placeholder="Město nebo hotel…" type="text" />
       <div class="muted" data-i18n="hotels_hint">Třídění podle měst, vyhledávání podle města nebo názvu hotelu.</div>
     </div>
-    <div class="col btnrow" style="align-items:flex-end">
-      <button class="btn inline" id="h-add" type="button" data-i18n="btn_add_hotel">+ Přidat</button>
-    </div>
+  </div>
+<div class="h-scroll">
+    <div id="h-list"></div>
   </div>
 
-  <div class="c-list-scroll">
-    <div id="h-list"></div>
+
+  <div class="h-footer">
+    <button class="btn" id="h-add" type="button" data-i18n="btn_add_hotel">+ Přidat</button>
   </div>
 
   <dialog id="hotelsDlg">
