@@ -436,6 +436,32 @@ input[type="search"] {
     margin-top:10px !important;
   }
 }
+
+
+/* --- Fixed codes layout like clients (scroll list + sticky bottom bar) --- */
+@media (max-width:430px){
+  #panel-fixed{ display:flex; flex-direction:column; }
+  #panel-fixed{ min-height:0; }
+  #panel-fixed .btnrow{ flex:0 0 auto; }
+  #panel-fixed #f-list{
+    flex:1 1 auto;
+    min-height:0;          /* important for iOS flex scroll */
+    overflow:auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom:110px;  /* space for sticky bar */
+  }
+  #panel-fixed .f-footer{
+    position:sticky !important;
+    bottom: env(safe-area-inset-bottom);
+    background: var(--card);
+    border-top:1px solid var(--border);
+    z-index:60;
+    padding:12px 0 calc(12px + env(safe-area-inset-bottom));
+    margin-top:0 !important;
+  }
+  /* match clients: hide logo for more room */
+  #panel-fixed .logo{ display:none !important; }
+}
 </style>
 <style id="mobile-override">
 
