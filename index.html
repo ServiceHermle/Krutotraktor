@@ -412,6 +412,30 @@ input[type="search"] {
     z-index:50;
   }
 }
+
+
+/* --- Fixed codes: list scroll + bottom bar sticky (like clients) --- */
+@media (max-width:430px){
+  #panel-fixed{
+    display:flex;
+    flex-direction:column;
+  }
+  #panel-fixed #f-list{
+    flex:1 1 auto;
+    overflow:auto;
+    padding-bottom:100px;
+    margin-top:12px; /* keep spacing when inline style removed */
+  }
+  #panel-fixed .f-footer{
+    position:sticky !important;
+    bottom: env(safe-area-inset-bottom);
+    background: var(--card);
+    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+    z-index:50;
+    margin-top:10px !important;
+  }
+}
 </style>
 <style id="mobile-override">
 
@@ -679,7 +703,7 @@ input[type="search"] {
 <div class="btnrow">
 <button class="btn inline" data-i18n="btn_add_code" id="f-add" type="button">+ Přidat kód</button>
 </div>
-<div id="f-list" style="margin-top:12px"></div>
+<div id="f-list"></div>
 <div class="btnrow f-footer" style="margin-top:14px">
 <button class="btn inline" data-i18n="btn_export_json" id="f-export" type="button">Export</button>
 <button class="btn inline" data-i18n="btn_import_json" id="f-import-btn" type="button">Import</button>
