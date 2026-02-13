@@ -8,8 +8,7 @@
 <link href="manifest.json" rel="manifest"/>
 <meta content="#f7f7f9" name="theme-color"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<style>
-    :root { --bg:#f7f7f9; --card:#ffffff; --text:#000000; --border:#e8e8ef; --accent:#d32525; --accent-2:#cf2b2b; --radius:24px; }
+<style>:root { --bg:#f7f7f9; --card:#ffffff; --text:#000000; --border:#e8e8ef; --accent:#d32525; --accent-2:#cf2b2b; --radius:24px; }
     * { box-sizing:border-box }
     html,body { margin:0; padding:0; background:var(--bg); color:var(--text); font: 16px/1.45 -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
     .wrap { max-width:520px; margin:0 auto; padding:10px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
@@ -305,8 +304,6 @@ input[type="search"] {
     #r-table td:nth-child(3),
     #r-table td:nth-child(4) { text-align: right; }
 
-
-
 /* --- Mobile fit: keep Hotels + disclaimer visible without overlap --- */
 @media (max-width: 430px){
   .wrap{ padding-top:8px; padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
@@ -337,13 +334,7 @@ input[type="search"] {
 }
 
 
-/* --- Mobile layout tweaks (clients/range) --- */
-@media (max-width: 430px){
-  /* More room: hide logo on Range + Clients */
-  #panel-range .logo,
-  #panel-clients .logo{ display:none !important; }
-
-  /* Clients: keep Export/Import visible */
+/* Clients: keep Export/Import visible */
   #panel-clients{ overflow:hidden; }
   #panel-clients .c-list-scroll{
     max-height: 58vh;
@@ -367,13 +358,7 @@ input[type="search"] {
 }
 
 
-/* --- Clients footer higher + always visible --- */
-@media (max-width:430px){
-  #panel-clients{
-    display:flex;
-    flex-direction:column;
-  }
-  #panel-clients .card{
+#panel-clients .card{
     display:flex;
     flex-direction:column;
   }
@@ -393,10 +378,7 @@ input[type="search"] {
 }
 
 
-/* --- Fixed codes: sticky Export/Import on mobile --- */
-@media (max-width:430px){
-  #panel-fixed{ display:flex; flex-direction:column; }
-  #panel-fixed .logo{ display:none !important; }
+#panel-fixed .logo{ display:none !important; }
   #panel-fixed .f-list-scroll{
     flex:1 1 auto;
     overflow:auto;
@@ -414,13 +396,7 @@ input[type="search"] {
 }
 
 
-/* --- Fixed codes: list scroll + bottom bar sticky (like clients) --- */
-@media (max-width:430px){
-  #panel-fixed{
-    display:flex;
-    flex-direction:column;
-  }
-  #panel-fixed #f-list{
+#panel-fixed #f-list{
     flex:1 1 auto;
     overflow:auto;
     padding-bottom:100px;
@@ -484,17 +460,7 @@ input[type="search"] {
 }
 
 
-/* --- Fixed codes: like Clients (respect .hidden) --- */
-@media (max-width:430px){
-  /* Apply flex only when panel is visible */
-  #panel-fixed:not(.hidden){
-    display:flex;
-    flex-direction:column;
-    height: calc(100svh - 190px);
-    height: calc(100vh - 190px);
-    overflow:hidden;
-  }
-  #panel-fixed #f-list{
+#panel-fixed #f-list{
     flex:1 1 auto;
     min-height:0;
     overflow:auto;
@@ -510,6 +476,93 @@ input[type="search"] {
     border-top:1px solid var(--border);
     z-index:100;
     margin-top:auto;
+  }
+}
+
+
+/* Hide logo on mobile like other tabs to gain space */
+  #panel-fixed:not(.hidden) .logo{ display:none !important; }
+
+  /* Let the list take remaining space and scroll */
+  #panel-fixed:not(.hidden) #f-list{
+    flex:1 1 auto;
+    min-height:0;                 /* critical for iOS */
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:100px;         /* same as Clients */
+  }
+
+  /* Footer identical to Clients footer (padding + safe area) */
+  #panel-fixed:not(.hidden) .f-footer{
+    margin-top:auto;
+    position:sticky;
+    bottom: env(safe-area-inset-bottom);
+    background: var(--card);
+    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+    z-index:50;
+  }
+}
+
+
+/* --- Mobile tweaks (Clients + Period + Fixed codes) --- */
+@media (max-width: 430px){
+
+  /* Give more space on Clients + Period + Fixed codes */
+  #panel-range .logo,
+  #panel-clients .logo,
+  #panel-fixed .logo{ display:none !important; }
+
+  /* Clients: inner scroll + fixed bottom bar */
+  #panel-clients{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  #panel-clients .c-list-scroll{
+    flex:1 1 auto;
+    min-height:0;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:100px;
+  }
+  #panel-clients .c-footer{
+    flex:0 0 auto;
+    position:sticky;
+    bottom: env(safe-area-inset-bottom);
+    background: var(--card);
+    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+    z-index:50;
+  }
+
+  /* Period: show as much of the week table as possible */
+  #panel-range div[style*="overflow:auto"]{
+    max-height: 62vh;
+  }
+
+  /* Fixed codes: same behavior as Clients (only when active) */
+  #panel-fixed:not(.hidden){
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  #panel-fixed:not(.hidden) #f-list{
+    flex:1 1 auto;
+    min-height:0;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:100px;
+  }
+  #panel-fixed:not(.hidden) .f-footer{
+    flex:0 0 auto;
+    margin-top:auto;
+    position:sticky;
+    bottom: env(safe-area-inset-bottom);
+    background: var(--card);
+    padding:14px 0 calc(14px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+    z-index:50;
   }
 }
 </style>
