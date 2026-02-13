@@ -464,28 +464,32 @@ input[type="search"] {
 }
 
 
-/* --- Fixed codes: behave like Clients (inner scroll + bottom bar) --- */
+
+
+
+/* --- Fixed codes: footer same level as Clients (full-height card + inner scroll) --- */
 @media (max-width:430px){
-  /* Give the card a viewport-bound height so inner list can scroll */
   #panel-fixed{
     display:flex;
     flex-direction:column;
     overflow:hidden;
-    max-height: calc(100vh - 190px); /* top bars + safe area */
+    /* force the card to take the available viewport height */
+    height: calc(100svh - 190px);
+    height: calc(100vh - 190px); /* fallback */
   }
   #panel-fixed #f-list{
     flex: 1 1 auto;
-    min-height: 0; /* IMPORTANT for flex overflow on iOS */
+    min-height: 0; /* IMPORTANT for iOS flex overflow */
     overflow:auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 90px; /* room under last item */
+    padding-bottom: 90px;
   }
   #panel-fixed .f-footer{
     flex: 0 0 auto;
     position: sticky !important;
     bottom: env(safe-area-inset-bottom);
     background: var(--card);
-    margin-top: 10px !important;
+    margin-top: auto !important; /* push to bottom like Clients */
     padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--border);
     z-index: 80;
