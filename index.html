@@ -1517,6 +1517,17 @@ function showTab(id){
   document.getElementById('panel-fixed').classList.toggle('hidden', id!=='fixed');
   document.getElementById('panel-clients').classList.toggle('hidden', id!=='clients');
   document.getElementById('panel-hotels').classList.toggle('hidden', id!=='hotels');
+  // Prevent iOS from auto-focusing inputs when opening Hotels
+  if(id==='hotels'){
+    const hs = document.getElementById('h-search');
+    try{ if(document.activeElement) document.activeElement.blur(); }catch(e){}
+    try{ if(hs) hs.blur(); }catch(e){}
+    setTimeout(()=>{
+      try{ if(document.activeElement) document.activeElement.blur(); }catch(e){}
+      try{ if(hs) hs.blur(); }catch(e){}
+    }, 0);
+  }
+
 }
 tabs.forEach(t => t.addEventListener('click', (e)=>{ 
   tabs.forEach(x=>x.classList.remove('active')); e.currentTarget.classList.add('active'); 
