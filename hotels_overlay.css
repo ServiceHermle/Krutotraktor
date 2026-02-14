@@ -115,3 +115,33 @@
 .hv-address{opacity:.85;margin-top:4px;font-size:13px;line-height:1.25;}
 
 .hv-list-scroll{flex:1; overflow:auto; padding-bottom:8px;}
+
+
+/* --- Hotel editor modal (custom, iOS-safe) --- */
+body.hv-modal-open{ overflow:hidden; }
+
+.hv-modal.hidden{ display:none; }
+.hv-modal{
+  position:fixed;
+  inset:0;
+  z-index:20000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+}
+.hv-modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.hv-modal-sheet{
+  position:relative;
+  width:min(520px, 94vw);
+  max-height: min(86vh, 720px);
+  overflow:auto;
+  border-radius:18px;
+}
+.hv-modal-sheet .modal{ border-radius:18px; }

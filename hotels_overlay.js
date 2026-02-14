@@ -172,25 +172,28 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
           <button class="btn small" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
         </div>
 
-        <dialog id="hvHotelDlg">
-          <form class="modal" method="dialog">
-            <div class="modal-h" id="hv-dlg-title" data-i18n="dlg_hotel_title">Hotel</div>
-            <div class="modal-b" id="hv-dlg-body">
-              <div class="hv-grid">
-                <input class="input" id="hv-city" data-i18n-placeholder="label_city" />
-                <input class="input" id="hv-name" data-i18n-placeholder="label_hotel" />
-                <input class="input" id="hv-address" data-i18n-placeholder="label_address" />
-                <input class="input" id="hv-phone" data-i18n-placeholder="label_phone" />
-                <textarea class="input hv-notes" id="hv-notes" data-i18n-placeholder="label_note"></textarea>
+        <div id="hvHotelDlg" class="hv-modal hidden" aria-hidden="true">
+          <div class="hv-modal-backdrop" data-act="hvHotelBackdrop"></div>
+          <div class="hv-modal-sheet" role="dialog" aria-modal="true">
+            <div class="modal">
+              <div class="modal-h" id="hv-dlg-title" data-i18n="dlg_hotel_title">Hotel</div>
+              <div class="modal-b" id="hv-dlg-body">
+                <div class="hv-grid">
+                  <input class="input" id="hv-city" data-i18n-placeholder="label_city" />
+                  <input class="input" id="hv-name" data-i18n-placeholder="label_hotel" />
+                  <input class="input" id="hv-address" data-i18n-placeholder="label_address" />
+                  <input class="input" id="hv-phone" data-i18n-placeholder="label_phone" />
+                  <textarea class="input hv-notes" id="hv-notes" data-i18n-placeholder="label_note"></textarea>
+                </div>
+              </div>
+              <div class="modal-f">
+                <button class="btn" type="button" id="hv-dlg-close"><span data-i18n="btn_close">Zavřít</span></button>
+                <button class="btn danger hidden" id="hv-dlg-delete" type="button" data-i18n="btn_delete">Smazat</button>
+                <button class="btn primary" id="hv-dlg-save" type="button" data-i18n="btn_save">Uložit</button>
               </div>
             </div>
-            <div class="modal-f">
-              <button class="btn" type="button" id="hv-dlg-close"><span data-i18n="btn_close">Zavřít</span></button>
-              <button class="btn danger hidden" id="hv-dlg-delete" type="button" data-i18n="btn_delete">Smazat</button>
-              <button class="btn primary" id="hv-dlg-save" type="button" data-i18n="btn_save">Uložit</button>
-            </div>
-          </form>
-        </dialog>
+          </div>
+        </div>
     `;
     document.body.appendChild(ov);
 
@@ -278,8 +281,11 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
     });
 
     if(hvDlg){
-      hvDlg.addEventListener("close", ()=>{ editingIndex = null; });
-      hvDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeEditor(); });
+      // backdrop click closes
+      hvDlg.addEventListener("click", (e)=>{
+        const b = e.target.closest('[data-act="hvHotelBackdrop"]');
+        if(b) closeEditor();
+      });
     }
 
 ov.querySelector("#hvSearch").addEventListener("input", render);
@@ -355,12 +361,9 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
       delBtn.classList.remove("hidden");
     }
 
-    if(typeof dlg.showModal === "function"){
-      dlg.showModal();
-    }else{
-      // fallback: toggle attribute
-      dlg.setAttribute("open","");
-    }
+    dlg.classList.remove("hidden");
+    dlg.setAttribute("aria-hidden","false");
+    document.body.classList.add("hv-modal-open");
     setTimeout(()=>ov.querySelector("#hv-city").focus(),0);
   }
 
@@ -369,8 +372,9 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
     if(!ov) return;
     const dlg=ov.querySelector("#hvHotelDlg");
     if(!dlg) return;
-    if(typeof dlg.close === "function") dlg.close();
-    else dlg.removeAttribute("open");
+    dlg.classList.add("hidden");
+    dlg.setAttribute("aria-hidden","true");
+    document.body.classList.remove("hv-modal-open");
     editingIndex = null;
   }
 
