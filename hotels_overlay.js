@@ -359,13 +359,9 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
       title.textContent = t("dlg_hotel_edit_title") || t("dlg_hotel_title") || "Hotel";
       delBtn.classList.remove("hidden");
     }
-
-    if(typeof dlg.showModal === "function"){
-      dlg.showModal();
-    }else{
-      // fallback: toggle attribute
-      dlg.setAttribute("open","");
-    }
+    // show modal (works on iOS/PWA)
+    dlg.classList.remove("hidden");
+    document.body.classList.add("hv-modal-open");
     setTimeout(()=>ov.querySelector("#hv-city").focus(),0);
   }
 
@@ -375,6 +371,7 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
     const dlg=ov.querySelector("#hvHotelDlg");
     if(!dlg) return;
     dlg.classList.add("hidden");
+    dlg.removeAttribute && dlg.removeAttribute("open");
     document.body.classList.remove("hv-modal-open");
     editingIndex = null;
   }
