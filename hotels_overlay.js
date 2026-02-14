@@ -349,7 +349,9 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
     const ov=ensureOverlay();
     ov.classList.add("is-open");
     if(app) app.style.display="none";
-    const s=ov.querySelector("#hvSearch"); if(s){ s.value=""; s.focus(); }
+    const s=ov.querySelector("#hvSearch"); if(s){ s.value=""; }
+    // Prevent iOS from auto-opening keyboard by focusing inputs on view switch
+    try{ document.activeElement && document.activeElement.blur && document.activeElement.blur(); }catch(e){}
     closeEditor();
     render();
   }
@@ -499,4 +501,11 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
   // Initial title
   document.addEventListener("DOMContentLoaded", syncIconTitle);
 
+  // iOS/Safari can restore focus when returning to the app; blur to avoid keyboard popping up
+  window.addEventListener("pageshow", ()=>{
+    try{ document.activeElement && document.activeElement.blur && document.activeElement.blur(); }catch(e){}
+  });
+  window.addEventListener("load", ()=>{
+    setTimeout(()=>{ try{ document.activeElement && document.activeElement.blur && document.activeElement.blur(); }catch(e){} }, 50);
+  });
 })();
