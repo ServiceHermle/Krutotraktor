@@ -1009,17 +1009,7 @@ input[type="search"] {
     <button class="btn" id="h-add" type="button" data-i18n="btn_add_hotel">+ Přidat</button>
   </div>
 
-  <dialog id="hotelsDlg">
-    <form class="modal" method="dialog">
-      <div class="modal-h" id="h-dlg-title" data-i18n="dlg_hotel_title">Hotel</div>
-      <div class="modal-b" id="h-dlg-body"></div>
-      <div class="modal-f">
-        <button class="btn" type="button" onclick="this.closest('dialog').close()" value="cancel"><span data-i18n="btn_close">Zavřít</span></button>
-        <button class="btn danger hidden" id="h-dlg-delete" type="button" data-i18n="btn_delete">Smazat</button>
-        <button class="btn primary" id="h-dlg-save" type="button" data-i18n="btn_save">Uložit</button>
-      </div>
-    </form>
-  </dialog>
+  
 </div>
 
 <!-- logout moved to top bar -->
@@ -2949,5 +2939,19 @@ document.addEventListener("DOMContentLoaded", ()=>{
   </div>
 </div>
   <script src="hotels_overlay.js"></script>
+
+
+<dialog id="hotelsDlg">
+    <form class="modal" method="dialog">
+      <div class="modal-h" id="h-dlg-title" data-i18n="dlg_hotel_title">Hotel</div>
+      <div class="modal-b" id="h-dlg-body"></div>
+      <div class="modal-f">
+        <button class="btn" type="button" onclick="this.closest('dialog').close()" value="cancel"><span data-i18n="btn_close">Zavřít</span></button>
+        <button class="btn danger hidden" id="h-dlg-delete" type="button" data-i18n="btn_delete">Smazat</button>
+        <button class="btn primary" id="h-dlg-save" type="button" data-i18n="btn_save">Uložit</button>
+      </div>
+    </form>
+  </dialog>
+
 </body>
 </html>
