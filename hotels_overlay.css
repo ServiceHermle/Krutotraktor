@@ -1,10 +1,10 @@
 
 /* Hotels overlay view (namespaced) */
 .hv-overlay{display:none;position:fixed;inset:0;z-index:10000;background:var(--bg,#f7f7f9);overflow:hidden;padding:14px;}
-.hv-overlay.is-open{display:flex;}
+/* Keep overlay as a flex container so the card layout is stable on iOS */
+.hv-overlay.is-open{display:flex;align-items:stretch;justify-content:center;}
 
-.hv-overlay.is-open{display:block;}
-.hv-card{max-width:820px;margin:0 auto;background:var(--card,#fff);border:1px solid var(--border,#e8e8ef);border-radius:20px;padding:12px;display:flex;flex-direction:column;width:100%;height:calc(100vh - 28px);}
+.hv-card{max-width:820px;margin:0 auto;background:var(--card,#fff);border:1px solid var(--border,#e8e8ef);border-radius:20px;padding:12px;display:flex;flex-direction:column;width:100%;height:calc(100vh - 28px);min-height:0;}
 
 .hv-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
 .hv-title{font-weight:900;font-size:18px;}
@@ -91,7 +91,7 @@
   line-height:1;
   padding:0;
 }
-.hv-bottombar{flex-shrink:0; background:var(--card,#fff); border-top:1px solid var(--border,#e8e8ef); padding:8px 10px; display:flex; gap:10px; margin-top:10px;}
+.hv-bottombar{flex-shrink:0; background:var(--card,#fff); border-top:1px solid var(--border,#e8e8ef); padding:10px 10px calc(10px + env(safe-area-inset-bottom)); display:flex; gap:10px; margin-top:10px;}
 .btn.small{flex:1; padding:8px 10px; font-size:13px; border-radius:14px;}
 .hv-item--row{display:flex; justify-content:space-between; align-items:center; gap:12px;}
 .hv-left{min-width:0; flex:1;}
@@ -114,7 +114,12 @@
 .hv-citygroup__title{font-weight:900;margin:6px 2px 2px 2px;}
 .hv-address{opacity:.85;margin-top:4px;font-size:13px;line-height:1.25;}
 
-.hv-list-scroll{flex:1; overflow:auto; padding-bottom:8px;}
+/* Critical for iOS: allow the inner list to scroll between header and footer */
+.hv-list-scroll{flex:1; min-height:0; overflow:auto; -webkit-overflow-scrolling:touch; padding-bottom:18px;}
+
+/* Anchor header/search visually while list scrolls */
+.hv-header{position:sticky; top:0; z-index:20; background:var(--card,#fff); padding-top: env(safe-area-inset-top);}
+.hv-row{position:sticky; top:44px; z-index:19; background:var(--card,#fff); padding-bottom:8px;}
 
 
 /* --- Hotel editor modal (custom, iOS-safe) --- */
