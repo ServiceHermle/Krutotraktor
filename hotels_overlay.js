@@ -172,10 +172,8 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
           <button class="btn small" type="button" id="hvImportBtn" data-i18n="btn_import_json"></button>
         </div>
 
-        <div id="hvHotelDlg" class="hv-modal hidden" aria-hidden="true">
-          <div class="hv-modal-backdrop" data-act="hvHotelBackdrop"></div>
-          <div class="hv-modal-sheet" role="dialog" aria-modal="true">
-            <div class="modal">
+        <dialog id="hvHotelDlg" class="hv-hotel-dlg">
+          <form class="modal" method="dialog">
               <div class="modal-h" id="hv-dlg-title" data-i18n="dlg_hotel_title">Hotel</div>
               <div class="modal-b" id="hv-dlg-body">
                 <div class="hv-grid">
@@ -191,9 +189,8 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
                 <button class="btn danger hidden" id="hv-dlg-delete" type="button" data-i18n="btn_delete">Smazat</button>
                 <button class="btn primary" id="hv-dlg-save" type="button" data-i18n="btn_save">Uložit</button>
               </div>
-            </div>
-          </div>
-        </div>
+          </form>
+        </dialog>
     `;
     document.body.appendChild(ov);
 
@@ -207,6 +204,33 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
       exportHotelsJSON(hotels);
       // Uncomment if you also want CSV every time:
       // exportHotelsCSV(hotels);
+
+    // Hotel editor dialog bindings
+    const hotelDlg = ov.querySelector('#hvHotelDlg');
+    const hotelClose = ov.querySelector('#hv-dlg-close');
+    const hotelSave = ov.querySelector('#hv-dlg-save');
+    const hotelDelete = ov.querySelector('#hv-dlg-delete');
+
+    if(hotelClose) hotelClose.addEventListener('click', (e)=>{ e.preventDefault(); closeEditor(); });
+    if(hotelSave) hotelSave.addEventListener('click', (e)=>{ e.preventDefault(); saveEditor(); });
+    if(hotelDelete) hotelDelete.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(editingIndex===null) return;
+      if(confirm(t('confirm_delete_hotel'))){
+        hotels.splice(editingIndex, 1);
+        save(hotels);
+        closeEditor();
+        render();
+      }
+    });
+
+    // Click on backdrop (outside modal) closes the dialog on browsers that support it
+    if(hotelDlg){
+      hotelDlg.addEventListener('click', (e)=>{
+        if(e.target === hotelDlg){ closeEditor(); }
+      });
+    }
+
     });
 
     // Import (mode dialog + file picker)
@@ -361,8 +385,7 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
       delBtn.classList.remove("hidden");
     }
 
-    dlg.classList.remove("hidden");
-    dlg.setAttribute("aria-hidden","false");
+    dlg.showModal();
     document.body.classList.add("hv-modal-open");
     setTimeout(()=>ov.querySelector("#hv-city").focus(),0);
   }
@@ -372,8 +395,7 @@ ov.querySelector("#hvSearch").addEventListener("input", render);
     if(!ov) return;
     const dlg=ov.querySelector("#hvHotelDlg");
     if(!dlg) return;
-    dlg.classList.add("hidden");
-    dlg.setAttribute("aria-hidden","true");
+    try{ dlg.close(); }catch(e){}
     document.body.classList.remove("hv-modal-open");
     editingIndex = null;
   }

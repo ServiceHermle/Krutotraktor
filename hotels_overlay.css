@@ -145,3 +145,16 @@ body.hv-modal-open{ overflow:hidden; }
   border-radius:18px;
 }
 .hv-modal-sheet .modal{ border-radius:18px; }
+
+
+/* --- Hotel editor as <dialog> (uses same look as other dialogs) --- */
+.hv-hotel-dlg{
+  border:none;
+  padding:0;
+  background:transparent;
+  width:min(520px, 92vw);
+}
+.hv-hotel-dlg::backdrop{
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(6px);
+}
