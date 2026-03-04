@@ -334,6 +334,14 @@ input[type="search"] {
 }
 
 
+
+/* Fixed codes: split view (codes vs parameters) */
+.fixedSplit{ display:flex; gap:10px; margin-top:10px; }
+.fixedCol{ flex:1 1 0; min-width:0; }
+.fixedHead{ font-weight:900; opacity:.8; margin:6px 0 10px; }
+@media (max-width: 520px){
+  .fixedSplit{ flex-direction:column; }
+}
 /* Clients: keep Export/Import visible */
   #panel-clients{ overflow:hidden; }
   #panel-clients .c-list-scroll{
@@ -846,6 +854,17 @@ input[type="search"] {
 <button class="btn" data-i18n="btn_copy_all" id="copyAll" type="button">Kopírovat vše</button>
 <button class="btn primary" data-i18n="btn_share" id="shareAll" type="button">Sdílet</button>
 </div>
+
+<div id="lastMachineBox" style="display:none;margin-top:10px">
+  <div role="button" tabindex="0" id="lastMachineTap"
+       style="padding:10px;border:1px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <div style="min-width:0">
+      <div style="font-weight:900;opacity:.8;font-size:.9rem" data-i18n="last_machine_title">Poslední stroj</div>
+      <div id="lastMachineText" style="font-weight:900;word-break:break-word"></div>
+    </div>
+    <div style="opacity:.7;font-size:1.1rem">↺</div>
+  </div>
+</div>
 <button class="btn" data-i18n="btn_add_machine" id="addMachine" style="grid-column: span 2; width:100%; margin-top:10px; font-weight:900;">${t("btn_add_machine_small")}</button>
 <div class="hotels-inline">
   <button class="btn" id="hotelViewBtn" type="button" style="width:100%;">🛌 <span data-i18n="tab_hotels">Hotely</span></button>
@@ -887,7 +906,16 @@ input[type="search"] {
 <div class="btnrow">
 <button class="btn inline" data-i18n="btn_add_code" id="f-add" type="button">+ Přidat kód</button>
 </div>
-<div id="f-list"></div>
+<div class="fixedSplit">
+  <div class="fixedCol">
+    <div class="fixedHead" data-i18n="fixed_head_codes">Pevné kódy</div>
+    <div id="f-list-fixed"></div>
+  </div>
+  <div class="fixedCol">
+    <div class="fixedHead" data-i18n="fixed_head_params">Parametry</div>
+    <div id="f-list-param"></div>
+  </div>
+</div>
 <div class="btnrow f-footer" style="margin-top:14px">
 <button class="btn inline" data-i18n="btn_export_json" id="f-export" type="button">Export</button>
 <button class="btn inline" data-i18n="btn_import_json" id="f-import-btn" type="button">Import</button>
@@ -900,6 +928,7 @@ input[type="search"] {
 <label data-i18n="label_name">Název</label><input id="fk-label"/>
 <label data-i18n="label_code">Kód</label><input id="fk-code"/>
 <label data-i18n="label_desc">Popis</label><input id="fk-desc"/>
+<label data-i18n="label_param">Parametr (volitelné)</label><input id="fk-param" placeholder="např. D, L, Z…"/>
 </div>
 <div class="modal-f">
 <button class="btn" onclick="this.closest('dialog').close()" type="button" value="cancel"><span data-i18n="btn_close">Zavřít</span></button>
@@ -1371,7 +1400,7 @@ const Store = (()=>{
   return MemDB;
 })();
 
-const LS_KEYS = { trustedDev: 'hdh_trusted_device_v1', customers: 'hdh-customers-v1' };
+const LS_KEYS = { trustedDev: 'hdh_trusted_device_v1', customers: 'hdh-customers-v1' , lastMachine: 'hdh-last-machine-v1' };
 
 const SECURITY = {
   // "Ošklivý seed" uložený uvnitř aplikace (nejde o skutečné zabezpečení – jen kosmetické znepříjemnění).
@@ -1534,6 +1563,27 @@ tabs.forEach(t => t.addEventListener('click', (e)=>{
   showTab(e.currentTarget.dataset.tab);
 }));
 
+// Quick reuse: last used machine (no extra button — tap the row)
+(function initLastMachineTap(){
+  const tap = document.getElementById('lastMachineTap');
+  if(tap){
+    const go = ()=>{
+      const lm = loadLastMachine();
+      if(!lm || !lm.number) return;
+      document.getElementById('machine').value = lm.number;
+      tabs.forEach(x=>x.classList.remove('active'));
+      const tbtn = document.querySelector('.tab[data-tab="single"]');
+      if(tbtn) tbtn.classList.add('active');
+      showTab('single');
+      toast(t("toast_filled_calc"));
+    };
+    tap.addEventListener('click', go);
+    tap.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); go(); } });
+  }
+  // initial paint
+  try{ updateLastMachineUI(); }catch(e){}
+})();
+
 function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg||'Hotovo'; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 1400); }
 
 // Calc core
@@ -1570,6 +1620,14 @@ function computeAll(){
   const dateStr = document.getElementById('date').value;
   const N = parseInt(document.getElementById('machine').value,10);
   if(!dateStr || isNaN(N)){ toast('Zadejte datum i číslo stroje'); return; }
+  // persist last used machine for quick reuse
+  try{
+    const prev = loadLastMachine();
+    const obj = { number: N, ts: Date.now() };
+    if(prev && prev.number===N){ if(prev.label) obj.label=prev.label; if(prev.customerName) obj.customerName=prev.customerName; }
+    saveLastMachine(obj);
+    updateLastMachineUI();
+  }catch(e){}
   const F = baseF(dateStr);
   setCode(document.getElementById('mpAccess'), computeCode(N,F,11,1777));
   setCode(document.getElementById('mpAcceptance'), computeCode(N,F,12,2888));
@@ -1849,6 +1907,32 @@ function saveCustomers(list){
 }
 function uuid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
 
+// Last used machine (for quick reuse in Výpočet)
+function loadLastMachine(){
+  try{ const raw = Store.getItem(LS_KEYS.lastMachine); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+function saveLastMachine(obj){
+  try{ Store.setItem(LS_KEYS.lastMachine, JSON.stringify(obj)); return true; }
+  catch(e){ return false; }
+}
+function updateLastMachineUI(){
+  const box = document.getElementById('lastMachineBox');
+  const txt = document.getElementById('lastMachineText');
+  if(!box || !txt) return;
+  const lm = loadLastMachine();
+  if(!lm || !lm.number){
+    box.style.display='none';
+    return;
+  }
+  const parts = [];
+  parts.push(`N: ${lm.number}`);
+  if(lm.label) parts.push(lm.label);
+  if(lm.customerName) parts.push(lm.customerName);
+  txt.textContent = parts.join(' — ');
+  box.style.display='block';
+}
+
 (function ensureSeed(){
   try{
     if (Store.getItem(LS_KEYS.customers) === null) {
@@ -1937,7 +2021,7 @@ function renderCustomers(filter=""){
           ? nameN.startsWith(qn)
           : (nameN.includes(qn) || noteN.includes(qn) || contactN.includes(qn) || phoneS.includes(q)));
 
-    const machines=(c.machines||[]);
+    const machines=[...(c.machines||[])].sort((a,b)=>(Number(b.number)||0)-(Number(a.number)||0));
     const matchedMachines=machines.filter(m=>{
       const labN = norm(m.label||"");
       const numS = String(m.number||"");
@@ -2235,6 +2319,7 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
           (close2)=>{
             cc.machines=cc.machines||[];
             cc.machines.push({id:uuid(), label:(document.getElementById('f-label').value||'').trim(), number: parseInt(document.getElementById('f-number').value||'0',10)});
+            cc.machines.sort((a,b)=>(Number(b.number)||0)-(Number(a.number)||0));
             if(saveCustomers(fresh)){ renderCustomers(document.getElementById('c-search').value); close2(); toast(t("toast_saved")); }
           }
         );
@@ -2273,6 +2358,7 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
   if(act==='add-m'){ const id=trg.getAttribute('data-id'); const c=list.find(x=>x.id===id);
     openDialog(t("dlg_add_machine_title"), `<label>${t("label_machine_name")}</label><input id="f-label"><label>${t("label_machine_number_short")}</label><input id="f-number" type="number" inputmode="numeric">`, (close)=>{
       c.machines=c.machines||[]; c.machines.push({id:uuid(), label:(document.getElementById('f-label').value||'').trim(), number: parseInt(document.getElementById('f-number').value||'0',10)});
+      c.machines.sort((a,b)=>(Number(b.number)||0)-(Number(a.number)||0));
       if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
     }); return; }
   if(act==='del-m'){ const cid=trg.getAttribute('data-cid'); const mid=trg.getAttribute('data-mid'); const c=list.find(x=>x.id===cid); if(!confirm(t("confirm_delete_machine"))) return; c.machines=(c.machines||[]).filter(m=>m.id!==mid); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); toast(t("toast_deleted")); } return; }
@@ -2294,7 +2380,16 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
     return;
   }
   if(act==='use-m'){ const cid=trg.getAttribute('data-cid'); const mid=trg.getAttribute('data-mid'); const c=list.find(x=>x.id===cid); const m=(c.machines||[]).find(x=>x.id===mid);
-    if(m&&m.number){ document.getElementById('machine').value=m.number; tabs.forEach(x=>x.classList.remove('active')); document.querySelector('.tab[data-tab="single"]').classList.add('active'); showTab('single'); toast(t("toast_filled_calc")); } return; }
+    if(m&&m.number){
+      document.getElementById('machine').value=m.number;
+      try{ saveLastMachine({ number: m.number, label: m.label||'', customerName: (c&&c.name)||'', ts: Date.now() }); updateLastMachineUI(); }catch(e){}
+      tabs.forEach(x=>x.classList.remove('active'));
+      document.querySelector('.tab[data-tab="single"]').classList.add('active');
+      showTab('single');
+      toast(t("toast_filled_calc"));
+    }
+    return;
+  }
 });
 
 
@@ -2494,15 +2589,32 @@ function saveFixed(list){
 function renderFixed(filter=""){
   const q = (filter||"").trim().toLowerCase();
   const list = loadFixed();
-  const root = document.getElementById('f-list');
-  if(!root) return;
-  root.innerHTML = "";
-  list.forEach(k=>{
-    const match = !q 
-      || (k.label||"").toLowerCase().includes(q) 
-      || (k.code||"").toLowerCase().includes(q) 
-      || (k.description||"").toLowerCase().includes(q);
-    if(!match) return;
+
+  const rootFixed = document.getElementById('f-list-fixed');
+  const rootParam = document.getElementById('f-list-param');
+  if(!rootFixed || !rootParam) return;
+  rootFixed.innerHTML = "";
+  rootParam.innerHTML = "";
+
+  const matchItem = (k)=>{
+    if(!q) return true;
+    return (k.label||"").toLowerCase().includes(q)
+      || (k.code||"").toLowerCase().includes(q)
+      || (k.description||"").toLowerCase().includes(q)
+      || (k.param||"").toLowerCase().includes(q);
+  };
+
+  const isParam = (k)=>{
+    const t = String(k.type||"").toLowerCase();
+    if(t==="param" || t==="parameter") return true;
+    return !!(k.param && String(k.param).trim());
+  };
+
+  // stable, readable ordering inside sections
+  const fixedList = list.filter(k=>!isParam(k)).sort((a,b)=>String(a.label||"").localeCompare(String(b.label||""),'cs',{sensitivity:'base'}));
+  const paramList = list.filter(k=>isParam(k)).sort((a,b)=>String(a.param||a.label||"").localeCompare(String(b.param||b.label||""),'cs',{sensitivity:'base'}));
+
+  const renderOne = (root, k, extraLine="")=>{
     const box = document.createElement('div');
     box.className = "card";
     box.style.padding = '12px';
@@ -2513,11 +2625,15 @@ function renderFixed(filter=""){
         <div style="min-width:0;flex:1">
           <div style="font-weight:900;font-size:1.15rem;line-height:1.1;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-variant-numeric:tabular-nums">${formatCodeUi(k.code||"")}</div>
           <div style="opacity:.85;font-weight:800;word-break:break-word">${k.label||""}</div>
+          ${extraLine}
           ${k.description ? `<div style="opacity:.75;font-size:.9rem;word-break:break-word">${k.description}</div>` : ``}
         </div>
       </div>`;
     root.appendChild(box);
-  });
+  };
+
+  fixedList.forEach(k=>{ if(matchItem(k)) renderOne(rootFixed, k); });
+  paramList.forEach(k=>{ if(matchItem(k)) renderOne(rootParam, k, k.param ? `<div style="opacity:.85;font-size:.92rem;margin-top:2px"><span style="font-weight:900">Param:</span> ${escapeHtml(k.param)}</div>` : ``); });
 }
 
 // inicializace vyhledávání
@@ -2536,6 +2652,7 @@ if(fAddBtn){
     document.getElementById('fk-label').value = "";
     document.getElementById('fk-code').value = "";
     document.getElementById('fk-desc').value = "";
+    document.getElementById('fk-param').value = "";
     // hide extra actions (copy/delete) in add mode
     const copyBtn = document.getElementById('fDlg-copy');
     const delBtn  = document.getElementById('fDlg-delete');
@@ -2548,9 +2665,10 @@ if(fAddBtn){
       const label = document.getElementById('fk-label').value.trim();
       const code = document.getElementById('fk-code').value.trim();
       const desc = document.getElementById('fk-desc').value.trim();
+      const param = (document.getElementById('fk-param').value||'').trim();
       if(!label || !code){ toast('Vyplňte název i kód'); return; }
       const list = loadFixed();
-      list.push({ id: uuid(), label, code, description: desc });
+      list.push({ id: uuid(), label, code, description: desc, param: param, type: (param ? 'param' : 'fixed') });
       if(saveFixed(list)){
         dlg.close();
         renderFixed(document.getElementById('f-search').value);
@@ -2561,7 +2679,7 @@ if(fAddBtn){
 }
 
 // delegované akce v seznamu pevných kódů
-const fListRoot = document.getElementById('f-list');
+const fListRoot = document.getElementById('panel-fixed');
 if(fListRoot){
   fListRoot.addEventListener('click', (e)=>{
     const btn = e.target.closest('[data-act]');
@@ -2579,6 +2697,7 @@ if(fListRoot){
       document.getElementById('fk-label').value = item.label||"";
       document.getElementById('fk-code').value = item.code||"";
       document.getElementById('fk-desc').value = item.description||"";
+      document.getElementById('fk-param').value = item.param||"";
 
       // show extra actions (copy/delete) in edit mode
       const copyBtn = document.getElementById('fDlg-copy');
@@ -2617,6 +2736,8 @@ if(fListRoot){
         it.label = document.getElementById('fk-label').value.trim();
         it.code  = document.getElementById('fk-code').value.trim();
         it.description = document.getElementById('fk-desc').value.trim();
+        it.param = (document.getElementById('fk-param').value||'').trim();
+        it.type = (it.param ? 'param' : 'fixed');
         if(!it.label || !it.code){ toast('Vyplňte název i kód'); return; }
         if(saveFixed(cur)){
           dlg.close();
