@@ -629,21 +629,23 @@ input[type="search"] {
   #panel-hotels:not(.hidden) .h-footer .btn{ width:min(320px, 100%); }
 }
 
-/* Machine input: inline "reuse last machine" icon */
+/* Machine input: inline "reuse last machine" icon (button inside the input) */
 .machine-input-wrap{
-  display:flex;
-  align-items:center;
-  gap:10px;
+  position:relative;
+  display:block;
 }
 .machine-input-wrap input{
-  flex:1 1 auto;
-  min-width:0;
+  width:100%;
+  padding-right:56px; /* space for the icon inside the input */
 }
 .iconbtn{
-  flex:0 0 auto;
-  height:44px;
-  width:44px;
-  border-radius:14px;
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform: translateY(-50%);
+  height:36px;
+  width:36px;
+  border-radius:999px;
   border:1px solid var(--border);
   background:#fff;
   display:flex;
@@ -651,7 +653,7 @@ input[type="search"] {
   justify-content:center;
   cursor:pointer;
 }
-.iconbtn:active{ transform: translateY(1px); }
+.iconbtn:active{ transform: translateY(-50%) scale(0.98); }
 .iconbtn svg{ display:block; }
 
 </style>
@@ -1143,8 +1145,6 @@ const I18N = {
     th_mp_acceptance: "MP Acceptance",
     th_plc_access: "PLC Access",
     btn_add_code: "+ Přidat kód",
-    fixed_head_codes: "Kódy",
-    fixed_head_params: "Parametry",
     dlg_edit_code_title: "Upravit kód",
     label_name: "Název",
     label_code: "Kód",
@@ -1235,8 +1235,6 @@ const I18N = {
     th_mp_acceptance: "MP Acceptance",
     th_plc_access: "PLC Access",
     btn_add_code: "+ Code hinzufügen",
-    fixed_head_codes: "Codes",
-    fixed_head_params: "Parameter",
     dlg_edit_code_title: "Code bearbeiten",
     label_name: "Name",
     label_code: "Code",
@@ -1326,8 +1324,6 @@ const I18N = {
     th_mp_acceptance: "MP Acceptance",
     th_plc_access: "PLC Access",
     btn_add_code: "+ Add code",
-    fixed_head_codes: "Codes",
-    fixed_head_params: "Parameters",
     dlg_edit_code_title: "Edit code",
     label_name: "Name",
     label_code: "Code",
@@ -1459,38 +1455,18 @@ function normalizeCode(s){
 
 async function getDailyCode() {
   // Deterministický 8-místný alfanumerický kód z (seed + datum).
-  // Primárně použij WebCrypto (crypto.subtle). Když není dostupné (některé iOS režimy),
-  // použij lehkou fallback funkci, aby odemčení nezůstalo "viset".
-  try{
-    const hex = await sha256Hex(`${SECURITY.seed}|${todayKey()}`);
-    const bytes = new Uint8Array(hex.match(/../g).map(h=>parseInt(h,16)));
-    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // bez 0/O/1/I kvůli záměnám
-    let out = "";
-    for (let i=0; i<8; i++){
-      out += alphabet[bytes[i] % alphabet.length];
-    }
-    return out;
-  }catch(err){
-    // Fallback: jednoduchý hash (není kryptografický, jen pro nouzovou kompatibilitu).
-    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    const s = `${SECURITY.seed}|${todayKey()}`;
-    let h1 = 2166136261;
-    for(let i=0;i<s.length;i++){
-      h1 ^= s.charCodeAt(i);
-      h1 = Math.imul(h1, 16777619) >>> 0;
-    }
-    let out="";
-    let x=h1;
-    for(let i=0;i<8;i++){
-      x = (Math.imul(x ^ (x >>> 15), 2246822507) >>> 0);
-      out += alphabet[x % alphabet.length];
-    }
-    return out;
+  const hex = await sha256Hex(`${SECURITY.seed}|${todayKey()}`);
+  const bytes = new Uint8Array(hex.match(/../g).map(h=>parseInt(h,16)));
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // bez 0/O/1/I kvůli záměnám
+  let out = "";
+  for (let i=0; i<8; i++){
+    out += alphabet[bytes[i] % alphabet.length];
   }
+  return out;
 }
 
-function uiShowApp(){ const lockEl=document.getElementById('lock'); const appEl=document.getElementById('app'); if(lockEl) lockEl.classList.add('hidden'); if(appEl) appEl.classList.remove('hidden'); }
-function uiShowLock(){ const lockEl=document.getElementById('lock'); const appEl=document.getElementById('app'); if(appEl) appEl.classList.add('hidden'); if(lockEl) lockEl.classList.remove('hidden'); }
+function uiShowApp(){ document.getElementById('lock').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); }
+function uiShowLock(){ document.getElementById('app').classList.add('hidden'); document.getElementById('lock').classList.remove('hidden'); }
 
 async function tryAutoUnlock(){
   const saved = Store.getItem(SECURITY.trustedKey);
@@ -1499,8 +1475,6 @@ async function tryAutoUnlock(){
 }
 
 async function unlockFlow(){
-  try{
-
   const entered = normalizeCode(document.getElementById('pass').value);
   if(!entered) { toast('Zadejte kód'); return; }
   const daily = await getDailyCode();
@@ -1512,10 +1486,6 @@ async function unlockFlow(){
     computeAll();
   } else {
     toast('Neplatný kód');
-  }
-  }catch(e){
-    console.error(e);
-    toast('Chyba odemknutí');
   }
 }
 document.getElementById('unlockBtn').addEventListener('click', unlockFlow);
@@ -2971,16 +2941,19 @@ document.getElementById('logoutConfirm').addEventListener('click', (e)=>{
 // SW registration
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js')); }
 
-// Boot (až po načtení DOM kvůli iOS WebView)
-window.addEventListener('DOMContentLoaded', async ()=>{
-  try{
-    if(!(await tryAutoUnlock())) uiShowLock();
-    else { uiShowApp(); computeAll(); }
-  }catch(e){
-    console.error(e);
-    uiShowLock();
-  }
+// Boot
+(async function boot(){
+  if(!(await tryAutoUnlock())) uiShowLock();
+  else { computeAll(); }
+})();
+
+document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("addMachine");
+    if (btn) btn.addEventListener("click", openAddMachinePopup);
 });
+
+
+// === AddMachine Popup Bindings ===
 document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById("addMachine");
     if (btn) btn.addEventListener("click", openAddMachinePopup);
