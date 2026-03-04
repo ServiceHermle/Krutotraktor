@@ -629,48 +629,37 @@ input[type="search"] {
   #panel-hotels:not(.hidden) .h-footer .btn{ width:min(320px, 100%); }
 }
 
-/* Machine input: inline "reuse last machine" icon (button inside the input) */
+/* Machine input: inline "reuse last machine" icon */
 .machine-input-wrap{
   position:relative;
-  display:block;
+  width:100%;
 }
-
 .machine-input-wrap input{
-  padding-right:44px;
+  width:100%;
+  padding-right:52px; /* space for icon */
 }
-.machine-icon{
+.machine-inline-icon{
   position:absolute;
   right:14px;
   top:50%;
   transform:translateY(-50%);
-  border:none !important;
-  background:transparent !important;
-  padding:0 !important;
-  width:auto !important;
-  height:auto !important;
-  min-width:0 !important;
-  border-radius:0 !important;
-  box-shadow:none !important;
-  opacity:.55;
-  display:flex;
+  display:inline-flex;
   align-items:center;
   justify-content:center;
-}
-.machine-icon:hover{ opacity:.9; }
-.machine-icon:active{ opacity:1; transform:translateY(-50%) scale(.96); }
-.machine-icon svg{ width:20px; height:20px; }
-.machine-input-wrap input{
-  width:100%;
-  padding-right:56px; /* space for the icon inside the input */
-}
-.iconbtn{
-  position:absolute;
-  right:10px;
-  top:50%;
-  transform: translateY(-50%);
-  height:36px;
-  width:36px;
+  padding:10px; /* touch target */
+  border:none;
+  background:transparent;
   border-radius:999px;
+  opacity:.55;
+  cursor:pointer;
+}
+.machine-inline-icon:active{ opacity:1; }
+.machine-inline-icon:hover{ opacity:.9; }
+.iconbtn{
+  flex:0 0 auto;
+  height:44px;
+  width:44px;
+  border-radius:14px;
   border:1px solid var(--border);
   background:#fff;
   display:flex;
@@ -678,29 +667,8 @@ input[type="search"] {
   justify-content:center;
   cursor:pointer;
 }
-.iconbtn:active{ transform: translateY(-50%) scale(0.98); }
+.iconbtn:active{ transform: translateY(1px); }
 .iconbtn svg{ display:block; }
-
-
-/* Fixed codes list - row layout (value | description) */
-.fixedRow{
-  display:grid;
-  grid-template-columns: 96px 1fr;
-  gap:12px;
-  padding:10px 0;
-  border-bottom:1px solid rgba(0,0,0,.08);
-  cursor:pointer;
-}
-.fixedKey{
-  font-weight:900;
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  letter-spacing:.06em;
-  font-variant-numeric: tabular-nums;
-}
-.fixedDesc{
-  opacity:.85;
-  word-break: break-word;
-}
 
 </style>
 <style id="mobile-override">
@@ -902,7 +870,7 @@ input[type="search"] {
 <label data-i18n="label_machine_number">Číslo stroje</label>
 <div class="machine-input-wrap">
 <input data-i18n-placeholder="placeholder_machine_n" id="machine" inputmode="numeric" placeholder="N" type="number"/>
-<button id="useLastMachineBtn" class="machine-icon" type="button" aria-label="Použít poslední stroj" title="Použít poslední stroj" style="display:none"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.32 4H3l3.5-3.5L10 9H7.08A5 5 0 1 0 12 7V5z"/></svg></button>
+<button id="useLastMachineBtn" class="machine-inline-icon" type="button" aria-label="Použít poslední stroj" title="Použít poslední stroj" style="display:none"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.32 4H3l3.5-3.5L10 9H7.08A5 5 0 1 0 12 7V5z"/></svg></button>
 </div>
 </div>
 </div>
@@ -975,11 +943,11 @@ input[type="search"] {
 </div>
 <div class="fixedSplit">
   <div class="fixedCol">
-    <div class="fixedHead">Kódy</div>
+    <div class="fixedHead" data-i18n="fixed_head_codes">Pevné kódy</div>
     <div id="f-list-fixed"></div>
   </div>
   <div class="fixedCol">
-    <div class="fixedHead">Parametry</div>
+    <div class="fixedHead" data-i18n="fixed_head_params">Parametry</div>
     <div id="f-list-param"></div>
   </div>
 </div>
@@ -1155,8 +1123,6 @@ const I18N = {
     tab_calc: "Výpočet",
     tab_range: "Období",
     tab_fixed: "Pevné kódy",
-    fixed_head_codes: "Kódy",
-    fixed_head_params: "Parametry",
     tab_clients: "Zákazníci",
     tab_hotels: "Hotely",
     label_date: "Datum",
@@ -1193,6 +1159,8 @@ const I18N = {
     th_mp_acceptance: "MP Acceptance",
     th_plc_access: "PLC Access",
     btn_add_code: "+ Přidat kód",
+    fixed_head_codes: "Kódy",
+    fixed_head_params: "Parametry",
     dlg_edit_code_title: "Upravit kód",
     label_name: "Název",
     label_code: "Kód",
@@ -1247,8 +1215,6 @@ const I18N = {
     tab_calc: "Berechnung",
     tab_range: "Zeitraum",
     tab_fixed: "Feste Codes",
-    fixed_head_codes: "Codes",
-    fixed_head_params: "Parameter",
     tab_clients: "Kunden",
     tab_hotels: "Hotels",
     label_date: "Datum",
@@ -1285,6 +1251,8 @@ const I18N = {
     th_mp_acceptance: "MP Acceptance",
     th_plc_access: "PLC Access",
     btn_add_code: "+ Code hinzufügen",
+    fixed_head_codes: "Codes",
+    fixed_head_params: "Parameter",
     dlg_edit_code_title: "Code bearbeiten",
     label_name: "Name",
     label_code: "Code",
@@ -1338,8 +1306,6 @@ const I18N = {
     tab_calc: "Calculator",
     tab_range: "Period",
     tab_fixed: "Fixed codes",
-    fixed_head_codes: "Codes",
-    fixed_head_params: "Parameters",
     tab_clients: "Customers",
     tab_hotels: "Hotels",
     label_date: "Date",
@@ -1376,6 +1342,8 @@ const I18N = {
     th_mp_acceptance: "MP Acceptance",
     th_plc_access: "PLC Access",
     btn_add_code: "+ Add code",
+    fixed_head_codes: "Codes",
+    fixed_head_params: "Parameters",
     dlg_edit_code_title: "Edit code",
     label_name: "Name",
     label_code: "Code",
@@ -1507,18 +1475,38 @@ function normalizeCode(s){
 
 async function getDailyCode() {
   // Deterministický 8-místný alfanumerický kód z (seed + datum).
-  const hex = await sha256Hex(`${SECURITY.seed}|${todayKey()}`);
-  const bytes = new Uint8Array(hex.match(/../g).map(h=>parseInt(h,16)));
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // bez 0/O/1/I kvůli záměnám
-  let out = "";
-  for (let i=0; i<8; i++){
-    out += alphabet[bytes[i] % alphabet.length];
+  // Primárně použij WebCrypto (crypto.subtle). Když není dostupné (některé iOS režimy),
+  // použij lehkou fallback funkci, aby odemčení nezůstalo "viset".
+  try{
+    const hex = await sha256Hex(`${SECURITY.seed}|${todayKey()}`);
+    const bytes = new Uint8Array(hex.match(/../g).map(h=>parseInt(h,16)));
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // bez 0/O/1/I kvůli záměnám
+    let out = "";
+    for (let i=0; i<8; i++){
+      out += alphabet[bytes[i] % alphabet.length];
+    }
+    return out;
+  }catch(err){
+    // Fallback: jednoduchý hash (není kryptografický, jen pro nouzovou kompatibilitu).
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const s = `${SECURITY.seed}|${todayKey()}`;
+    let h1 = 2166136261;
+    for(let i=0;i<s.length;i++){
+      h1 ^= s.charCodeAt(i);
+      h1 = Math.imul(h1, 16777619) >>> 0;
+    }
+    let out="";
+    let x=h1;
+    for(let i=0;i<8;i++){
+      x = (Math.imul(x ^ (x >>> 15), 2246822507) >>> 0);
+      out += alphabet[x % alphabet.length];
+    }
+    return out;
   }
-  return out;
 }
 
-function uiShowApp(){ document.getElementById('lock').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); }
-function uiShowLock(){ document.getElementById('app').classList.add('hidden'); document.getElementById('lock').classList.remove('hidden'); }
+function uiShowApp(){ const lockEl=document.getElementById('lock'); const appEl=document.getElementById('app'); if(lockEl) lockEl.classList.add('hidden'); if(appEl) appEl.classList.remove('hidden'); }
+function uiShowLock(){ const lockEl=document.getElementById('lock'); const appEl=document.getElementById('app'); if(appEl) appEl.classList.add('hidden'); if(lockEl) lockEl.classList.remove('hidden'); }
 
 async function tryAutoUnlock(){
   const saved = Store.getItem(SECURITY.trustedKey);
@@ -1527,6 +1515,8 @@ async function tryAutoUnlock(){
 }
 
 async function unlockFlow(){
+  try{
+
   const entered = normalizeCode(document.getElementById('pass').value);
   if(!entered) { toast('Zadejte kód'); return; }
   const daily = await getDailyCode();
@@ -1538,6 +1528,10 @@ async function unlockFlow(){
     computeAll();
   } else {
     toast('Neplatný kód');
+  }
+  }catch(e){
+    console.error(e);
+    toast('Chyba odemknutí');
   }
 }
 document.getElementById('unlockBtn').addEventListener('click', unlockFlow);
@@ -2685,21 +2679,23 @@ function renderFixed(filter=""){
   const fixedList = list.filter(k=>!isParam(k)).sort((a,b)=>String(a.code||a.label||"").localeCompare(String(b.code||b.label||""),'cs',{sensitivity:'base'}));
   const paramList = list.filter(k=>isParam(k)).sort((a,b)=>String(a.param||"").localeCompare(String(b.param||""),'cs',{numeric:true,sensitivity:'base'}));
 
-  const renderOne = (root, k)=>{
+  const renderOne = (root, k, extraLine="")=>{
     const isP = isParam(k);
     const keyUi = isP ? String(k.param||"") : formatCodeUi(k.code||"");
-    const row = document.createElement('div');
-    row.className = "fixedRow";
-    row.setAttribute('data-id', k.id);
-    const kEl = document.createElement('div');
-    kEl.className = "fixedKey";
-    kEl.textContent = keyUi;
-    const dEl = document.createElement('div');
-    dEl.className = "fixedDesc";
-    dEl.textContent = (k.description||"");
-    row.appendChild(kEl);
-    row.appendChild(dEl);
-    root.appendChild(row);
+    const box = document.createElement('div');
+    box.className = "card";
+    box.style.padding = '12px';
+    box.style.marginBottom = '8px';
+    box.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn iconbtn" data-act="edit-fixed-btn" data-id="${k.id}" type="button" aria-label="Upravit">✎</button>
+        <div style="min-width:0;flex:1">
+          <div style="font-weight:900;font-size:1.15rem;line-height:1.1;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-variant-numeric:tabular-nums">${keyUi}</div>
+          ${extraLine}
+          ${k.description ? `<div style="opacity:.75;font-size:.9rem;word-break:break-word">${k.description}</div>` : ``}
+        </div>
+      </div>`;
+    root.appendChild(box);
   };
 
   fixedList.forEach(k=>{ if(matchItem(k)) renderOne(rootFixed, k); });
@@ -2776,23 +2772,15 @@ if(fAddBtn){
 const fListRoot = document.getElementById('panel-fixed');
 if(fListRoot){
   fListRoot.addEventListener('click', (e)=>{
-    let btn = e.target.closest('[data-act]');
-    let act = null;
-    let id = null;
-    if(btn){
-      act = btn.getAttribute('data-act');
-      id  = btn.getAttribute('data-id');
-    } else {
-      const row = e.target.closest('.fixedRow[data-id]');
-      if(!row) return;
-      act = 'edit-fixed-row';
-      id  = row.getAttribute('data-id');
-    }
+    const btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    const act = btn.getAttribute('data-act');
+    const id = btn.getAttribute('data-id');
     const list = loadFixed();
-    const item = list.find(x=>String(x.id)===String(id));
+    const item = list.find(x=>x.id===id);
     if(!item) return;
 
-    if(act === 'edit-fixed-btn' || act === 'edit-fixed-row'){
+    if(act === 'edit-fixed-btn'){
       const dlg = document.getElementById('fDlg');
       dlg.dataset.id = id;
       document.getElementById('fDlg-title').textContent = "Upravit kód";
@@ -2999,19 +2987,16 @@ document.getElementById('logoutConfirm').addEventListener('click', (e)=>{
 // SW registration
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js')); }
 
-// Boot
-(async function boot(){
-  if(!(await tryAutoUnlock())) uiShowLock();
-  else { computeAll(); }
-})();
-
-document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("addMachine");
-    if (btn) btn.addEventListener("click", openAddMachinePopup);
+// Boot (až po načtení DOM kvůli iOS WebView)
+window.addEventListener('DOMContentLoaded', async ()=>{
+  try{
+    if(!(await tryAutoUnlock())) uiShowLock();
+    else { uiShowApp(); computeAll(); }
+  }catch(e){
+    console.error(e);
+    uiShowLock();
+  }
 });
-
-
-// === AddMachine Popup Bindings ===
 document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById("addMachine");
     if (btn) btn.addEventListener("click", openAddMachinePopup);
