@@ -2632,6 +2632,8 @@ function renderFixed(filter=""){
   const paramList = list.filter(k=>isParam(k)).sort((a,b)=>String(a.param||"").localeCompare(String(b.param||""),'cs',{numeric:true,sensitivity:'base'}));
 
   const renderOne = (root, k, extraLine="")=>{
+    const isP = isParam(k);
+    const keyUi = isP ? String(k.param||"") : formatCodeUi(k.code||"");
     const box = document.createElement('div');
     box.className = "card";
     box.style.padding = '12px';
@@ -2640,8 +2642,7 @@ function renderFixed(filter=""){
       <div style="display:flex;align-items:center;gap:12px">
         <button class="btn iconbtn" data-act="edit-fixed-btn" data-id="${k.id}" type="button" aria-label="Upravit">✎</button>
         <div style="min-width:0;flex:1">
-          <div style="font-weight:900;font-size:1.15rem;line-height:1.1;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-variant-numeric:tabular-nums">${formatCodeUi(k.code||"")}</div>
-          <div style="opacity:.85;font-weight:800;word-break:break-word">${k.label||""}</div>
+          <div style="font-weight:900;font-size:1.15rem;line-height:1.1;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-variant-numeric:tabular-nums">${keyUi}</div>
           ${extraLine}
           ${k.description ? `<div style="opacity:.75;font-size:.9rem;word-break:break-word">${k.description}</div>` : ``}
         </div>
@@ -2701,13 +2702,15 @@ if(fAddBtn){
     const saveBtn = document.getElementById('fDlg-save');
     saveBtn.onclick = (ev)=>{
       ev.preventDefault();
-      const label = document.getElementById('fk-label').value.trim();
       const code = document.getElementById('fk-code').value.trim();
       const desc = document.getElementById('fk-desc').value.trim();
       const param = (document.getElementById('fk-param').value||'').trim();
-      if(!label || !code){ toast('Vyplňte název i kód'); return; }
+      const hasCode = !!code;
+      const hasParam = !!param;
+      if(!desc){ toast('Vyplňte popis'); return; }
+      if((hasCode && hasParam) || (!hasCode && !hasParam)) { toast('Vyplňte buď kód nebo parametr'); return; }
       const list = loadFixed();
-      list.push({ id: uuid(), label, code, description: desc, param: param, type: (param ? 'param' : 'fixed') });
+      list.push({ id: uuid(), label: '', code: hasCode ? code : '', param: hasParam ? param : '', description: desc, type: (hasParam ? 'param' : 'fixed') });
       if(saveFixed(list)){
         dlg.close();
         renderFixed(document.getElementById('f-search').value);
@@ -2750,7 +2753,8 @@ if(fListRoot){
         copyBtn.onclick = (ev)=>{
           ev.preventDefault();
           const code = (document.getElementById('fk-code').value||"").trim();
-          copyText(code);
+          const param = (document.getElementById('fk-param').value||"").trim();
+          copyText(code || param);
         };
       }
       if(delBtn){
@@ -2773,12 +2777,18 @@ if(fListRoot){
         const cur = loadFixed();
         const it = cur.find(x=>x.id===id);
         if(!it) { dlg.close(); renderFixed(document.getElementById('f-search').value); return; }
-        it.label = document.getElementById('fk-label').value.trim();
-        it.code  = document.getElementById('fk-code').value.trim();
-        it.description = document.getElementById('fk-desc').value.trim();
-        it.param = (document.getElementById('fk-param').value||'').trim();
-        it.type = (it.param ? 'param' : 'fixed');
-        if(!it.label || !it.code){ toast('Vyplňte název i kód'); return; }
+        const code = (document.getElementById('fk-code').value||'').trim();
+        const param = (document.getElementById('fk-param').value||'').trim();
+        const desc = (document.getElementById('fk-desc').value||'').trim();
+        const hasCode = !!code;
+        const hasParam = !!param;
+        if(!desc){ toast('Vyplňte popis'); return; }
+        if((hasCode && hasParam) || (!hasCode && !hasParam)) { toast('Vyplňte buď kód nebo parametr'); return; }
+        it.label = '';
+        it.code  = hasCode ? code : '';
+        it.description = desc;
+        it.param = hasParam ? param : '';
+        it.type = (hasParam ? 'param' : 'fixed');
         if(saveFixed(cur)){
           dlg.close();
           renderFixed(document.getElementById('f-search').value);
