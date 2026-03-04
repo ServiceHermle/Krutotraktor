@@ -640,19 +640,25 @@ input[type="search"] {
 }
 .machine-inline-icon{
   position:absolute;
-  right:14px;
+  right:10px;
   top:50%;
   transform:translateY(-50%);
-  display:inline-flex;
+  display:flex;
   align-items:center;
   justify-content:center;
-  padding:10px; /* touch target */
+  width:26px;
+  height:26px;
+  padding:0;
   border:none;
   background:transparent;
-  border-radius:999px;
+  border-radius:0;
   opacity:.55;
   cursor:pointer;
+  z-index:2;
 }
+.machine-inline-icon svg{ pointer-events:none; }
+.machine-inline-icon:active{ opacity:1; transform:translateY(-50%) scale(0.95); }
+.machine-input-wrap input{ padding-right:44px; }
 .machine-inline-icon:active{ opacity:1; }
 .machine-inline-icon:hover{ opacity:.9; }
 .iconbtn{
