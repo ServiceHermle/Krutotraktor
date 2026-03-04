@@ -681,6 +681,27 @@ input[type="search"] {
 .iconbtn:active{ transform: translateY(-50%) scale(0.98); }
 .iconbtn svg{ display:block; }
 
+
+/* Fixed codes list - row layout (value | description) */
+.fixedRow{
+  display:grid;
+  grid-template-columns: 96px 1fr;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(0,0,0,.08);
+  cursor:pointer;
+}
+.fixedKey{
+  font-weight:900;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing:.06em;
+  font-variant-numeric: tabular-nums;
+}
+.fixedDesc{
+  opacity:.85;
+  word-break: break-word;
+}
+
 </style>
 <style id="mobile-override">
 
@@ -954,11 +975,11 @@ input[type="search"] {
 </div>
 <div class="fixedSplit">
   <div class="fixedCol">
-    <div class="fixedHead" data-i18n="fixed_head_codes">Pevné kódy</div>
+    <div class="fixedHead">Kódy</div>
     <div id="f-list-fixed"></div>
   </div>
   <div class="fixedCol">
-    <div class="fixedHead" data-i18n="fixed_head_params">Parametry</div>
+    <div class="fixedHead">Parametry</div>
     <div id="f-list-param"></div>
   </div>
 </div>
@@ -1134,6 +1155,8 @@ const I18N = {
     tab_calc: "Výpočet",
     tab_range: "Období",
     tab_fixed: "Pevné kódy",
+    fixed_head_codes: "Kódy",
+    fixed_head_params: "Parametry",
     tab_clients: "Zákazníci",
     tab_hotels: "Hotely",
     label_date: "Datum",
@@ -1224,6 +1247,8 @@ const I18N = {
     tab_calc: "Berechnung",
     tab_range: "Zeitraum",
     tab_fixed: "Feste Codes",
+    fixed_head_codes: "Codes",
+    fixed_head_params: "Parameter",
     tab_clients: "Kunden",
     tab_hotels: "Hotels",
     label_date: "Datum",
@@ -1313,6 +1338,8 @@ const I18N = {
     tab_calc: "Calculator",
     tab_range: "Period",
     tab_fixed: "Fixed codes",
+    fixed_head_codes: "Codes",
+    fixed_head_params: "Parameters",
     tab_clients: "Customers",
     tab_hotels: "Hotels",
     label_date: "Date",
@@ -2658,23 +2685,21 @@ function renderFixed(filter=""){
   const fixedList = list.filter(k=>!isParam(k)).sort((a,b)=>String(a.code||a.label||"").localeCompare(String(b.code||b.label||""),'cs',{sensitivity:'base'}));
   const paramList = list.filter(k=>isParam(k)).sort((a,b)=>String(a.param||"").localeCompare(String(b.param||""),'cs',{numeric:true,sensitivity:'base'}));
 
-  const renderOne = (root, k, extraLine="")=>{
+  const renderOne = (root, k)=>{
     const isP = isParam(k);
     const keyUi = isP ? String(k.param||"") : formatCodeUi(k.code||"");
-    const box = document.createElement('div');
-    box.className = "card";
-    box.style.padding = '12px';
-    box.style.marginBottom = '8px';
-    box.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn iconbtn" data-act="edit-fixed-btn" data-id="${k.id}" type="button" aria-label="Upravit">✎</button>
-        <div style="min-width:0;flex:1">
-          <div style="font-weight:900;font-size:1.15rem;line-height:1.1;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-variant-numeric:tabular-nums">${keyUi}</div>
-          ${extraLine}
-          ${k.description ? `<div style="opacity:.75;font-size:.9rem;word-break:break-word">${k.description}</div>` : ``}
-        </div>
-      </div>`;
-    root.appendChild(box);
+    const row = document.createElement('div');
+    row.className = "fixedRow";
+    row.setAttribute('data-id', k.id);
+    const kEl = document.createElement('div');
+    kEl.className = "fixedKey";
+    kEl.textContent = keyUi;
+    const dEl = document.createElement('div');
+    dEl.className = "fixedDesc";
+    dEl.textContent = (k.description||"");
+    row.appendChild(kEl);
+    row.appendChild(dEl);
+    root.appendChild(row);
   };
 
   fixedList.forEach(k=>{ if(matchItem(k)) renderOne(rootFixed, k); });
@@ -2751,15 +2776,23 @@ if(fAddBtn){
 const fListRoot = document.getElementById('panel-fixed');
 if(fListRoot){
   fListRoot.addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-act]');
-    if(!btn) return;
-    const act = btn.getAttribute('data-act');
-    const id = btn.getAttribute('data-id');
+    let btn = e.target.closest('[data-act]');
+    let act = null;
+    let id = null;
+    if(btn){
+      act = btn.getAttribute('data-act');
+      id  = btn.getAttribute('data-id');
+    } else {
+      const row = e.target.closest('.fixedRow[data-id]');
+      if(!row) return;
+      act = 'edit-fixed-row';
+      id  = row.getAttribute('data-id');
+    }
     const list = loadFixed();
-    const item = list.find(x=>x.id===id);
+    const item = list.find(x=>String(x.id)===String(id));
     if(!item) return;
 
-    if(act === 'edit-fixed-btn'){
+    if(act === 'edit-fixed-btn' || act === 'edit-fixed-row'){
       const dlg = document.getElementById('fDlg');
       dlg.dataset.id = id;
       document.getElementById('fDlg-title').textContent = "Upravit kód";
