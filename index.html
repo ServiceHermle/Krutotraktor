@@ -839,7 +839,7 @@ input[type="search"] {
 <div class="tabs">
 <button class="tab active" data-tab="single" type="button"><span data-i18n="tab_calc">Výpočet</span></button>
 <button class="tab" data-tab="range" type="button"><span data-i18n="tab_range">Období</span></button>
-<button class="tab" data-tab="fixed" type="button"><span data-i18n="tab_fixed">Pevné kódy</span></button>
+<button class="tab" data-tab="fixed" type="button"><span data-i18n="tab_fixed">Kódy</span></button>
 <button class="tab" data-tab="clients" type="button"><span data-i18n="tab_clients">Zákazníci</span></button>
 </div>
 <!-- SINGLE -->
@@ -927,7 +927,7 @@ input[type="search"] {
 </div>
 <div class="fixedSplit">
   <div class="fixedCol">
-    <div class="fixedHead" data-i18n="fixed_head_codes">Pevné kódy</div>
+    <div class="fixedHead" data-i18n="fixed_head_codes">Kódy</div>
     <div id="f-list-fixed"></div>
   </div>
   <div class="fixedCol">
@@ -1106,7 +1106,7 @@ const I18N = {
     lock_unlock: "Odemknout",
     tab_calc: "Výpočet",
     tab_range: "Období",
-    tab_fixed: "Pevné kódy",
+    tab_fixed: "Kódy",
     tab_clients: "Zákazníci",
     tab_hotels: "Hotely",
     label_date: "Datum",
@@ -2802,7 +2802,7 @@ if(fListRoot){
   });
 }
 
-// při otevření tab "Pevné kódy" znovu překreslit
+// při otevření tab "Kódy" znovu překreslit
 tabs.forEach(t=>{
   if(t.dataset.tab === 'fixed'){
     t.addEventListener('click', ()=>renderFixed(document.getElementById('f-search')?document.getElementById('f-search').value:""));
