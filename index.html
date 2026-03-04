@@ -628,6 +628,32 @@ input[type="search"] {
   }
   #panel-hotels:not(.hidden) .h-footer .btn{ width:min(320px, 100%); }
 }
+
+/* Machine input: inline "reuse last machine" icon */
+.machine-input-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.machine-input-wrap input{
+  flex:1 1 auto;
+  min-width:0;
+}
+.iconbtn{
+  flex:0 0 auto;
+  height:44px;
+  width:44px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.iconbtn:active{ transform: translateY(1px); }
+.iconbtn svg{ display:block; }
+
 </style>
 <style id="mobile-override">
 
@@ -826,7 +852,10 @@ input[type="search"] {
 </div>
 <div class="col">
 <label data-i18n="label_machine_number">Číslo stroje</label>
+<div class="machine-input-wrap">
 <input data-i18n-placeholder="placeholder_machine_n" id="machine" inputmode="numeric" placeholder="N" type="number"/>
+<button id="useLastMachineBtn" class="iconbtn" type="button" aria-label="Použít poslední stroj" title="Použít poslední stroj" style="display:none"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.32 4H3l3.5-3.5L10 9H7.08A5 5 0 1 0 12 7V5z"/></svg></button>
+</div>
 </div>
 </div>
 <div class="actions">
@@ -855,16 +884,6 @@ input[type="search"] {
 <button class="btn primary" data-i18n="btn_share" id="shareAll" type="button">Sdílet</button>
 </div>
 
-<div id="lastMachineBox" style="display:none;margin-top:10px">
-  <div role="button" tabindex="0" id="lastMachineTap"
-       style="padding:10px;border:1px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px">
-    <div style="min-width:0">
-      <div style="font-weight:900;opacity:.8;font-size:.9rem" data-i18n="last_machine_title">Poslední stroj</div>
-      <div id="lastMachineText" style="font-weight:900;word-break:break-word"></div>
-    </div>
-    <div style="opacity:.7;font-size:1.1rem">↺</div>
-  </div>
-</div>
 <button class="btn" data-i18n="btn_add_machine" id="addMachine" style="grid-column: span 2; width:100%; margin-top:10px; font-weight:900;">${t("btn_add_machine_small")}</button>
 <div class="hotels-inline">
   <button class="btn" id="hotelViewBtn" type="button" style="width:100%;">🛌 <span data-i18n="tab_hotels">Hotely</span></button>
@@ -925,10 +944,13 @@ input[type="search"] {
 <form class="modal" method="dialog">
 <div class="modal-h" data-i18n="dlg_edit_code_title" id="fDlg-title">Upravit kód</div>
 <div class="modal-b">
-<label data-i18n="label_name">Název</label><input id="fk-label"/>
-<label data-i18n="label_code">Kód</label><input id="fk-code"/>
-<label data-i18n="label_desc">Popis</label><input id="fk-desc"/>
-<label data-i18n="label_param">Parametr (volitelné)</label><input id="fk-param" placeholder="např. D, L, Z…"/>
+<div class="modal-b">
+  <input id="fk-label" type="hidden"/>
+  <div class="muted">Vyplňte buď <b>Kód</b> nebo <b>Parametr (číslo)</b>.</div>
+  <label data-i18n="label_code">Kód</label><input id="fk-code" placeholder="např. M30, G54…"/>
+  <label data-i18n="label_param_num">Parametr (číslo)</label><input id="fk-param" inputmode="numeric" pattern="[0-9]*" placeholder="např. 12"/>
+  <label data-i18n="label_desc">Popis</label><input id="fk-desc" placeholder="co to dělá…"/>
+</div>
 </div>
 <div class="modal-f">
 <button class="btn" onclick="this.closest('dialog').close()" type="button" value="cancel"><span data-i18n="btn_close">Zavřít</span></button>
@@ -1125,6 +1147,7 @@ const I18N = {
     label_name: "Název",
     label_code: "Kód",
     label_desc: "Popis",
+    label_param_num: "Parametr (číslo)",
     btn_close: "Zavřít",
     btn_save: "Uložit",
     btn_add_client: "+ Přidat",
@@ -1214,6 +1237,7 @@ const I18N = {
     label_name: "Name",
     label_code: "Code",
     label_desc: "Beschreibung",
+    label_param_num: "Parameter (Zahl)",
     btn_close: "Schließen",
     btn_save: "Speichern",
     btn_add_client: "+ Hinzufügen",
@@ -1302,6 +1326,7 @@ const I18N = {
     label_name: "Name",
     label_code: "Code",
     label_desc: "Description",
+    label_param_num: "Parameter (number)",
     btn_close: "Close",
     btn_save: "Save",
     btn_add_client: "+ Add",
@@ -1563,24 +1588,23 @@ tabs.forEach(t => t.addEventListener('click', (e)=>{
   showTab(e.currentTarget.dataset.tab);
 }));
 
-// Quick reuse: last used machine (no extra button — tap the row)
-(function initLastMachineTap(){
-  const tap = document.getElementById('lastMachineTap');
-  if(tap){
-    const go = ()=>{
-      const lm = loadLastMachine();
-      if(!lm || !lm.number) return;
-      document.getElementById('machine').value = lm.number;
-      tabs.forEach(x=>x.classList.remove('active'));
-      const tbtn = document.querySelector('.tab[data-tab="single"]');
-      if(tbtn) tbtn.classList.add('active');
-      showTab('single');
-      toast(t("toast_filled_calc"));
-    };
-    tap.addEventListener('click', go);
-    tap.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); go(); } });
+// Quick reuse: last used machine (icon button shown only when machine is empty)
+(function initUseLastMachine(){
+  const btn = document.getElementById('useLastMachineBtn');
+  const input = document.getElementById('machine');
+  const apply = ()=>{
+    const lm = loadLastMachine();
+    if(!lm || !lm.number) return;
+    input.value = lm.number;
+    try{ input.focus(); }catch(e){}
+    updateLastMachineUI();
+    toast(t("toast_filled_calc"));
+  };
+  if(btn) btn.addEventListener('click', apply);
+  if(input){
+    input.addEventListener('input', ()=>{ try{ updateLastMachineUI(); }catch(e){} });
+    input.addEventListener('change', ()=>{ try{ updateLastMachineUI(); }catch(e){} });
   }
-  // initial paint
   try{ updateLastMachineUI(); }catch(e){}
 })();
 
@@ -1917,20 +1941,13 @@ function saveLastMachine(obj){
   catch(e){ return false; }
 }
 function updateLastMachineUI(){
-  const box = document.getElementById('lastMachineBox');
-  const txt = document.getElementById('lastMachineText');
-  if(!box || !txt) return;
+  const btn = document.getElementById('useLastMachineBtn');
+  const input = document.getElementById('machine');
+  if(!btn || !input) return;
   const lm = loadLastMachine();
-  if(!lm || !lm.number){
-    box.style.display='none';
-    return;
-  }
-  const parts = [];
-  parts.push(`N: ${lm.number}`);
-  if(lm.label) parts.push(lm.label);
-  if(lm.customerName) parts.push(lm.customerName);
-  txt.textContent = parts.join(' — ');
-  box.style.display='block';
+  const hasLM = !!(lm && lm.number);
+  const empty = !String(input.value || '').trim();
+  btn.style.display = (hasLM && empty) ? 'flex' : 'none';
 }
 
 (function ensureSeed(){
@@ -2611,8 +2628,8 @@ function renderFixed(filter=""){
   };
 
   // stable, readable ordering inside sections
-  const fixedList = list.filter(k=>!isParam(k)).sort((a,b)=>String(a.label||"").localeCompare(String(b.label||""),'cs',{sensitivity:'base'}));
-  const paramList = list.filter(k=>isParam(k)).sort((a,b)=>String(a.param||a.label||"").localeCompare(String(b.param||b.label||""),'cs',{sensitivity:'base'}));
+  const fixedList = list.filter(k=>!isParam(k)).sort((a,b)=>String(a.code||a.label||"").localeCompare(String(b.code||b.label||""),'cs',{sensitivity:'base'}));
+  const paramList = list.filter(k=>isParam(k)).sort((a,b)=>String(a.param||"").localeCompare(String(b.param||""),'cs',{numeric:true,sensitivity:'base'}));
 
   const renderOne = (root, k, extraLine="")=>{
     const box = document.createElement('div');
@@ -2633,7 +2650,7 @@ function renderFixed(filter=""){
   };
 
   fixedList.forEach(k=>{ if(matchItem(k)) renderOne(rootFixed, k); });
-  paramList.forEach(k=>{ if(matchItem(k)) renderOne(rootParam, k, k.param ? `<div style="opacity:.85;font-size:.92rem;margin-top:2px"><span style="font-weight:900">Param:</span> ${escapeHtml(k.param)}</div>` : ``); });
+  paramList.forEach(k=>{ if(matchItem(k)) renderOne(rootParam, k); });
 }
 
 // inicializace vyhledávání
@@ -2641,6 +2658,27 @@ const fSearchEl = document.getElementById('f-search');
 if(fSearchEl){
   fSearchEl.addEventListener('input', (e)=>renderFixed(e.target.value));
 }
+
+// mutual exclusive inputs (Code vs Parameter)
+(function setupFixedDlgExclusivity(){
+  const codeEl = document.getElementById('fk-code');
+  const paramEl = document.getElementById('fk-param');
+  if(!codeEl || !paramEl) return;
+
+  const sync = ()=>{
+    const hasCode = !!(codeEl.value||'').trim();
+    const hasParam = !!(paramEl.value||'').trim();
+    paramEl.disabled = hasCode;
+    codeEl.disabled = hasParam;
+  };
+
+  codeEl.addEventListener('input', sync);
+  paramEl.addEventListener('input', sync);
+
+  // expose for dialog open
+  window.__syncFixedDlg = sync;
+  sync();
+})();
 
 // přidání nového kódu
 const fAddBtn = document.getElementById('f-add');
@@ -2653,6 +2691,7 @@ if(fAddBtn){
     document.getElementById('fk-code').value = "";
     document.getElementById('fk-desc').value = "";
     document.getElementById('fk-param').value = "";
+    window.__syncFixedDlg && window.__syncFixedDlg();
     // hide extra actions (copy/delete) in add mode
     const copyBtn = document.getElementById('fDlg-copy');
     const delBtn  = document.getElementById('fDlg-delete');
@@ -2698,6 +2737,7 @@ if(fListRoot){
       document.getElementById('fk-code').value = item.code||"";
       document.getElementById('fk-desc').value = item.description||"";
       document.getElementById('fk-param').value = item.param||"";
+      window.__syncFixedDlg && window.__syncFixedDlg();
 
       // show extra actions (copy/delete) in edit mode
       const copyBtn = document.getElementById('fDlg-copy');
