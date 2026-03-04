@@ -336,12 +336,30 @@ input[type="search"] {
 
 
 /* Fixed codes: split view (codes vs parameters) */
-.fixedSplit{ display:flex; gap:10px; margin-top:10px; }
-.fixedCol{ flex:1 1 0; min-width:0; }
-.fixedHead{ font-weight:900; opacity:.8; margin:6px 0 10px; }
-@media (max-width: 520px){
-  .fixedSplit{ flex-direction:column; }
+.fixedStack{ margin-top:10px; }
+.fixedSection{ }
+.fixedHead{ font-weight:900; opacity:.9; margin:6px 0 8px; }
+.fixedList{ border-top:1px solid rgba(0,0,0,.07); }
+.fixedRow{
+  display:grid;
+  grid-template-columns: 92px 1fr;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(0,0,0,.07);
 }
+.fixedKey{
+  font-weight:900;
+  font-size:1.05rem;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.fixedDesc{
+  font-size:1rem;
+  opacity:.85;
+  word-break: break-word;
+}
+.fixedRow:active{ transform: scale(.995); }
+.fixedRow:focus{ outline: 2px solid rgba(0,0,0,.12); outline-offset: 2px; border-radius: 8px; }
 /* Clients: keep Export/Import visible */
   #panel-clients{ overflow:hidden; }
   #panel-clients .c-list-scroll{
@@ -839,7 +857,7 @@ input[type="search"] {
 <div class="tabs">
 <button class="tab active" data-tab="single" type="button"><span data-i18n="tab_calc">Výpočet</span></button>
 <button class="tab" data-tab="range" type="button"><span data-i18n="tab_range">Období</span></button>
-<button class="tab" data-tab="fixed" type="button"><span data-i18n="tab_fixed">Kódy</span></button>
+<button class="tab" data-tab="fixed" type="button"><span data-i18n="tab_fixed">Pevné kódy</span></button>
 <button class="tab" data-tab="clients" type="button"><span data-i18n="tab_clients">Zákazníci</span></button>
 </div>
 <!-- SINGLE -->
@@ -925,14 +943,15 @@ input[type="search"] {
 <div class="btnrow">
 <button class="btn inline" data-i18n="btn_add_code" id="f-add" type="button">+ Přidat kód</button>
 </div>
-<div class="fixedSplit">
-  <div class="fixedCol">
+<div class="fixedStack">
+  <div class="fixedSection">
     <div class="fixedHead" data-i18n="fixed_head_codes">Kódy</div>
-    <div id="f-list-fixed"></div>
+    <div class="fixedList" id="f-list-fixed"></div>
   </div>
-  <div class="fixedCol">
+
+  <div class="fixedSection" style="margin-top:14px">
     <div class="fixedHead" data-i18n="fixed_head_params">Parametry</div>
-    <div id="f-list-param"></div>
+    <div class="fixedList" id="f-list-param"></div>
   </div>
 </div>
 <div class="btnrow f-footer" style="margin-top:14px">
@@ -1106,7 +1125,9 @@ const I18N = {
     lock_unlock: "Odemknout",
     tab_calc: "Výpočet",
     tab_range: "Období",
-    tab_fixed: "Kódy",
+    tab_fixed: "Pevné kódy",
+    fixed_head_codes: "Kódy",
+    fixed_head_params: "Parametry",
     tab_clients: "Zákazníci",
     tab_hotels: "Hotely",
     label_date: "Datum",
@@ -1197,6 +1218,8 @@ const I18N = {
     tab_calc: "Berechnung",
     tab_range: "Zeitraum",
     tab_fixed: "Feste Codes",
+    fixed_head_codes: "Codes",
+    fixed_head_params: "Parameter",
     tab_clients: "Kunden",
     tab_hotels: "Hotels",
     label_date: "Datum",
@@ -1286,6 +1309,8 @@ const I18N = {
     tab_calc: "Calculator",
     tab_range: "Period",
     tab_fixed: "Fixed codes",
+    fixed_head_codes: "Codes",
+    fixed_head_params: "Parameters",
     tab_clients: "Customers",
     tab_hotels: "Hotels",
     label_date: "Date",
@@ -1624,6 +1649,15 @@ function formatCodeUi(raw){
   if (s.length === 7) return `${s.slice(0,2)} ${s.slice(2,5)} ${s.slice(5,7)}`;
   // Fallback: thousands grouping
   return s.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+function escapeHtml(str){
+  return String(str ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
 }
 // Code formatting without spaces (for period table compact view)
 function formatCodeUiNoSpace(raw){
@@ -2603,6 +2637,25 @@ function saveFixed(list){
   catch(e){ toast('Uložení pevných kódů selhalo'); return false; }
 }
 
+
+function openFixedEdit(id){
+  const list = loadFixed();
+  const item = list.find(x=>x.id===id);
+  if(!item) return;
+
+  const dlg = document.getElementById('fDlg');
+  if(!dlg) return;
+  dlg.dataset.id = id;
+
+  document.getElementById('fDlg-title').textContent = t('dlg_edit_code') || 'Upravit';
+  document.getElementById('fk-label').value = item.label||"";
+  document.getElementById('fk-code').value = item.code||"";
+  document.getElementById('fk-param').value = item.param||"";
+  document.getElementById('fk-desc').value = item.description||"";
+
+  try{ if(typeof window.__syncFixedDlg==='function') window.__syncFixedDlg(); }catch(e){}
+  dlg.showModal();
+}
 function renderFixed(filter=""){
   const q = (filter||"").trim().toLowerCase();
   const list = loadFixed();
@@ -2631,24 +2684,30 @@ function renderFixed(filter=""){
   const fixedList = list.filter(k=>!isParam(k)).sort((a,b)=>String(a.code||a.label||"").localeCompare(String(b.code||b.label||""),'cs',{sensitivity:'base'}));
   const paramList = list.filter(k=>isParam(k)).sort((a,b)=>String(a.param||"").localeCompare(String(b.param||""),'cs',{numeric:true,sensitivity:'base'}));
 
-  const renderOne = (root, k, extraLine="")=>{
+  const renderOne = (root, k)=>{
     const isP = isParam(k);
     const keyUi = isP ? String(k.param||"") : formatCodeUi(k.code||"");
-    const box = document.createElement('div');
-    box.className = "card";
-    box.style.padding = '12px';
-    box.style.marginBottom = '8px';
-    box.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn iconbtn" data-act="edit-fixed-btn" data-id="${k.id}" type="button" aria-label="Upravit">✎</button>
-        <div style="min-width:0;flex:1">
-          <div style="font-weight:900;font-size:1.15rem;line-height:1.1;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-variant-numeric:tabular-nums">${keyUi}</div>
-          ${extraLine}
-          ${k.description ? `<div style="opacity:.75;font-size:.9rem;word-break:break-word">${k.description}</div>` : ``}
-        </div>
-      </div>`;
-    root.appendChild(box);
+    const row = document.createElement('div');
+    row.className = "fixedRow";
+    row.setAttribute('data-id', k.id);
+    row.setAttribute('role', 'button');
+    row.setAttribute('tabindex', '0');
+    row.innerHTML = `
+      <div class="fixedKey">${escapeHtml(keyUi)}</div>
+      <div class="fixedDesc">${escapeHtml(k.description||"")}</div>
+    `;
+
+    // click = edit
+    row.addEventListener('click', ()=>openFixedEdit(k.id));
+    // enter/space = edit
+    row.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); openFixedEdit(k.id); } });
+
+    root.appendChild(row);
   };
+
+  fixedList.forEach(k=>{ if(matchItem(k)) renderOne(rootFixed, k); });
+  paramList.forEach(k=>{ if(matchItem(k)) renderOne(rootParam, k); });
+}
 
   fixedList.forEach(k=>{ if(matchItem(k)) renderOne(rootFixed, k); });
   paramList.forEach(k=>{ if(matchItem(k)) renderOne(rootParam, k); });
@@ -2802,7 +2861,7 @@ if(fListRoot){
   });
 }
 
-// při otevření tab "Kódy" znovu překreslit
+// při otevření tab "Pevné kódy" znovu překreslit
 tabs.forEach(t=>{
   if(t.dataset.tab === 'fixed'){
     t.addEventListener('click', ()=>renderFixed(document.getElementById('f-search')?document.getElementById('f-search').value:""));
