@@ -113,6 +113,22 @@
     .modal-f .btn:not(.danger):not(.primary){order:1;}
 
   
+
+    .c-card{ padding:12px; margin-bottom:10px; }
+    .c-top{ display:flex; gap:12px; justify-content:space-between; align-items:flex-start; }
+    .c-left{ min-width:0; flex:1; }
+    .c-name{ font-weight:900; word-break:break-word; }
+    .c-contact,.c-address,.c-note{ opacity:.9; font-size:.92rem; margin-top:2px; word-break:break-word; }
+    .c-note{ opacity:.75; }
+    .c-right{ display:flex; gap:8px; flex-shrink:0; align-items:center; }
+    .c-iconbtn{ width:40px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; border:1px solid var(--border); background:var(--bg); font-size:18px; text-decoration:none; color:inherit; padding:0; cursor:pointer; }
+    .c-iconbtn svg{ width:22px; height:22px; display:block; }
+    .c-iconbtn--disabled{ opacity:.35; }
+    .c-machinebtn{ position:relative; }
+    .c-machinebtn svg{ width:22px; height:22px; }
+    .c-machinecount{ position:absolute; right:-4px; top:-4px; min-width:18px; height:18px; padding:0 4px; border-radius:999px; background:#111; color:#fff; font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center; }
+    .c-machines{ margin-top:10px; }
+
 /* --- Universal mobile overflow fix --- */
 input:not([type="checkbox"]):not([type="radio"]), select, textarea, button {
     max-width: 100% !important;
@@ -680,6 +696,8 @@ input[type="search"] {
 .iconbtn:active{ transform: translateY(1px); }
 .iconbtn svg{ display:block; }
 
+
+.icon-machine{width:22px;height:22px}
 </style>
 <style id="mobile-override">
 
@@ -728,6 +746,22 @@ input[type="date"], input[type="number"], input[type="password"], input[type="te
 }
 /* END override */
 
+
+
+    .c-card{ padding:12px; margin-bottom:10px; }
+    .c-top{ display:flex; gap:12px; justify-content:space-between; align-items:flex-start; }
+    .c-left{ min-width:0; flex:1; }
+    .c-name{ font-weight:900; word-break:break-word; }
+    .c-contact,.c-address,.c-note{ opacity:.9; font-size:.92rem; margin-top:2px; word-break:break-word; }
+    .c-note{ opacity:.75; }
+    .c-right{ display:flex; gap:8px; flex-shrink:0; align-items:center; }
+    .c-iconbtn{ width:40px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; border:1px solid var(--border); background:var(--bg); font-size:18px; text-decoration:none; color:inherit; padding:0; cursor:pointer; }
+    .c-iconbtn svg{ width:22px; height:22px; display:block; }
+    .c-iconbtn--disabled{ opacity:.35; }
+    .c-machinebtn{ position:relative; }
+    .c-machinebtn svg{ width:22px; height:22px; }
+    .c-machinecount{ position:absolute; right:-4px; top:-4px; min-width:18px; height:18px; padding:0 4px; border-radius:999px; background:#111; color:#fff; font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center; }
+    .c-machines{ margin-top:10px; }
 
 /* --- Universal mobile overflow fix --- */
 input:not([type="checkbox"]):not([type="radio"]), select, textarea, button {
@@ -835,6 +869,8 @@ input[type="search"] {
     tr.weekend td { background: rgba(211, 37, 37, 0.08); }
     tr.weekend td:first-child { font-weight: 900; }
 
+
+.icon-machine{width:22px;height:22px}
 </style>
   <link rel="stylesheet" href="hotels_overlay.css">
 </head>
@@ -1196,6 +1232,7 @@ const I18N = {
     label_hotel: "Hotel",
     label_phone: "Telefon",
     label_contact: "Kontakt",
+    label_address: "Adresa",
     customers_no_machines: "Žádné stroje",
     label_machine_name: "Název stroje",
     label_machine_number_short: "Číslo (N)",
@@ -1211,6 +1248,7 @@ const I18N = {
     customers_filter_hint: "Zadejte 1 písmeno pro filtr A–Z",
     btn_map: "Mapa",
     btn_call: "Volat",
+    btn_machines: "Stroje",
     confirm_delete_hotel: "Opravdu smazat hotel?",
     hotels_title: "Hotely",
     hotels_open_title: "Hotely",
@@ -1287,6 +1325,7 @@ const I18N = {
     label_hotel: "Hotel",
     label_phone: "Telefon",
     label_contact: "Kontakt",
+    label_address: "Adresse",
     customers_no_machines: "Keine Maschinen",
     label_machine_name: "Maschinenname",
     label_machine_number_short: "Nummer (N)",
@@ -1302,6 +1341,7 @@ const I18N = {
     customers_filter_hint: "1 Buchstabe = A–Z Filter",
     btn_map: "Karte",
     btn_call: "Anrufen",
+    btn_machines: "Maschinen",
     confirm_delete_hotel: "Hotel wirklich löschen?",
     hotels_title: "Hotels",
     hotels_open_title: "Hotels",
@@ -1378,6 +1418,7 @@ const I18N = {
     label_hotel: "Hotel",
     label_phone: "Phone",
     label_contact: "Contact",
+    label_address: "Address",
     customers_no_machines: "No machines",
     label_machine_name: "Machine name",
     label_machine_number_short: "Number (N)",
@@ -1393,6 +1434,7 @@ const I18N = {
     customers_filter_hint: "1 letter = A–Z filter",
     btn_map: "Map",
     btn_call: "Call",
+    btn_machines: "Machines",
     confirm_delete_hotel: "Delete hotel?",
     hotels_title: "Hotels",
     hotels_open_title: "Hotels",
@@ -1823,6 +1865,22 @@ document.getElementById('r-print').addEventListener('click', ()=>{
   const tableHTML=document.getElementById('r-table').outerHTML; 
   const w=window.open('', '_blank'); 
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>HDH CODE – export</title><style>body{font-family:Arial,sans-serif;padding:16px}h1{font-size:18px;margin:00 8px}p{margin:00 12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:6px 8px;text-align:left}th{background:#f0f0f0}
+
+    .c-card{ padding:12px; margin-bottom:10px; }
+    .c-top{ display:flex; gap:12px; justify-content:space-between; align-items:flex-start; }
+    .c-left{ min-width:0; flex:1; }
+    .c-name{ font-weight:900; word-break:break-word; }
+    .c-contact,.c-address,.c-note{ opacity:.9; font-size:.92rem; margin-top:2px; word-break:break-word; }
+    .c-note{ opacity:.75; }
+    .c-right{ display:flex; gap:8px; flex-shrink:0; align-items:center; }
+    .c-iconbtn{ width:40px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; border:1px solid var(--border); background:var(--bg); font-size:18px; text-decoration:none; color:inherit; padding:0; cursor:pointer; }
+    .c-iconbtn svg{ width:22px; height:22px; display:block; }
+    .c-iconbtn--disabled{ opacity:.35; }
+    .c-machinebtn{ position:relative; }
+    .c-machinebtn svg{ width:22px; height:22px; }
+    .c-machinecount{ position:absolute; right:-4px; top:-4px; min-width:18px; height:18px; padding:0 4px; border-radius:999px; background:#111; color:#fff; font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center; }
+    .c-machines{ margin-top:10px; }
+
 /* --- Universal mobile overflow fix --- */
 input:not([type="checkbox"]):not([type="radio"]), select, textarea, button {
     max-width: 100% !important;
@@ -1929,6 +1987,8 @@ input[type="search"] {
     tr.weekend td { background: rgba(211, 37, 37, 0.08); }
     tr.weekend td:first-child { font-weight: 900; }
 
+
+.icon-machine{width:22px;height:22px}
 </style></head><body><h1>HDH CODE – hromadný export</h1><p>Stroj N: <b>${N}</b> | Období: <b>${from}</b> – <b>${to}</b></p>${tableHTML}<script>window.onload=()=>window.print();<\/script>
 <!-- Popup Add Machine -->
 <div id="popupAddMachine" class="modal" style="display:none;
@@ -2072,77 +2132,92 @@ function attachPhoneFormatter(inputEl){
   });
 }
 
+function escapeHtml(str){
+  return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function machineIconSvg(){
+  return `
+  <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <circle cx="32" cy="32" r="30" fill="none" stroke="#2f5cff" stroke-width="4"></circle>
+    <rect x="14" y="18" width="36" height="28" rx="3" fill="none" stroke="#000" stroke-width="3"></rect>
+    <rect x="26" y="12" width="12" height="6" fill="#000"></rect>
+    <rect x="20" y="24" width="8" height="16" fill="#000"></rect>
+    <rect x="36" y="24" width="8" height="16" fill="#000"></rect>
+  </svg>`;
+}
+
+function buildMapHref(address, name=''){
+  const q = [String(name||'').trim(), String(address||'').trim()].filter(Boolean).join(', ');
+  return q ? `https://maps.google.com/?q=${encodeURIComponent(q)}` : '';
+}
+
 function renderCustomers(filter=""){
   const raw=(filter||"").trim();
   const q=raw.toLowerCase();
-  const norm = (str)=>String(str||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const norm = (str)=>String(str||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
   const qn = norm(q);
   const list=loadCustomers();
 
-  // Sort customers alphabetically (CZ), ignoring accents/case
   list.sort((a,b)=>String(a?.name||'').localeCompare(String(b?.name||''),'cs',{sensitivity:'base'}));
 
-  const root=document.getElementById('c-list'); 
+  const root=document.getElementById('c-list');
   root.innerHTML="";
 
   list.forEach(c=>{
     const nameN = norm(c.name);
     const noteN = norm(c.note||"");
     const contactN = norm(c.contactName||"");
+    const addressN = norm(c.address||"");
     const phoneS = String(c.contactPhone||"");
     const matchCustomer = (!q)
       ? true
       : (qn.length===1 && /[a-z]/i.test(qn)
           ? nameN.startsWith(qn)
-          : (nameN.includes(qn) || noteN.includes(qn) || contactN.includes(qn) || phoneS.includes(q)));
+          : (nameN.includes(qn) || noteN.includes(qn) || contactN.includes(qn) || addressN.includes(qn) || phoneS.includes(q)));
 
     const machines=[...(c.machines||[])].sort((a,b)=>(Number(b.number)||0)-(Number(a.number)||0));
     const matchedMachines=machines.filter(m=>{
       const labN = norm(m.label||"");
       const numS = String(m.number||"");
       if(!q) return true;
-      // 1-letter filtering focuses on customer names
       return (qn.length===1 && /[a-z]/i.test(qn))
         ? false
         : (labN.includes(qn) || numS.includes(q));
     });
 
     if(!q || matchCustomer || matchedMachines.length){
-      const box=document.createElement('div'); 
-      box.className="card"; 
-      box.style.padding='12px'; 
-      box.style.marginBottom='10px';
+      const box=document.createElement('div');
+      box.className="card c-card";
 
       const isOpen = customersUIState.expandedCustomers.has(c.id);
       const phoneNorm = normalizePhone(c.contactPhone);
+      const mapHref = buildMapHref(c.address, c.name);
+      const shownMachines = (q && !matchCustomer) ? matchedMachines : machines;
+
       const contactLine = (c.contactName || c.contactPhone)
-        ? `<div style="opacity:.9;font-size:.92rem;margin-top:2px">
-             ${c.contactName ? `<span>${c.contactName}</span>` : ``}
-             ${c.contactPhone ? `<span style="margin-left:8px"><a href="tel:${phoneNorm}" style="text-decoration:underline">${c.contactPhone}</a></span>` : ``}
-           </div>`
+        ? `<div class="c-contact">${c.contactName ? `<span>${escapeHtml(c.contactName)}</span>` : ``}${c.contactPhone ? `<span style="margin-left:8px"><a href="tel:${phoneNorm}" style="text-decoration:underline">${escapeHtml(c.contactPhone)}</a></span>` : ``}</div>`
         : ``;
+      const addressLine = c.address ? `<div class="c-address">${escapeHtml(c.address)}</div>` : ``;
+      const noteLine = c.note ? `<div class="c-note">${escapeHtml(c.note)}</div>` : ``;
 
-      // Header (compact): name + contact + machine count, tap to expand
-      box.innerHTML =
-        `<div class="c-row" style="display:flex;align-items:center;gap:10px">
-           <button class="btn iconbtn" data-act="edit-c-btn" data-id="${c.id}" type="button" aria-label="Upravit">✎</button>
-           <div class="c-head" data-act="toggle-c" data-id="${c.id}" role="button" tabindex="0"
-                style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer">
-             <div style="min-width:0">
-               <div style="font-weight:900;word-break:break-word">${c.name}</div>
-               ${contactLine}
-               ${c.note ? `<div style="opacity:.75;font-size:.9rem;margin-top:2px">${c.note}</div>` : ``}
-             </div>
-             <div style="display:flex;align-items:center;gap:10px;flex:00 auto">
-               <div style="font-weight:800;opacity:.75">${machines.length}</div>
-               <div style="opacity:.7;font-size:1.1rem">${isOpen ? "▾" : "▸"}</div>
-             </div>
-           </div>
-         </div>`;
+      box.innerHTML = `
+        <div class="c-top">
+          <div class="c-left">
+            <div class="c-name">${escapeHtml(c.name)}</div>
+            ${contactLine}
+            ${addressLine}
+            ${noteLine}
+          </div>
+          <div class="c-right">
+            ${c.contactPhone ? `<a class="c-iconbtn" href="tel:${phoneNorm}" title="${t('btn_call')}" aria-label="${t('btn_call')}">📞</a>` : `<button class="c-iconbtn c-iconbtn--disabled" type="button" disabled aria-label="${t('btn_call')}">📞</button>`}
+            ${mapHref ? `<a class="c-iconbtn" href="${mapHref}" target="_blank" rel="noopener" title="${t('btn_map')}" aria-label="${t('btn_map')}">🗺️</a>` : `<button class="c-iconbtn c-iconbtn--disabled" type="button" disabled aria-label="${t('btn_map')}">🗺️</button>`}
+            <button class="c-iconbtn" data-act="edit-c-btn" data-id="${c.id}" type="button" aria-label="${t('btn_edit')}" title="${t('btn_edit')}">✏️</button>
+            <button class="c-iconbtn c-machinebtn" data-act="toggle-c" data-id="${c.id}" type="button" aria-label="${t('btn_machines')}" title="${t('btn_machines')}">${machineIconSvg()}<span class="c-machinecount">${machines.length}</span></button>
+          </div>
+        </div>`;
 
-      // Expanded content
       if(isOpen){
-        const shownMachines = (q && !matchCustomer) ? matchedMachines : machines;
         const machinesHtml = shownMachines.length
           ? shownMachines.map(m=>{
               return `
@@ -2150,16 +2225,16 @@ function renderCustomers(filter=""){
                   <div style="display:flex;align-items:center;gap:10px">
                     <div data-act="use-m" data-cid="${c.id}" data-mid="${m.id}" role="button" tabindex="0"
                          style="flex:1;min-width:0;cursor:pointer;padding:10px;border:1px solid var(--border);border-radius:14px;background:#fff">
-                      <div style="font-weight:900;font-size:1.15rem;line-height:1.1">N: ${m.number||""}</div>
-                      <div style="opacity:.85;font-size:.92rem;word-break:break-word">${m.label||""}</div>
+                      <div style="font-weight:900;font-size:1.15rem;line-height:1.1">N: ${escapeHtml(m.number||"")}</div>
+                      <div style="opacity:.85;font-size:.92rem;word-break:break-word">${escapeHtml(m.label||"")}</div>
                     </div>
-                    <button class="btn iconbtn" data-act="edit-m" data-cid="${c.id}" data-mid="${m.id}" type="button" aria-label="Upravit">✎</button>
+                    <button class="btn iconbtn" data-act="edit-m" data-cid="${c.id}" data-mid="${m.id}" type="button" aria-label="${t('btn_edit')}">✎</button>
                   </div>
                 </div>`;
             }).join('')
           : `<div style="margin-top:10px;opacity:.75">${t("customers_no_machines")}</div>`;
 
-        box.innerHTML += `${machinesHtml}`;
+        box.innerHTML += `<div class="c-machines">${machinesHtml}</div>`;
       }
 
       root.appendChild(box);
@@ -2199,11 +2274,11 @@ function openDialog(title, innerHTML, onSave, onDelete=null){
 
 // Add customer
 document.getElementById('c-add').addEventListener('click', ()=>{
-  openDialog(t("dlg_add_customer_title"), `<label>${t("label_name")}</label><input id="f-name"><label>${t("label_contact")}</label><input id="f-contact"><label>${t("label_phone")}</label><input id="f-phone" inputmode="tel" autocomplete="tel"><label>${t("label_note")}</label><input id="f-note">`, (close)=>{
+  openDialog(t("dlg_add_customer_title"), `<label>${t("label_name")}</label><input id="f-name"><label>${t("label_contact")}</label><input id="f-contact"><label>${t("label_phone")}</label><input id="f-phone" inputmode="tel" autocomplete="tel"><label>${t("label_address")}</label><input id="f-address"><label>${t("label_note")}</label><input id="f-note">`, (close)=>{
     const name=document.getElementById('f-name').value.trim();
     if(!name){ toast(t("err_enter_name")); return; }
     const list=loadCustomers();
-    list.push({id:uuid(), name, contactName:(document.getElementById('f-contact').value||'').trim(), contactPhone:(document.getElementById('f-phone').value||'').trim(), note:(document.getElementById('f-note').value||'').trim(), machines:[]});
+    list.push({id:uuid(), name, contactName:(document.getElementById('f-contact').value||'').trim(), contactPhone:(document.getElementById('f-phone').value||'').trim(), address:(document.getElementById('f-address').value||'').trim(), note:(document.getElementById('f-note').value||'').trim(), machines:[]});
     if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
   });
   // iOS shows phone keypad (practical), but it has no space. This formatter adds spaces automatically.
@@ -2293,6 +2368,7 @@ document.getElementById('c-import-file').addEventListener('change', (e)=>{
           // fill missing meta fields only (do not overwrite existing)
           if(!cur.contactName && inc.contactName) cur.contactName = inc.contactName;
           if(!cur.contactPhone && inc.contactPhone) cur.contactPhone = inc.contactPhone;
+          if(!cur.address && inc.address) cur.address = inc.address;
           if(!cur.note && inc.note) cur.note = inc.note;
 
           // merge machines
@@ -2351,13 +2427,15 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
 
     const body = `
       <label>${t("label_name")}</label>
-      <input id="f-name" value="${c.name}">
+      <input id="f-name" value="${escapeHtml(c.name)}">
       <label>${t("label_contact")}</label>
-      <input id="f-contact" value="${c.contactName||""}">
+      <input id="f-contact" value="${escapeHtml(c.contactName||"")}">
       <label>${t("label_phone")}</label>
-      <input id="f-phone" inputmode="tel" value="${c.contactPhone||""}">
+      <input id="f-phone" inputmode="tel" value="${escapeHtml(c.contactPhone||"")}">
+      <label>${t("label_address")}</label>
+      <input id="f-address" value="${escapeHtml(c.address||"")}">
       <label>${t("label_note")}</label>
-      <input id="f-note" value="${c.note||""}">
+      <input id="f-note" value="${escapeHtml(c.note||"")}">
       <div style="display:flex;justify-content:flex-end;margin-top:12px">
         <button id="dlg-add-machine" type="button" class="btn inline">${t("btn_add_machine_small")}</button>
       </div>
@@ -2370,6 +2448,7 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
         c.name=document.getElementById('f-name').value.trim();
         c.contactName=(document.getElementById('f-contact').value||'').trim();
         c.contactPhone=(document.getElementById('f-phone').value||'').trim();
+        c.address=(document.getElementById('f-address').value||'').trim();
         c.note=(document.getElementById('f-note').value||'').trim();
         if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
       },
@@ -2380,6 +2459,8 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
     );
 
     // Hook "+ Stroj" button inside dialog body
+    attachPhoneFormatter(document.getElementById('f-phone'));
+
     const addBtn = document.getElementById('dlg-add-machine');
     if(addBtn){
       addBtn.addEventListener('click', (ev)=>{
@@ -2425,8 +2506,8 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
   const list=loadCustomers();
   if(act==='del-c'){ const id=trg.getAttribute('data-id'); if(!confirm(t("confirm_delete_customer"))) return; if(saveCustomers(list.filter(c=>c.id!==id))){ renderCustomers(document.getElementById('c-search').value); toast(t("toast_deleted")); } return; }
   if(act==='edit-c'){ const id=trg.getAttribute('data-id'); const c=list.find(x=>x.id===id);
-    openDialog(t("dlg_edit_customer_title"), `<label>${t("label_name")}</label><input id="f-name" value="${c.name}"><label>${t("label_contact")}</label><input id="f-contact" value="${c.contactName||""}"><label>${t("label_phone")}</label><input id="f-phone" inputmode="tel" value="${c.contactPhone||""}"><label>${t("label_note")}</label><input id="f-note" value="${c.note||""}">`, (close)=>{
-      c.name=document.getElementById('f-name').value.trim(); c.contactName=(document.getElementById('f-contact').value||'').trim(); c.contactPhone=(document.getElementById('f-phone').value||'').trim(); c.note=document.getElementById('f-note').value.trim(); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
+    openDialog(t("dlg_edit_customer_title"), `<label>${t("label_name")}</label><input id="f-name" value="${escapeHtml(c.name)}"><label>${t("label_contact")}</label><input id="f-contact" value="${escapeHtml(c.contactName||"")}"><label>${t("label_phone")}</label><input id="f-phone" inputmode="tel" value="${escapeHtml(c.contactPhone||"")}"><label>${t("label_address")}</label><input id="f-address" value="${escapeHtml(c.address||"")}"><label>${t("label_note")}</label><input id="f-note" value="${escapeHtml(c.note||"")}">`, (close)=>{
+      c.name=document.getElementById('f-name').value.trim(); c.contactName=(document.getElementById('f-contact').value||'').trim(); c.contactPhone=(document.getElementById('f-phone').value||'').trim(); c.address=(document.getElementById('f-address').value||'').trim(); c.note=document.getElementById('f-note').value.trim(); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
     });
     attachPhoneFormatter(document.getElementById('f-phone'));
     return; }
@@ -3103,7 +3184,7 @@ function addMachineToExisting(custId){
     c.machines.push({
         id:"m"+Date.now(),
         label:"Stroj "+N,
-        number:N,
+        number: parseInt(N||'0',10),
         note:""
     });
     saveCustomersLS(customers);
@@ -3125,12 +3206,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
             name,
             contactName,
             contactPhone: phone,
+            address: "",
             note: "",
             machines:[
                 {
                     id:"m"+Date.now(),
                     label:"Stroj "+N,
-                    number:N,
+                    number: parseInt(N||'0',10),
                     note:""
                 }
             ]
