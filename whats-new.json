@@ -1,0 +1,10 @@
+{
+  "version": "2026-04-25-1",
+  "title": "Co je nového",
+  "items": [
+    "Přidána tlačítka u zákazníků: telefon, mapa a editace.",
+    "Přidán symbol stroje s počtem strojů zákazníka.",
+    "Opraveno přidávání zákazníka a stroje.",
+    "Telefonní číslo je v seznamu skryté, volání je přes ikonu telefonu."
+  ]
+}

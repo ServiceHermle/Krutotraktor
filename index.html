@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>Hermle (v5.8.51 Thomas Pospisil)</title>
+<title>Hermle (v5.8.52 Thomas Pospisil)</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#f7f7f9" name="theme-color"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
@@ -222,7 +222,19 @@ input[type="search"] {
 }
 
 
-    input, select, textarea { font-size:16px !important; }
+    
+
+/* Whats new popup */
+.news-overlay{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.38);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.news-overlay.show{display:flex;}
+.news-card{width:min(460px,100%);max-height:min(80dvh,720px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.18);}
+.news-card h2{margin:0 0 8px 0;font-size:1.8rem;line-height:1.1;}
+.news-ver{font-weight:800;opacity:.8;margin-bottom:10px;}
+.news-list{margin:0;padding-left:22px;display:grid;gap:10px;}
+.news-list li{font-size:1.05rem;line-height:1.45;}
+.news-actions{margin-top:16px;display:flex;justify-content:flex-end;}
+
+input, select, textarea { font-size:16px !important; }
 
 /* Ensure Import text matches Export exactly (iOS can style buttons differently) */
 #f-import-btn, #c-import-btn{
@@ -1558,11 +1570,114 @@ async function getDailyCode() {
 }
 
 function uiShowApp(){ const lockEl=document.getElementById('lock'); const appEl=document.getElementById('app'); if(lockEl) lockEl.classList.add('hidden'); if(appEl) appEl.classList.remove('hidden'); }
+
+const APP_NEWS_KEY = "app_news_seen_version";
+const APP_NEWS_FILE = "./whats-new.json";
+const APP_NEWS_FALLBACK = {
+  version: "2026-04-21-2",
+  items: [
+    "Změny aplikace se nyní načítají z externího JSON souboru whats-new.json.",
+    "Po další úpravě stačí přepsat verzi a seznam změn v textovém souboru.",
+    "Po potvrzení se okno znovu neukáže až do změny verze v souboru."
+  ]
+};
+let appNewsData = { ...APP_NEWS_FALLBACK };
+
+function escapeHtml(str){
+  return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch] || ch));
+}
+
+function buildNewsList(items){
+  return (items || []).map(item => `<li>${escapeHtml(item)}</li>`).join("");
+}
+
+function normalizeWhatsNewJson(data){
+  if(!data || typeof data !== "object") return { ...APP_NEWS_FALLBACK, items:[...APP_NEWS_FALLBACK.items] };
+  const version = String(data.version || APP_NEWS_FALLBACK.version).trim() || APP_NEWS_FALLBACK.version;
+  const items = Array.isArray(data.items)
+    ? data.items.map(item => String(item || '').trim()).filter(Boolean)
+    : [];
+  return { version, items: items.length ? items : [...APP_NEWS_FALLBACK.items] };
+}
+
+async function loadWhatsNewData(){
+  try{
+    const res = await fetch(`${APP_NEWS_FILE}?t=${Date.now()}`, { cache:'no-store' });
+    if(!res.ok) throw new Error('whats-new fetch failed');
+    const json = await res.json();
+    appNewsData = normalizeWhatsNewJson(json);
+  }catch(e){
+    appNewsData = { ...APP_NEWS_FALLBACK, items:[...APP_NEWS_FALLBACK.items] };
+  }
+  return appNewsData;
+}
+
+async function showWhatsNew(force=false){
+  const overlay = document.getElementById("whatsNewOverlay");
+  const list = document.getElementById("whatsNewList");
+  const ver = document.getElementById("whatsNewVersion");
+  if(!overlay || !list || !ver) return;
+  const data = await loadWhatsNewData();
+  let seen = null;
+  try{ seen = canUseLocal() ? localStorage.getItem(APP_NEWS_KEY) : null; }catch(e){}
+  if(!force && seen === data.version) return;
+  ver.textContent = `Verze ${data.version}`;
+  list.innerHTML = buildNewsList(data.items);
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+
+
+function ensureWhatsNewUI(){
+  let overlay = document.getElementById("whatsNewOverlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.className = "news-overlay";
+    overlay.id = "whatsNewOverlay";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = `
+      <div class="news-card">
+        <h2>Co je nového</h2>
+        <div class="news-ver" id="whatsNewVersion"></div>
+        <ul class="news-list" id="whatsNewList"></ul>
+        <div class="news-actions">
+          <button class="btn primary" id="whatsNewConfirm" type="button">Rozumím</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+  const confirmBtn = document.getElementById("whatsNewConfirm");
+  if(confirmBtn && !confirmBtn.dataset.bound){
+    confirmBtn.addEventListener("click", confirmWhatsNew);
+    confirmBtn.dataset.bound = "1";
+  }
+  if(overlay && !overlay.dataset.bound){
+    overlay.addEventListener("click", (e)=>{
+      if(e.target && e.target.id === "whatsNewOverlay") confirmWhatsNew();
+    });
+    overlay.dataset.bound = "1";
+  }
+  const logo = document.getElementById("appLogo") || document.querySelector('.logo img') || document.querySelector('.logo');
+  if(logo && !logo.dataset.newsBound){
+    logo.addEventListener("dblclick", ()=>showWhatsNew(true));
+    logo.dataset.newsBound = "1";
+  }
+}
+function confirmWhatsNew(){
+  try{ if(canUseLocal()) localStorage.setItem(APP_NEWS_KEY, (appNewsData && appNewsData.version) ? appNewsData.version : APP_NEWS_FALLBACK.version); }catch(e){}
+  const el=document.getElementById("whatsNewOverlay");
+  if(el){ el.classList.remove("show"); el.setAttribute("aria-hidden", "true"); }
+  document.body.style.overflow = "";
+}
+
+
 function uiShowLock(){ const lockEl=document.getElementById('lock'); const appEl=document.getElementById('app'); if(appEl) appEl.classList.add('hidden'); if(lockEl) lockEl.classList.remove('hidden'); }
 
 async function tryAutoUnlock(){
   const saved = Store.getItem(SECURITY.trustedKey);
-  if (saved === '1') { uiShowApp(); return true; }
+  if (saved === '1') { uiShowApp(); setTimeout(()=>showWhatsNew(false), 120); return true; }
   return false;
 }
 
@@ -1578,6 +1693,7 @@ async function unlockFlow(){
     }
     uiShowApp();
     computeAll();
+    setTimeout(()=>showWhatsNew(false), 120);
   } else {
     toast('Neplatný kód');
   }
@@ -1864,178 +1980,7 @@ document.getElementById('r-print').addEventListener('click', ()=>{
   const N=document.getElementById('r-machine').value; const from=document.getElementById('r-from').value; const to=document.getElementById('r-to').value; 
   const tableHTML=document.getElementById('r-table').outerHTML; 
   const w=window.open('', '_blank'); 
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>HDH CODE – export</title><style>body{font-family:Arial,sans-serif;padding:16px}h1{font-size:18px;margin:00 8px}p{margin:00 12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:6px 8px;text-align:left}th{background:#f0f0f0}
-
-    .c-card{ padding:12px; margin-bottom:10px; }
-    .c-top{ display:flex; gap:12px; justify-content:space-between; align-items:flex-start; }
-    .c-left{ min-width:0; flex:1; }
-    .c-name{ font-weight:900; word-break:break-word; }
-    .c-contact,.c-address,.c-note{ opacity:.9; font-size:.92rem; margin-top:2px; word-break:break-word; }
-    .c-note{ opacity:.75; }
-    .c-right{ display:flex; gap:8px; flex-shrink:0; align-items:center; }
-    .c-iconbtn{ width:40px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; border:1px solid var(--border); background:var(--bg); font-size:18px; text-decoration:none; color:inherit; padding:0; cursor:pointer; }
-    .c-iconbtn svg{ width:22px; height:22px; display:block; }
-    .c-iconbtn--disabled{ opacity:.35; }
-    .c-machinebtn{ position:relative; }
-    .c-machinebtn svg{ width:22px; height:22px; }
-    .c-machinecount{ position:absolute; right:-4px; top:-4px; min-width:18px; height:18px; padding:0 4px; border-radius:999px; background:#111; color:#fff; font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center; }
-    .c-machines{ margin-top:10px; }
-
-/* --- Universal mobile overflow fix --- */
-input:not([type="checkbox"]):not([type="radio"]), select, textarea, button {
-    max-width: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box;
-}
-.section, .card {
-    max-width: 100%;
-    overflow-x: hidden;
-}
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-
-/* Rounded input beautify */
-input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-    border-radius: 20px !important;
-    padding: 12px 16px !important;
-    border: 1px solid #e0e0e0 !important;
-}
-button {
-    border-radius: 18px !important;
-}
-
-
-/* --- Rounded input fix A --- */
-.card {
-    border: none !important;
-}
-
-.card input[type="text"],
-.card input[type="number"],
-.card input[type="date"],
-.card input[type="password"],
-.card input[type="search"],
-.card input {
-    border-radius: 20px !important;
-    border: 1px solid #d0d0d0 !important;
-    padding: 12px 16px !important;
-    background: #ffffff !important;
-}
-
-
-/* --- iOS rounded input fix --- */
-input[type="date"],
-input[type="number"],
-input[type="text"],
-input[type="password"],
-input[type="search"] {
-    -webkit-appearance: none !important;
-    appearance: none !important;
-
-    border-radius: 20px !important;
-    border: 1px solid #d0d0d0 !important;
-    padding: 14px 16px !important;
-    background-color: #ffffff !important;
-
-    width: 100% !important;
-    box-sizing: border-box;
-}
-
-
-/* --- Language switch --- */
-.langbar{display:flex; gap:6px; align-items:center}
-.langbtn{
-  border:1px solid #d0d0d0 !important;
-  background:#fff !important;
-  padding:6px 10px !important;
-  border-radius:999px !important;
-  font-weight:900 !important;
-  min-width:auto !important;
-}
-.langbtn.active{
-  background:#111 !important;
-  color:#fff !important;
-  border-color:#111 !important;
-}
-
-
-/* Ensure Import text matches Export exactly (iOS can style buttons differently) */
-#f-import-btn, #c-import-btn{
-  -webkit-appearance:none;
-  appearance:none;
-  font-family: inherit;
-  font-weight: 900;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-}
-
-
-/* FINAL: Import text same as Export (no bold, same size/font) */
-#f-import-btn, #c-import-btn{
-  font-weight: inherit;
-  font-size: inherit;
-  font-family: inherit;
-}
-
-
-    /* weekend highlighting */
-    tr.weekend td { background: rgba(211, 37, 37, 0.08); }
-    tr.weekend td:first-child { font-weight: 900; }
-
-
-.icon-machine{width:22px;height:22px}
-</style></head><body><h1>HDH CODE – hromadný export</h1><p>Stroj N: <b>${N}</b> | Období: <b>${from}</b> – <b>${to}</b></p>${tableHTML}<script>window.onload=()=>window.print();<\/script>
-<!-- Popup Add Machine -->
-<div id="popupAddMachine" class="modal" style="display:none;
- position:fixed; top:0; left:0; width:100%; height:100%;
- background:rgba(0,0,0,0.5); backdrop-filter:blur(3px); 
- justify-content:center; align-items:center; z-index:9999;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
-    <h2>Přidat stroj</h2>
-    <p>Číslo stroje: <span id="popupMachineNumber"></span></p>
-
-    <h3>K existujícímu zákazníkovi</h3>
-    <div id="popupCustomerList"></div>
-
-    <hr>
-
-    <h3>Nový zákazník</h3>
-    <input id="popupNewCustName" placeholder="Jméno zákazníka" style="width:100%; margin-bottom:10px;">
-    <input id="popupNewCustPhone" placeholder="Telefon" inputmode="tel" autocomplete="tel" style="width:100%; margin-bottom:10px;">
-    <button class="btn primary" id="popupCreateCustomer" style="width:100%;">Vytvořit zákazníka a přidat stroj</button>
-
-    <button class="btn" id="popupClose" style="margin-top:10px; width:100%;">Zavřít</button>
-  </div>
-</div>
-
-
-
-
-
-<div id="popupAddMachine" class="modal" style="display:none;
- position:fixed; top:0; left:0; width:100%; height:100%;
- background:rgba(0,0,0,0.5); backdrop-filter:blur(3px); 
- justify-content:center; align-items:center; z-index:9999;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
-    <h2>Přidat stroj</h2>
-    <p>Číslo stroje: <span id="popupMachineNumber"></span></p>
-    <h3>K existujícímu zákazníkovi</h3>
-    <div id="popupCustomerList"></div>
-    <hr>
-    <h3>Nový zákazník</h3>
-    <input id="popupNewCustName" placeholder="Jméno zákazníka" style="width:100%; margin-bottom:10px;">
-    <input id="popupNewCustPhone" placeholder="Telefon" inputmode="tel" autocomplete="tel" style="width:100%; margin-bottom:10px;">
-    <button class="btn primary" id="popupCreateCustomer" style="width:100%;">Vytvořit zákazníka a přidat stroj</button>
-    <button class="btn" id="popupClose" style="margin-top:10px; width:100%;">Zavřít</button>
-  </div>
-</div>
-
-</body></html>`); 
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>HDH CODE – export</title><style>body{font-family:Arial,sans-serif;padding:16px}h1{font-size:18px;margin:0 0 8px}p{margin:0 0 12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:6px 8px;text-align:left}th{background:#f0f0f0}tr.weekend td { background: rgba(211, 37, 37, 0.08); }tr.weekend td:first-child { font-weight: 900; }</style></head><body><h1>HDH CODE – hromadný export</h1><p>Stroj N: <b>${N}</b> | Období: <b>${from}</b> – <b>${to}</b></p>${tableHTML}<script>window.onload=()=>window.print();<\/script></body></html>`); 
   w.document.close(); 
 });
 
@@ -2195,8 +2140,8 @@ function renderCustomers(filter=""){
       const mapHref = buildMapHref(c.address, c.name);
       const shownMachines = (q && !matchCustomer) ? matchedMachines : machines;
 
-      const contactLine = (c.contactName || c.contactPhone)
-        ? `<div class="c-contact">${c.contactName ? `<span>${escapeHtml(c.contactName)}</span>` : ``}${c.contactPhone ? `<span style="margin-left:8px"><a href="tel:${phoneNorm}" style="text-decoration:underline">${escapeHtml(c.contactPhone)}</a></span>` : ``}</div>`
+      const contactLine = c.contactName
+        ? `<div class="c-contact"><span>${escapeHtml(c.contactName)}</span></div>`
         : ``;
       const addressLine = c.address ? `<div class="c-address">${escapeHtml(c.address)}</div>` : ``;
       const noteLine = c.note ? `<div class="c-note">${escapeHtml(c.note)}</div>` : ``;
@@ -3075,12 +3020,18 @@ document.getElementById('logoutConfirm').addEventListener('click', (e)=>{
   toast('Odhlášeno');
 });
 
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  ensureWhatsNewUI();
+});
+
 // SW registration
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js')); }
 
 // Boot (až po načtení DOM kvůli iOS WebView)
 window.addEventListener('DOMContentLoaded', async ()=>{
   try{
+    ensureWhatsNewUI();
     if(!(await tryAutoUnlock())) uiShowLock();
     else { uiShowApp(); computeAll(); }
   }catch(e){

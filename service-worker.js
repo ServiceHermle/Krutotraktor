@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v2_8_1-soft-ux3-hotels1-v13nofocus-v15-customers-actions';
+const CACHE_VER = 'hdh-code-v2_8_1-soft-ux3-hotels1-v13nofocus-v15-customers-actions-v18-whatsnew-popup-overlayfix';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
@@ -6,7 +6,8 @@ const CORE_ASSETS = [
   './icon-512.png',
   './service-worker.js',
   './hotels_overlay.js',
-  './hotels_overlay.css'
+  './hotels_overlay.css',
+  './whats-new.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -79,3 +80,7 @@ self.addEventListener('fetch', (event) => {
 // bump 20260213143536
 
 // bump 20260213170936
+
+// bump 20260422052000
+
+// bump 20260422054000
