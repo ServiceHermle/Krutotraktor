@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v2_8_1-soft-ux3-hotels1-v13nofocus-v15-customers-actions-v18-whatsnew-popup-overlayfix';
+const CACHE_VER = 'hdh-code-v2_9_0-calc-clean';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
@@ -54,33 +54,3 @@ self.addEventListener('fetch', (event) => {
     } catch(e) { return Response.error(); }
   })());
 });
-
-// bump 20260212145549
-
-// bump 20260212162958
-
-// bump 20260212165742
-
-// bump 20260212182536
-
-// bump 20260212190255
-
-// bump 20260212191401
-
-// bump 20260212192251
-
-// bump 20260213100705
-
-// bump 20260213111624
-
-// bump 20260213112704
-
-// bump 20260213113735
-
-// bump 20260213143536
-
-// bump 20260213170936
-
-// bump 20260422052000
-
-// bump 20260422054000

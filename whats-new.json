@@ -1,10 +1,13 @@
 {
-  "version": "2026-04-25-1",
+  "version": "5.8.77",
   "title": "Co je nového",
   "items": [
-    "Přidána tlačítka u zákazníků: telefon, mapa a editace.",
-    "Přidán symbol stroje s počtem strojů zákazníka.",
-    "Opraveno přidávání zákazníka a stroje.",
-    "Telefonní číslo je v seznamu skryté, volání je přes ikonu telefonu."
+    "Na stránku Výpočet jsem přidal tlačítko Kalkulačky.",
+    "Zatím jsou zde tyto kalkulačky:",
+    "Orientace vřetene – po výměně vřetene už není potřeba složitě přemýšlet nad výpočtem. Stačí zadat ideální pozici a aplikace rovnou vypočítá hodnotu, kterou je potřeba zapsat do parametru 3430.",
+    "Měření kinematiky – mělo by fungovat stejně jako původní Excel pro starší stroje.",
+    "Měření vibrací – slouží hlavně jako pomocný zápis pro měření vřeten a zadávání závaží.",
+    "Výpočet utahovacího momentu pro hákové klíče – je to jednoduchý výpočet, ale často se musí dohledávat. Dole je navíc možnost uložit si vlastní nářadí, takže ho není potřeba pokaždé měřit znovu. Stačí vybrat, s čím právě chcete pracovat.",
+    "Kdyby cokoliv nefungovalo, stačí mi napsat. Budu rád i za jakýkoliv nápad na další funkce."
   ]
 }

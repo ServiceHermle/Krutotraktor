@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>Hermle (v5.8.52 Thomas Pospisil)</title>
+<title>Hermle (v5.8.53 Thomas Pospisil)</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#f7f7f9" name="theme-color"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
@@ -710,6 +710,102 @@ input, select, textarea { font-size:16px !important; }
 
 
 .icon-machine{width:22px;height:22px}
+
+/* --- Service calculators --- */
+.calc-launch{ margin-top:10px; }
+.quick-launch-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+.quick-launch-row .btn{ width:100%; }
+.calc-head{ display:flex; gap:10px; align-items:center; margin-bottom:12px; }
+.calc-head .btn{ width:auto !important; min-width:92px; flex:0 0 auto; }
+.calc-title{ font-size:1.35rem; font-weight:900; flex:1; text-align:center; padding-right:92px; }
+.calc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+.calc-tile{ min-height:86px; white-space:normal !important; line-height:1.15 !important; flex-direction:column; text-align:center; font-size:1rem; }
+.calc-tile .calc-emoji{ font-size:1.45rem; line-height:1; }
+.calc-box{ margin-top:12px; border:1px solid var(--border); border-radius:18px; padding:12px; background:#fff; }
+.calc-result{ margin-top:12px; border:1px solid var(--border); border-radius:18px; padding:14px; background:#f8fafc; }
+.calc-result-label{ font-weight:900; opacity:.75; }
+.calc-result-value{ font-size:2rem; font-weight:900; margin-top:4px; font-variant-numeric:tabular-nums; word-break:break-word; }
+.calc-note{ margin-top:10px; font-size:.86rem; opacity:.72; font-weight:700; }
+.calc-copy{ margin-top:10px; }
+.calc-input-select{ display:grid; grid-template-columns:1fr; gap:8px; align-items:center; }
+.calc-input-select.has-tool-select{ grid-template-columns:minmax(0,1fr) 78px; }
+.tool-inline-select{ width:78px !important; min-width:78px !important; height:44px !important; padding:8px 10px !important; border-radius:14px !important; font-weight:900; text-align:center; background:#fff; }
+.tool-store{ margin-top:10px; border:1px solid var(--border); border-radius:16px; padding:10px; background:#f8fafc; }
+.tool-store summary{ cursor:pointer; list-style:none; }
+.tool-store summary::-webkit-details-marker{ display:none; }
+.tool-store-title{ font-weight:900; margin-bottom:8px; }
+.tool-store-title::after{ content:' ▾'; font-weight:900; }
+.tool-store[open] .tool-store-title::after{ content:' ▴'; }
+.tool-store-body{ display:grid; gap:10px; margin-top:8px; }
+.tool-store-hint{ font-size:.86rem; opacity:.72; font-weight:700; }
+.tool-row{ display:grid; grid-template-columns:1fr; gap:8px; }
+.tool-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+@media (max-width:420px){ .calc-grid{grid-template-columns:1fr;} .calc-title{padding-right:0; text-align:left;} }
+
+/* --- Kinematics calculator --- */
+.kin-form{ margin-top:0; }
+.kin-top-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.kin-tabs{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0; }
+.kin-tab{ min-height:54px; white-space:normal !important; line-height:1.1 !important; }
+.kin-tab.active{ background:#ffecec !important; border-color:#f3b1b1 !important; }
+.kin-subtitle{ font-size:.92rem; opacity:.72; font-weight:800; margin-top:2px; }
+.kin-screen{ display:none; }
+.kin-screen.active{ display:block; }
+.kin-section{ margin-top:10px; border:1px solid var(--border); border-radius:18px; padding:12px; background:#fff; }
+.kin-section h3{ margin:0 0 8px; font-size:1rem; }
+.kin-fields{ display:grid; grid-template-columns:1fr; gap:8px; }
+.kin-field label{ margin-top:0; font-size:.86rem !important; }
+.kin-hint{ display:block; font-size:.78rem; opacity:.62; font-weight:700; line-height:1.25; margin-top:1px; }
+.kin-field input{ margin-top:4px !important; }
+.kin-warning{ margin-top:10px; border:1px solid var(--border); border-radius:14px; padding:10px 12px; background:#f8fafc; font-size:.86rem; font-weight:800; line-height:1.35; }
+.kin-warning.ok{ background:#f0fdf4; border-color:#bbf7d0; }
+.kin-warning.warn{ background:#fff7ed; border-color:#fed7aa; }
+.kin-result-list{ display:grid; gap:8px; margin-top:8px; }
+.kin-result-row{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:10px; border:1px solid var(--border); border-radius:14px; background:#f8fafc; }
+.kin-param{ font-weight:900; }
+.kin-desc{ font-size:.8rem; opacity:.72; font-weight:800; line-height:1.25; }
+.kin-values{ margin-top:4px; display:flex; gap:8px; flex-wrap:wrap; font-size:.83rem; font-weight:800; }
+.kin-old{ opacity:.68; }
+.kin-new{ font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:900; font-size:1.05rem; }
+.kin-copy-btn{ width:auto !important; min-width:42px !important; height:42px !important; padding:0 10px !important; border-radius:12px !important; }
+.kin-pills{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 8px; }
+.kin-pill{ border:1px solid var(--border); border-radius:999px; padding:6px 9px; background:#f8fafc; font-size:.8rem; font-weight:800; }
+.kin-pill strong{ font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.kin-formula{ white-space:pre-wrap; border:1px solid var(--border); border-radius:14px; padding:10px; background:#f8fafc; font-size:.8rem; font-weight:800; line-height:1.4; overflow:auto; }
+.kin-details{ margin-top:10px; }
+.kin-details summary{ cursor:pointer; font-weight:900; }
+@media (max-width:420px){
+  .kin-top-actions{ grid-template-columns:1fr; }
+  .kin-result-row{ grid-template-columns:1fr; }
+  .kin-copy-btn{ width:100% !important; }
+}
+
+
+/* --- Vibration measurement calculator --- */
+.vib-form{ margin-top:0; }
+.vib-tabs{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0; }
+.vib-tab{ min-height:52px; white-space:normal !important; line-height:1.1 !important; }
+.vib-tab.active{ background:#ffecec !important; border-color:#f3b1b1 !important; }
+.vib-grid{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px; }
+.vib-side-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.vib-side-head h3{ margin:0; font-size:1.05rem; }
+.vib-metrics{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+.vib-metric{ border:1px solid var(--border); border-radius:14px; padding:10px; background:#f8fafc; }
+.vib-metric span{ display:block; font-size:.74rem; opacity:.68; font-weight:900; text-transform:uppercase; letter-spacing:.03em; }
+.vib-metric strong{ display:block; margin-top:3px; font-size:1.1rem; font-weight:900; font-variant-numeric:tabular-nums; }
+.vib-result-list{ display:grid; gap:7px; margin-top:10px; }
+.vib-row{ display:grid; grid-template-columns:42px minmax(0,1fr) minmax(86px,110px); gap:8px; align-items:center; border:1px solid var(--border); border-radius:14px; padding:8px; background:#f8fafc; }
+.vib-no{ height:34px; min-width:34px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; border:1px solid var(--border); background:#fff; font-weight:900; }
+.vib-angle{ font-size:1rem; font-weight:900; font-variant-numeric:tabular-nums; }
+.vib-angle small{ display:block; font-size:.72rem; opacity:.62; font-weight:800; }
+.vib-weight{ min-height:38px !important; padding:8px 10px !important; border-radius:12px !important; font-size:14px !important; text-align:center; margin-top:0 !important; }
+.vib-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+@media (max-width:420px){
+  .vib-metrics,.vib-actions{ grid-template-columns:1fr; }
+  .vib-row{ grid-template-columns:38px minmax(0,1fr); }
+  .vib-weight{ grid-column:1 / -1; text-align:left; }
+}
+
 </style>
 <style id="mobile-override">
 
@@ -959,14 +1055,207 @@ input[type="search"] {
 </div>
 
 <button class="btn" data-i18n="btn_add_machine" id="addMachine" style="grid-column: span 2; width:100%; margin-top:10px; font-weight:900;">${t("btn_add_machine_small")}</button>
-<div class="hotels-inline">
-  <button class="btn" id="hotelViewBtn" type="button" style="width:100%;">🛌 <span data-i18n="tab_hotels">Hotely</span></button>
+<div class="quick-launch-row">
+  <button class="btn" id="hotelViewBtn" type="button">🛌 <span data-i18n="tab_hotels">Hotely</span></button>
+  <button class="btn" id="serviceCalcBtn" type="button">🧮 <span data-i18n="service_calculators">Kalkulačky</span></button>
 </div>
 
   <div class="footer"><span data-i18n="footer_disclaimer">Použití a sdílení mimo společnost Hermle je přísně zakázáno.</span></div>
 </div>
 
 <div class="divider" style="height:1px;background:var(--border);margin:14px 0;"></div>
+
+
+<!-- SERVICE CALCULATORS -->
+<div class="card hidden" id="panel-service-calcs">
+  <div class="calc-head">
+    <button class="btn" id="calcBackBtn" type="button">← <span data-i18n="btn_back">Zpět</span></button>
+    <div class="calc-title" data-i18n="service_calculators">Kalkulačky</div>
+  </div>
+
+  <div id="calcMenu" class="calc-grid">
+    <button class="btn calc-tile" data-calc="spindle" type="button"><span class="calc-emoji">🌀</span><span data-i18n="calc_spindle">Orientace vřetene</span></button>
+    <button class="btn calc-tile" data-calc="kinematics" type="button"><span class="calc-emoji">⚙️</span><span data-i18n="calc_kinematics">Kinematika</span></button>
+    <button class="btn calc-tile" data-calc="hook_torque" type="button"><span class="calc-emoji">🔧</span><span data-i18n="calc_hook_torque">Hákový klíč / moment</span></button>
+    <button class="btn calc-tile" data-calc="vibrations" type="button"><span class="calc-emoji">📳</span><span data-i18n="calc_vibrations">Měření vibrací</span></button>
+  </div>
+
+  <div id="calcForm" class="hidden">
+    <button class="btn" id="calcMenuBackBtn" type="button" style="margin-bottom:10px;">← <span data-i18n="calc_back_to_menu">Zpět na kalkulačky</span></button>
+    <div class="calc-box">
+      <div class="calc-title" id="activeCalcTitle" style="padding:0;text-align:left;font-size:1.2rem;">Orientace vřetene</div>
+      <label id="calcLabel1">Hodnota parametru</label>
+      <div class="calc-input-select" id="calcInputWrap1">
+        <input id="calcInput1" inputmode="decimal" type="text" placeholder="0.000"/>
+        <select id="torqueWrenchSelect" class="tool-inline-select hidden" aria-label="Momentový klíč"></select>
+      </div>
+      <label id="calcLabel2">Pozice M19</label>
+      <div class="calc-input-select" id="calcInputWrap2">
+        <input id="calcInput2" inputmode="decimal" type="text" placeholder="0.000"/>
+        <select id="torqueAdapterSelect" class="tool-inline-select hidden" aria-label="Adaptér / hák"></select>
+      </div>
+      <label id="calcLabel3">Skutečná pozice M19</label>
+      <div class="calc-input-select" id="calcInputWrap3">
+        <input id="calcInput3" inputmode="decimal" type="text" placeholder="0.000"/>
+      </div>
+      <div class="calc-result">
+        <div class="calc-result-label" id="calcResultLabel">Nová hodnota parametru</div>
+        <div class="calc-result-value" id="calcResult">–</div>
+      </div>
+      <button class="btn primary calc-copy" id="calcCopyBtn" type="button" data-i18n="btn_copy">Kopírovat</button>
+      <div class="calc-note" id="calcHelp">Po změně parametru vždy ověř skutečný výsledek měřením.</div>
+      <details id="torqueToolStore" class="tool-store hidden">
+        <summary class="tool-store-title" data-i18n="tool_store_title">Správa uloženého nářadí</summary>
+        <div class="tool-store-body">
+          <div class="tool-store-hint" data-i18n="tool_store_hint">Uložené klíče a adaptéry se potom objeví v malém rolovacím menu vedle délky L a A.</div>
+          <div class="tool-row">
+            <label data-i18n="tool_select_wrench">Momentový klíč</label>
+            <div class="tool-actions">
+              <button class="btn" id="addTorqueWrenchBtn" type="button" data-i18n="tool_add_wrench">+ Klíč</button>
+              <button class="btn" id="deleteTorqueWrenchBtn" type="button" data-i18n="tool_delete_selected">Smazat vybraný</button>
+            </div>
+          </div>
+          <div class="tool-row">
+            <label data-i18n="tool_select_adapter">Adaptér / hák</label>
+            <div class="tool-actions">
+              <button class="btn" id="addTorqueAdapterBtn" type="button" data-i18n="tool_add_adapter">+ Adaptér</button>
+              <button class="btn" id="deleteTorqueAdapterBtn" type="button" data-i18n="tool_delete_selected">Smazat vybraný</button>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div id="kinematicsForm" class="kin-form hidden">
+    <button class="btn" id="kinMenuBackBtn" type="button" style="margin-bottom:10px;">← <span data-i18n="calc_back_to_menu">Zpět na kalkulačky</span></button>
+    <div class="calc-box">
+      <div class="calc-title" style="padding:0;text-align:left;font-size:1.2rem;" data-i18n="calc_kinematics">Kinematika</div>
+      <div class="calc-note" data-i18n="kin_note">Mobilní verze podle Excelu: nejdřív C osa, potom A osa. Výsledky se ukládají lokálně v telefonu.</div>
+
+      <div class="kin-top-actions">
+        <button class="btn" id="kinExampleBtn" type="button" data-i18n="kin_load_example">Načíst příklad</button>
+        <button class="btn danger" id="kinClearBtn" type="button" data-i18n="kin_clear">Vymazat kinematiku</button>
+      </div>
+
+      <div class="kin-tabs">
+        <button class="btn kin-tab active" id="kinTabC" type="button">
+          <span><span data-i18n="kin_tab_c">1. C osa</span><br><span class="kin-subtitle">A0 / C180</span></span>
+        </button>
+        <button class="btn kin-tab" id="kinTabA" type="button">
+          <span><span data-i18n="kin_tab_a">2. A osa</span><br><span class="kin-subtitle">A-90 / C180</span></span>
+        </button>
+      </div>
+
+      <section class="kin-screen active" id="kinScreenC">
+        <div class="kin-section">
+          <h3 data-i18n="kin_original_params">Vstup – původní parametry</h3>
+          <div class="kin-fields">
+            <div class="kin-field"><label for="kin-c-p0">7530.0 – C v X<span class="kin-hint">původní hodnota parametru</span></label><input id="kin-c-p0" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-c-p1">7530.1 – C v Y<span class="kin-hint">původní hodnota parametru</span></label><input id="kin-c-p1" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-c-p2">7530.2 – stůl v Z<span class="kin-hint">původní hodnota parametru</span></label><input id="kin-c-p2" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-c-p4">7530.4 – A v Y / IY<span class="kin-hint">původní hodnota parametru</span></label><input id="kin-c-p4" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-c-p5">7530.5 – A v Z / IZ<span class="kin-hint">původní hodnota parametru</span></label><input id="kin-c-p5" inputmode="decimal" autocomplete="off" type="text"></div>
+          </div>
+        </div>
+
+        <div class="kin-section">
+          <h3 data-i18n="kin_measure_c">Měření A0 / C180</h3>
+          <div class="kin-fields">
+            <div class="kin-field"><label for="kin-c-x">X<span class="kin-hint">naměřená odchylka</span></label><input id="kin-c-x" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-c-y">Y<span class="kin-hint">naměřená odchylka</span></label><input id="kin-c-y" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-c-z">Z<span class="kin-hint">kontrola polohy A osy</span></label><input id="kin-c-z" inputmode="decimal" autocomplete="off" type="text"></div>
+          </div>
+          <div id="kinCWarning" class="kin-warning ok">Zatím nejsou zadané hodnoty.</div>
+        </div>
+
+        <div class="kin-section">
+          <h3 data-i18n="kin_result_c">Výsledek po 1. měření – zapsat před měřením A osy</h3>
+          <div class="kin-result-list" id="kinCResults"></div>
+          <div class="btnrow">
+            <button class="btn" id="kinCopyCBtn" type="button" data-i18n="kin_copy_results">Kopírovat výsledky</button>
+            <button class="btn primary" id="kinApplyCBtn" type="button" data-i18n="kin_apply_a">Použít pro A osu</button>
+          </div>
+          <details class="kin-details">
+            <summary data-i18n="kin_formula">Vzorec</summary>
+            <div class="kin-formula">7530.0 nový = 7530.0 původní + X / 2
+7530.1 nový = 7530.1 původní + Y / 2
+7530.2, 7530.4, 7530.5 = beze změny
+Kontrola: pokud ABS(Z) &gt; 0.015, Excel upozorní na nastavení A osy / MP960.</div>
+          </details>
+        </div>
+      </section>
+
+      <section class="kin-screen" id="kinScreenA">
+        <div class="kin-section">
+          <h3 data-i18n="kin_input_after_c">Vstup – hodnoty po C ose</h3>
+          <div class="kin-fields">
+            <div class="kin-field"><label for="kin-a-p0">7530.0 – X<span class="kin-hint">může se převzít z výsledku C</span></label><input id="kin-a-p0" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-a-p1">7530.1 – Y<span class="kin-hint">může se převzít z výsledku C</span></label><input id="kin-a-p1" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-a-p2">7530.2 – Z<span class="kin-hint">může se převzít z výsledku C</span></label><input id="kin-a-p2" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-a-p4">7530.4 – IY<span class="kin-hint">hodnota před korekcí A osy</span></label><input id="kin-a-p4" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-a-p5">7530.5 – IZ<span class="kin-hint">hodnota před korekcí A osy</span></label><input id="kin-a-p5" inputmode="decimal" autocomplete="off" type="text"></div>
+          </div>
+          <button class="btn" id="kinApplyCBtn2" type="button" style="margin-top:10px;" data-i18n="kin_take_c">Převzít z výsledku C</button>
+        </div>
+
+        <div class="kin-section">
+          <h3 data-i18n="kin_measure_a">Měření A-90 / C180</h3>
+          <div class="kin-fields">
+            <div class="kin-field"><label for="kin-a-x">X<span class="kin-hint">kontrola geometrie Z v X směru</span></label><input id="kin-a-x" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-a-y">Y<span class="kin-hint">naměřená odchylka</span></label><input id="kin-a-y" inputmode="decimal" autocomplete="off" type="text"></div>
+            <div class="kin-field"><label for="kin-a-z">Z<span class="kin-hint">naměřená odchylka</span></label><input id="kin-a-z" inputmode="decimal" autocomplete="off" type="text"></div>
+          </div>
+          <div id="kinAWarning" class="kin-warning ok">Zatím nejsou zadané hodnoty.</div>
+        </div>
+
+        <div class="kin-section">
+          <h3>Výsledek po 2. měření – finální hodnoty k zapsání</h3>
+          <div class="kin-pills" id="kinAHelper"></div>
+          <div class="kin-result-list" id="kinAResults"></div>
+          <button class="btn primary" id="kinCopyABtn" type="button" style="margin-top:10px;">Kopírovat finální hodnoty</button>
+          <details class="kin-details">
+            <summary data-i18n="kin_formula">Vzorec</summary>
+            <div class="kin-formula">průměr = (Y + Z) / 2
+7530.4 nový = 7530.4 původní + (Y - průměr)
+7530.5 nový = 7530.5 původní + průměr
+7530.0, 7530.1, 7530.2 = beze změny
+Kontrola: pokud ABS(X) &gt; 0.020, Excel upozorní na kontrolu geometrie Z osy v X směru.</div>
+          </details>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="vibrationsForm" class="kin-form vib-form hidden">
+    <button class="btn" id="vibMenuBackBtn" type="button" style="margin-bottom:10px;">← <span data-i18n="calc_back_to_menu">Zpět na kalkulačky</span></button>
+    <div class="calc-box">
+      <div class="calc-title" style="padding:0;text-align:left;font-size:1.2rem;" data-i18n="calc_vibrations">Měření vibrací</div>
+      <div class="calc-note" data-i18n="vib_note">Pozice vyvažovacích míst podle Excelu WUCHTVORLAGE. Přepni stranu A/B, zadej počet otvorů a polohu vřetene pro první červík.</div>
+
+      <div class="kin-top-actions">
+        <button class="btn danger" id="vibClearWeightsBtn" type="button" data-i18n="vib_clear_weights">Smazat závaží</button>
+      </div>
+
+      <div class="vib-tabs" role="tablist" aria-label="Výběr strany měření vibrací">
+        <button class="btn vib-tab active" id="vibTabA" type="button" onclick="vibShowSide('A')" data-i18n="vib_side_a">Strana A</button>
+        <button class="btn vib-tab" id="vibTabB" type="button" onclick="vibShowSide('B')" data-i18n="vib_side_b">Strana B</button>
+      </div>
+
+      <div class="vib-grid" id="vibSideCards"></div>
+
+      <div class="kin-section">
+        <h3 data-i18n="vib_control">Ovládání</h3>
+        <div class="btnrow">
+          <button class="btn" id="vibCopyABtn" type="button" data-i18n="vib_copy_a">Kopírovat A stranu</button>
+          <button class="btn" id="vibCopyBBtn" type="button" data-i18n="vib_copy_b">Kopírovat B stranu</button>
+          <button class="btn primary" id="vibCopyAllBtn" type="button" data-i18n="btn_copy_all">Kopírovat vše</button>
+        </div>
+        <div class="calc-note" data-i18n="vib_note_bottom">Sloupec „závaží“ je pomocné pole jako v Excelu a ukládá se lokálně v telefonu. Vstupy berou čárku i tečku.</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- RANGE -->
 <div class="card hidden" id="panel-range">
@@ -1183,6 +1472,30 @@ const I18N = {
     tab_fixed: "Pevné kódy",
     tab_clients: "Zákazníci",
     tab_hotels: "Hotely",
+    service_calculators: "Kalkulačky",
+    calc_spindle: "Orientace vřetene",
+    calc_kinematics: "Kinematika",
+    calc_hook_torque: "Hákový klíč / moment",
+    calc_vibrations: "Měření vibrací",
+    calc_back_to_menu: "Zpět na kalkulačky",
+    calc_current_param: "Hodnota parametru",
+    calc_current_position: "Pozice M19",
+    calc_ideal_position: "Skutečná pozice M19",
+    calc_new_param: "Nová hodnota parametru",
+    calc_wrench_length_l: "Délka momentového klíče (od středu ráčny po střed rukojeti) [mm]",
+    calc_adapter_length_a: "Efektivní délka adaptéru (napsána na adaptéru) [mm]",
+    tool_store_title: "Správa uloženého nářadí",
+    tool_store_hint: "Uložené klíče a adaptéry se potom objeví v malém rolovacím menu vedle délky L a A.",
+    tool_select_wrench: "Momentový klíč",
+    tool_select_adapter: "Adaptér / hák",
+    tool_add_wrench: "+ Klíč",
+    tool_add_adapter: "+ Adaptér",
+    tool_delete_selected: "Smazat vybraný",
+    tool_manual: "Ručně zadat",
+    calc_required_torque_te: "Požadovaný moment TE [Nm]",
+    calc_set_torque_ts: "Nastavit na klíči TS [Nm]",
+    calc_input_placeholder: "Bude doplněno",
+    calc_result: "Výsledek",
     label_date: "Datum",
     label_machine_number: "Číslo stroje",
     placeholder_machine_n: "N",
@@ -1277,6 +1590,30 @@ const I18N = {
     tab_fixed: "Feste Codes",
     tab_clients: "Kunden",
     tab_hotels: "Hotels",
+    service_calculators: "Rechner",
+    calc_spindle: "Spindelorientierung",
+    calc_kinematics: "Kinematik",
+    calc_hook_torque: "Hakenschlüssel / Drehmoment",
+    calc_vibrations: "Vibrationsmessung",
+    calc_back_to_menu: "Zurück zu Rechnern",
+    calc_current_param: "Aktueller Parameterwert",
+    calc_current_position: "Aktuelle Spindelposition",
+    calc_ideal_position: "Ideale Spindelposition",
+    calc_new_param: "Neuer Parameterwert",
+    calc_wrench_length_l: "Länge des Drehmomentschlüssels L [mm]",
+    calc_adapter_length_a: "Wirksame Adapterlänge A [mm]",
+    tool_store_title: "Werkzeugverwaltung",
+    tool_store_hint: "Gespeicherte Schlüssel und Adapter erscheinen im kleinen Auswahlmenü neben Länge L und A.",
+    tool_select_wrench: "Drehmomentschlüssel",
+    tool_select_adapter: "Adapter / Haken",
+    tool_add_wrench: "+ Schlüssel",
+    tool_add_adapter: "+ Adapter",
+    tool_delete_selected: "Auswahl löschen",
+    tool_manual: "Manuell eingeben",
+    calc_required_torque_te: "Erforderliches Drehmoment TE [Nm]",
+    calc_set_torque_ts: "Einstellwert am Schlüssel TS [Nm]",
+    calc_input_placeholder: "Wird ergänzt",
+    calc_result: "Ergebnis",
     label_date: "Datum",
     label_machine_number: "Maschinennummer",
     placeholder_machine_n: "Nr.",
@@ -1370,6 +1707,30 @@ const I18N = {
     tab_fixed: "Fixed codes",
     tab_clients: "Customers",
     tab_hotels: "Hotels",
+    service_calculators: "Calculators",
+    calc_spindle: "Spindle orientation",
+    calc_kinematics: "Kinematics",
+    calc_hook_torque: "Hook wrench / torque",
+    calc_vibrations: "Vibration measurement",
+    calc_back_to_menu: "Back to calculators",
+    calc_current_param: "Current parameter value",
+    calc_current_position: "Current spindle position",
+    calc_ideal_position: "Ideal spindle position",
+    calc_new_param: "New parameter value",
+    calc_wrench_length_l: "Torque wrench length L [mm]",
+    calc_adapter_length_a: "Effective adapter length A [mm]",
+    tool_store_title: "Saved tool management",
+    tool_store_hint: "Saved wrenches and adapters appear in the small drop-down next to lengths L and A.",
+    tool_select_wrench: "Torque wrench",
+    tool_select_adapter: "Adapter / hook",
+    tool_add_wrench: "+ Wrench",
+    tool_add_adapter: "+ Adapter",
+    tool_delete_selected: "Delete selected",
+    tool_manual: "Manual input",
+    calc_required_torque_te: "Required torque TE [Nm]",
+    calc_set_torque_ts: "Torque setting TS [Nm]",
+    calc_input_placeholder: "To be added",
+    calc_result: "Result",
     label_date: "Date",
     label_machine_number: "Machine number",
     placeholder_machine_n: "No.",
@@ -1464,8 +1825,78 @@ function getLang(){
 }
 let CURRENT_LANG = getLang();
 
+const CALC_I18N = {
+  cs: {
+    calc_help_spindle: "Nový parametr = aktuální parametr − (ideální poloha − aktuální poloha).",
+    calc_help_torque: "Vzorec: TS = TE × L / (L + A). Hodnoty L a A zadávej ve stejných jednotkách, typicky mm.",
+    calc_help_default: "Po změně parametru vždy ověř skutečný výsledek měřením.",
+    prompt_wrench_name: "Název momentového klíče:", prompt_adapter_name: "Název adaptéru / háku:",
+    prompt_wrench_length: "Délka momentového klíče L [mm]:", prompt_adapter_length: "Efektivní délka adaptéru A [mm]:",
+    invalid_value: "Neplatná hodnota", copied: "Zkopírováno", copy_not_supported: "Kopírování není podporováno",
+    kin_note: "Mobilní verze podle Excelu: nejdřív C osa, potom A osa. Výsledky se ukládají lokálně v telefonu.",
+    kin_load_example: "Načíst příklad", kin_clear: "Vymazat kinematiku", kin_tab_c: "1. C osa", kin_tab_a: "2. A osa",
+    kin_original_params: "Vstup – původní parametry", kin_measure_c: "Měření A0 / C180", kin_result_c: "Výsledek po 1. měření – zapsat před měřením A osy",
+    kin_copy_results: "Kopírovat výsledky", kin_apply_a: "Použít pro A osu", kin_take_c: "Převzít z výsledku C", kin_formula: "Vzorec",
+    kin_input_after_c: "Vstup – hodnoty po C ose", kin_measure_a: "Měření A-90 / C180", kin_result_a: "Finální výsledek po měření A osy",
+    kin_no_values: "Zatím nejsou zadané hodnoty.", kin_z_warn: "Pozor: ABS(Z) je větší než 0.015. Excel upozorňuje, že poloha A osy se musí nastavit přes MP960 a restartovat řízení.", kin_z_ok: "Kontrola Z je v limitu podle původního Excelu.",
+    kin_x_warn: "Pozor: ABS(X) je větší než 0.020. Excel upozorňuje na kontrolu geometrie Z osy v X směru.", kin_x_ok: "Kontrola X je v limitu podle původního Excelu.",
+    kin_old: "Původní", kin_new: "Nová", kin_avg_yz: "Průměr Y/Z", kin_corr_75304: "Korekce 7530.4", kin_corr_75305: "Korekce 7530.5", kin_dev_y: "Odchylka Y", kin_dev_z: "Odchylka Z",
+    kin_c_copied: "Výsledek C byl převzatý jako vstup pro A osu.", kin_example_loaded: "Načtený příklad z Excelu.", kin_cleared: "Kinematika vymazána.",
+    vib_note: "Pozice vyvažovacích míst podle Excelu WUCHTVORLAGE. Přepni stranu A/B, zadej počet otvorů a polohu vřetene pro první červík.",
+    vib_clear_weights: "Smazat závaží", vib_side_a: "Strana A", vib_side_b: "Strana B", vib_control: "Ovládání",
+    vib_copy_a: "Kopírovat A stranu", vib_copy_b: "Kopírovat B stranu", vib_note_bottom: "Sloupec „závaží“ je pomocné pole jako v Excelu a ukládá se lokálně v telefonu. Vstupy berou čárku i tečku.",
+    vib_a_label: "A strana", vib_b_label: "B strana", vib_places: "míst", vib_no_calc: "bez výpočtu", vib_division: "Počet otvorů / červíků", vib_division_hint: "počet vyvažovacích míst", vib_start: "Poloha vřetene pro první červík", vib_start_hint: "Spindel Pos pro první místo", vib_step: "Rozteč", vib_last_position: "Poslední poloha", vib_valid_warning: "Zadej platný počet otvorů a první polohu vřetene.", vib_weight: "závaží", vib_weight_deleted: "Závaží smazáno", vib_side_reset: "strana resetována", vib_side_copied: "strana zkopírována", vib_all_copied: "Měření vibrací zkopírováno", vib_holes: "Počet otvorů", vib_first_pos: "První poloha"
+  },
+  de: {
+    calc_help_spindle: "Neuer Parameter = aktueller Parameter − (Sollposition − aktuelle Position).",
+    calc_help_torque: "Formel: TS = TE × L / (L + A). L und A in gleichen Einheiten eingeben, typischerweise mm.",
+    calc_help_default: "Nach der Parameteränderung immer das tatsächliche Ergebnis durch Messung prüfen.",
+    prompt_wrench_name: "Name des Drehmomentschlüssels:", prompt_adapter_name: "Name des Adapters / Hakens:",
+    prompt_wrench_length: "Länge des Drehmomentschlüssels L [mm]:", prompt_adapter_length: "Wirksame Adapterlänge A [mm]:",
+    invalid_value: "Ungültiger Wert", copied: "Kopiert", copy_not_supported: "Kopieren wird nicht unterstützt",
+    kin_note: "Mobile Version nach Excel: zuerst C-Achse, danach A-Achse. Die Ergebnisse werden lokal im Telefon gespeichert.",
+    kin_load_example: "Beispiel laden", kin_clear: "Kinematik löschen", kin_tab_c: "1. C-Achse", kin_tab_a: "2. A-Achse",
+    kin_original_params: "Eingabe – ursprüngliche Parameter", kin_measure_c: "Messung A0 / C180", kin_result_c: "Ergebnis nach 1. Messung – vor der A-Achsen-Messung eintragen",
+    kin_copy_results: "Ergebnisse kopieren", kin_apply_a: "Für A-Achse verwenden", kin_take_c: "Aus C-Ergebnis übernehmen", kin_formula: "Formel",
+    kin_input_after_c: "Eingabe – Werte nach C-Achse", kin_measure_a: "Messung A-90 / C180", kin_result_a: "Endergebnis nach A-Achsen-Messung",
+    kin_no_values: "Noch keine Werte eingegeben.", kin_z_warn: "Achtung: ABS(Z) ist größer als 0.015. Excel weist darauf hin, dass die A-Achsen-Position über MP960 eingestellt und die Steuerung neu gestartet werden muss.", kin_z_ok: "Z-Kontrolle ist innerhalb der Grenze nach der ursprünglichen Excel-Datei.",
+    kin_x_warn: "Achtung: ABS(X) ist größer als 0.020. Excel weist auf eine Kontrolle der Z-Achsengeometrie in X-Richtung hin.", kin_x_ok: "X-Kontrolle ist innerhalb der Grenze nach der ursprünglichen Excel-Datei.",
+    kin_old: "Alt", kin_new: "Neu", kin_avg_yz: "Mittelwert Y/Z", kin_corr_75304: "Korrektur 7530.4", kin_corr_75305: "Korrektur 7530.5", kin_dev_y: "Abweichung Y", kin_dev_z: "Abweichung Z",
+    kin_c_copied: "C-Ergebnis wurde als Eingabe für die A-Achse übernommen.", kin_example_loaded: "Beispiel aus Excel geladen.", kin_cleared: "Kinematik gelöscht.",
+    vib_note: "Positionen der Auswuchtorte nach Excel WUCHTVORLAGE. Seite A/B umschalten, Anzahl der Bohrungen und Spindelposition für den ersten Gewindestift eingeben.",
+    vib_clear_weights: "Gewichte löschen", vib_side_a: "Seite A", vib_side_b: "Seite B", vib_control: "Bedienung",
+    vib_copy_a: "Seite A kopieren", vib_copy_b: "Seite B kopieren", vib_note_bottom: "Die Spalte „Gewicht“ ist ein Hilfsfeld wie in Excel und wird lokal im Telefon gespeichert. Eingaben akzeptieren Komma und Punkt.",
+    vib_a_label: "Seite A", vib_b_label: "Seite B", vib_places: "Orte", vib_no_calc: "keine Berechnung", vib_division: "Anzahl Bohrungen / Gewindestifte", vib_division_hint: "Anzahl der Auswuchtorte", vib_start: "Spindelposition für den ersten Gewindestift", vib_start_hint: "Spindel Pos für den ersten Ort", vib_step: "Teilung", vib_last_position: "Letzte Position", vib_valid_warning: "Gültige Anzahl der Bohrungen und erste Spindelposition eingeben.", vib_weight: "Gewicht", vib_weight_deleted: "Gewichte gelöscht", vib_side_reset: "Seite zurückgesetzt", vib_side_copied: "Seite kopiert", vib_all_copied: "Vibrationsmessung kopiert", vib_holes: "Anzahl Bohrungen", vib_first_pos: "Erste Position"
+  },
+  en: {
+    calc_help_spindle: "New parameter = current parameter − (ideal position − current position).",
+    calc_help_torque: "Formula: TS = TE × L / (L + A). Enter L and A in the same units, typically mm.",
+    calc_help_default: "After changing the parameter, always verify the actual result by measurement.",
+    prompt_wrench_name: "Torque wrench name:", prompt_adapter_name: "Adapter / hook name:",
+    prompt_wrench_length: "Torque wrench length L [mm]:", prompt_adapter_length: "Effective adapter length A [mm]:",
+    invalid_value: "Invalid value", copied: "Copied", copy_not_supported: "Copying is not supported",
+    kin_note: "Mobile version based on Excel: first C axis, then A axis. Results are stored locally on the phone.",
+    kin_load_example: "Load example", kin_clear: "Clear kinematics", kin_tab_c: "1. C axis", kin_tab_a: "2. A axis",
+    kin_original_params: "Input – original parameters", kin_measure_c: "Measurement A0 / C180", kin_result_c: "Result after 1st measurement – enter before A-axis measurement",
+    kin_copy_results: "Copy results", kin_apply_a: "Use for A axis", kin_take_c: "Take from C result", kin_formula: "Formula",
+    kin_input_after_c: "Input – values after C axis", kin_measure_a: "Measurement A-90 / C180", kin_result_a: "Final result after A-axis measurement",
+    kin_no_values: "No values entered yet.", kin_z_warn: "Warning: ABS(Z) is greater than 0.015. Excel indicates that the A-axis position must be set via MP960 and the control restarted.", kin_z_ok: "Z check is within the limit according to the original Excel file.",
+    kin_x_warn: "Warning: ABS(X) is greater than 0.020. Excel indicates a check of the Z-axis geometry in X direction.", kin_x_ok: "X check is within the limit according to the original Excel file.",
+    kin_old: "Old", kin_new: "New", kin_avg_yz: "Average Y/Z", kin_corr_75304: "Correction 7530.4", kin_corr_75305: "Correction 7530.5", kin_dev_y: "Deviation Y", kin_dev_z: "Deviation Z",
+    kin_c_copied: "C result was used as input for the A axis.", kin_example_loaded: "Excel example loaded.", kin_cleared: "Kinematics cleared.",
+    vib_note: "Balancing position locations based on Excel WUCHTVORLAGE. Switch side A/B, enter the number of holes and the spindle position for the first grub screw.",
+    vib_clear_weights: "Clear weights", vib_side_a: "Side A", vib_side_b: "Side B", vib_control: "Controls",
+    vib_copy_a: "Copy side A", vib_copy_b: "Copy side B", vib_note_bottom: "The “weight” column is a helper field like in Excel and is stored locally on the phone. Inputs accept comma and dot.",
+    vib_a_label: "Side A", vib_b_label: "Side B", vib_places: "positions", vib_no_calc: "no calculation", vib_division: "Number of holes / grub screws", vib_division_hint: "number of balancing positions", vib_start: "Spindle position for first grub screw", vib_start_hint: "Spindle Pos for first position", vib_step: "Pitch", vib_last_position: "Last position", vib_valid_warning: "Enter a valid number of holes and first spindle position.", vib_weight: "weight", vib_weight_deleted: "Weights cleared", vib_side_reset: "side reset", vib_side_copied: "side copied", vib_all_copied: "Vibration measurement copied", vib_holes: "Number of holes", vib_first_pos: "First position"
+  }
+};
+
 function t(key){
-  return (I18N[CURRENT_LANG] && I18N[CURRENT_LANG][key]) || (I18N.cs[key] || key);
+  return (I18N[CURRENT_LANG] && I18N[CURRENT_LANG][key]) ||
+         (typeof CALC_I18N !== 'undefined' && CALC_I18N[CURRENT_LANG] && CALC_I18N[CURRENT_LANG][key]) ||
+         (I18N.cs[key]) ||
+         (typeof CALC_I18N !== 'undefined' && CALC_I18N.cs && CALC_I18N.cs[key]) ||
+         key;
 }
 
 function applyI18n(){
@@ -1490,6 +1921,19 @@ function setLang(lang){
   applyI18n();
   try{ if(typeof renderCustomers==='function'){ const el=document.getElementById('c-search'); renderCustomers(el?el.value:''); } }catch(e){}
   try{ if(typeof renderFixed==='function'){ const el=document.getElementById('f-search'); renderFixed(el?el.value:''); } }catch(e){}
+  try{ if(typeof refreshServiceCalculatorLang==='function') refreshServiceCalculatorLang(); }catch(e){}
+}
+
+function refreshServiceCalculatorLang(){
+  if(activeServiceCalc && !document.getElementById('calcForm')?.classList.contains('hidden')){
+    const c = activeServiceCalc;
+    const titleEl = document.getElementById('activeCalcTitle'); if(titleEl) titleEl.textContent = t(c.title);
+    const resultLabel = document.getElementById('calcResultLabel'); if(resultLabel) resultLabel.textContent = t(c.resultLabel);
+    ['1','2','3'].forEach((n,i)=>{ const lab=document.getElementById('calcLabel'+n); if(lab) lab.textContent = t(c.labels[i]); });
+    const help=document.getElementById('calcHelp'); if(help) help.textContent = t(c.help || 'calc_help_default');
+  }
+  if(!document.getElementById('vibrationsForm')?.classList.contains('hidden') && typeof vibRender === 'function') vibRender();
+  if(!document.getElementById('kinematicsForm')?.classList.contains('hidden') && typeof kinRenderAll === 'function') kinRenderAll();
 }
 
 document.addEventListener("click", (e)=>{
@@ -1584,7 +2028,7 @@ const APP_NEWS_FALLBACK = {
 let appNewsData = { ...APP_NEWS_FALLBACK };
 
 function escapeHtml(str){
-  return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch] || ch));
+  return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch] || ch));
 }
 
 function buildNewsList(items){
@@ -1736,7 +2180,7 @@ async function copyText(txt){
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(txt);
-      toast('Zkopírováno');
+      toast(t('copied'));
       return true;
     }
   } catch(e){}
@@ -1750,7 +2194,7 @@ async function copyText(txt){
     ta.select();
     const ok = document.execCommand('copy');
     document.body.removeChild(ta);
-    if (ok) { toast('Zkopírováno'); return true; }
+    if (ok) { toast(t('copied')); return true; }
   } catch(e){}
   try {
     const div = document.createElement('div');
@@ -1766,9 +2210,9 @@ async function copyText(txt){
     const ok = document.execCommand('copy');
     sel.removeAllRanges();
     document.body.removeChild(div);
-    if (ok) { toast('Zkopírováno'); return true; }
+    if (ok) { toast(t('copied')); return true; }
   } catch(e){}
-  toast('Kopírování není podporováno');
+  toast(t('copy_not_supported'));
   return false;
 }
 
@@ -1787,6 +2231,7 @@ function showTab(id){
   document.getElementById('panel-fixed').classList.toggle('hidden', id!=='fixed');
   document.getElementById('panel-clients').classList.toggle('hidden', id!=='clients');
   document.getElementById('panel-hotels').classList.toggle('hidden', id!=='hotels');
+  const scp=document.getElementById('panel-service-calcs'); if(scp) scp.classList.add('hidden');
   // Prevent iOS from auto-focusing inputs when opening Hotels
   if(id==='hotels'){
     const hs = document.getElementById('h-search');
@@ -1803,6 +2248,553 @@ tabs.forEach(t => t.addEventListener('click', (e)=>{
   tabs.forEach(x=>x.classList.remove('active')); e.currentTarget.classList.add('active'); 
   showTab(e.currentTarget.dataset.tab);
 }));
+
+
+// Service calculators
+function calcParse(v){
+  if(v == null) return NaN;
+  return parseFloat(String(v).replace(',', '.').trim());
+}
+function calcFmt(v, decimals=3){
+  if(!isFinite(v)) return '–';
+  return Number(v).toFixed(decimals);
+}
+function norm360(v){ return ((v % 360) + 360) % 360; }
+const serviceCalcs = {
+  spindle: {
+    title: 'calc_spindle', resultLabel: 'calc_new_param',
+    labels: ['calc_current_param','calc_current_position','calc_ideal_position'],
+    placeholders: ['74.781','15.190','313.914'],
+    help: 'calc_help_spindle',
+    calc: (a,b,c)=> norm360(a - (c - b))
+  },
+  kinematics: {
+    title: 'calc_kinematics', resultLabel: 'calc_result',
+    labels: ['calc_input_placeholder','calc_input_placeholder','calc_input_placeholder'],
+    placeholders: ['','',''],
+    help: 'calc_help_default',
+    disabled: true,
+    calc: ()=> NaN
+  },
+  hook_torque: {
+    title: 'calc_hook_torque', resultLabel: 'calc_set_torque_ts',
+    labels: ['calc_wrench_length_l','calc_adapter_length_a','calc_required_torque_te'],
+    placeholders: ['480','150','110'],
+    help: 'calc_help_torque',
+    calc: (l,a,te)=> (l + a) ? te * l / (l + a) : NaN
+  }
+};
+let activeServiceCalc = null;
+function openServiceCalculators(){
+  tabs.forEach(x=>x.classList.remove('active'));
+  ['panel-single','panel-range','panel-fixed','panel-clients','panel-hotels'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('hidden'); });
+  const p=document.getElementById('panel-service-calcs'); if(p) p.classList.remove('hidden');
+  document.getElementById('calcMenu')?.classList.remove('hidden');
+  document.getElementById('calcForm')?.classList.add('hidden');
+  document.getElementById('kinematicsForm')?.classList.add('hidden');
+  document.getElementById('vibrationsForm')?.classList.add('hidden');
+}
+function closeServiceCalculators(){
+  const p=document.getElementById('panel-service-calcs'); if(p) p.classList.add('hidden');
+  const single=document.getElementById('panel-single'); if(single) single.classList.remove('hidden');
+  const tab=document.querySelector('.tab[data-tab="single"]'); if(tab) tab.classList.add('active');
+}
+function openCalc(type){
+  if(type === 'kinematics'){ openKinematicsCalc(); return; }
+  if(type === 'vibrations'){ openVibrationsCalc(); return; }
+  const c = serviceCalcs[type]; if(!c) return;
+  activeServiceCalc = c;
+  document.getElementById('calcMenu')?.classList.add('hidden');
+  document.getElementById('kinematicsForm')?.classList.add('hidden');
+  document.getElementById('vibrationsForm')?.classList.add('hidden');
+  document.getElementById('calcForm')?.classList.remove('hidden');
+  document.getElementById('activeCalcTitle').textContent = t(c.title);
+  document.getElementById('calcResultLabel').textContent = t(c.resultLabel);
+  ['1','2','3'].forEach((n,i)=>{
+    const lab=document.getElementById('calcLabel'+n), inp=document.getElementById('calcInput'+n);
+    if(lab) lab.textContent = t(c.labels[i]);
+    if(inp){ inp.placeholder = c.placeholders[i] || '0.000'; inp.value=''; }
+  });
+  const i3=document.getElementById('calcInput3'); const l3=document.getElementById('calcLabel3');
+  const hideThird = !!c.hideThird;
+  if(i3) i3.style.display = hideThird ? 'none' : '';
+  if(l3) l3.style.display = hideThird ? 'none' : '';
+  ['calcInput1','calcInput2','calcInput3'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled = !!c.disabled; });
+  const copyBtn=document.getElementById('calcCopyBtn'); if(copyBtn) copyBtn.style.display = c.disabled ? 'none' : '';
+  const isHook = type === 'hook_torque';
+  const toolStore=document.getElementById('torqueToolStore');
+  if(toolStore) toolStore.classList.toggle('hidden', !isHook);
+  ['torqueWrenchSelect','torqueAdapterSelect'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden', !isHook));
+  ['calcInputWrap1','calcInputWrap2'].forEach(id=>document.getElementById(id)?.classList.toggle('has-tool-select', isHook));
+  document.getElementById('calcInputWrap3')?.classList.remove('has-tool-select');
+  if(isHook) renderTorqueTools();
+  document.getElementById('calcHelp').textContent = t(c.help || 'calc_help_default');
+  updateCalcResult();
+}
+
+const TORQUE_TOOLS_KEY = 'serviceTorqueTools.v1';
+function loadTorqueTools(){
+  try{
+    const raw = localStorage.getItem(TORQUE_TOOLS_KEY);
+    const data = raw ? JSON.parse(raw) : null;
+    return {
+      wrenches: Array.isArray(data?.wrenches) ? data.wrenches : [],
+      adapters: Array.isArray(data?.adapters) ? data.adapters : []
+    };
+  }catch(e){ return {wrenches:[], adapters:[]}; }
+}
+function saveTorqueTools(data){
+  try{ localStorage.setItem(TORQUE_TOOLS_KEY, JSON.stringify(data)); }catch(e){}
+}
+function fillToolSelect(selectId, items){
+  const sel=document.getElementById(selectId); if(!sel) return;
+  const current=sel.value;
+  sel.innerHTML='';
+  const opt=document.createElement('option'); opt.value=''; opt.textContent='0'; sel.appendChild(opt);
+  items.forEach((it, idx)=>{
+    const o=document.createElement('option');
+    o.value=String(idx);
+    o.textContent=`${it.name} (${calcFmt(Number(it.value),1)} mm)`;
+    sel.appendChild(o);
+  });
+  if([...sel.options].some(o=>o.value===current)) sel.value=current;
+}
+function renderTorqueTools(){
+  const data=loadTorqueTools();
+  fillToolSelect('torqueWrenchSelect', data.wrenches);
+  fillToolSelect('torqueAdapterSelect', data.adapters);
+}
+function applySelectedTorqueTool(kind){
+  const data=loadTorqueTools();
+  const sel=document.getElementById(kind==='wrench'?'torqueWrenchSelect':'torqueAdapterSelect');
+  const inp=document.getElementById(kind==='wrench'?'calcInput1':'calcInput2');
+  if(!sel || !inp || sel.value==='') return;
+  const arr = kind==='wrench' ? data.wrenches : data.adapters;
+  const item = arr[Number(sel.value)];
+  if(item){ inp.value = String(item.value).replace('.', ','); updateCalcResult(); }
+}
+function addTorqueTool(kind){
+  const name = prompt(kind==='wrench' ? t('prompt_wrench_name') : t('prompt_adapter_name'));
+  if(!name) return;
+  const valueTxt = prompt(kind==='wrench' ? t('prompt_wrench_length') : t('prompt_adapter_length'));
+  const value = calcParse(valueTxt);
+  if(!isFinite(value) || value <= 0){ toast(t('invalid_value')); return; }
+  const data=loadTorqueTools();
+  const arr = kind==='wrench' ? data.wrenches : data.adapters;
+  arr.push({name:name.trim(), value:Number(value.toFixed(3))});
+  saveTorqueTools(data);
+  renderTorqueTools();
+  const sel=document.getElementById(kind==='wrench'?'torqueWrenchSelect':'torqueAdapterSelect');
+  if(sel) sel.value=String(arr.length-1);
+  applySelectedTorqueTool(kind);
+}
+function deleteTorqueTool(kind){
+  const data=loadTorqueTools();
+  const sel=document.getElementById(kind==='wrench'?'torqueWrenchSelect':'torqueAdapterSelect');
+  if(!sel || sel.value==='') return;
+  const arr = kind==='wrench' ? data.wrenches : data.adapters;
+  arr.splice(Number(sel.value),1);
+  saveTorqueTools(data);
+  renderTorqueTools();
+}
+
+function updateCalcResult(){
+  if(!activeServiceCalc) return;
+  const a=calcParse(document.getElementById('calcInput1')?.value);
+  const b=calcParse(document.getElementById('calcInput2')?.value);
+  const c=calcParse(document.getElementById('calcInput3')?.value);
+  const v=activeServiceCalc.calc(a,b,c);
+  document.getElementById('calcResult').textContent = calcFmt(v,3);
+}
+document.getElementById('serviceCalcBtn')?.addEventListener('click', openServiceCalculators);
+document.getElementById('calcBackBtn')?.addEventListener('click', closeServiceCalculators);
+document.getElementById('calcMenuBackBtn')?.addEventListener('click', ()=>{ document.getElementById('calcForm')?.classList.add('hidden'); document.getElementById('kinematicsForm')?.classList.add('hidden'); document.getElementById('vibrationsForm')?.classList.add('hidden'); document.getElementById('calcMenu')?.classList.remove('hidden'); });
+document.getElementById('kinMenuBackBtn')?.addEventListener('click', ()=>{ document.getElementById('kinematicsForm')?.classList.add('hidden'); document.getElementById('calcMenu')?.classList.remove('hidden'); });
+document.getElementById('vibMenuBackBtn')?.addEventListener('click', ()=>{ document.getElementById('vibrationsForm')?.classList.add('hidden'); document.getElementById('calcMenu')?.classList.remove('hidden'); });
+document.querySelectorAll('[data-calc]').forEach(btn=>btn.addEventListener('click', ()=>openCalc(btn.getAttribute('data-calc'))));
+document.getElementById('torqueWrenchSelect')?.addEventListener('change', ()=>applySelectedTorqueTool('wrench'));
+document.getElementById('torqueAdapterSelect')?.addEventListener('change', ()=>applySelectedTorqueTool('adapter'));
+document.getElementById('addTorqueWrenchBtn')?.addEventListener('click', ()=>addTorqueTool('wrench'));
+document.getElementById('addTorqueAdapterBtn')?.addEventListener('click', ()=>addTorqueTool('adapter'));
+document.getElementById('deleteTorqueWrenchBtn')?.addEventListener('click', ()=>deleteTorqueTool('wrench'));
+document.getElementById('deleteTorqueAdapterBtn')?.addEventListener('click', ()=>deleteTorqueTool('adapter'));
+['calcInput1','calcInput2','calcInput3'].forEach(id=>document.getElementById(id)?.addEventListener('input', updateCalcResult));
+document.getElementById('calcCopyBtn')?.addEventListener('click', ()=>copyText(document.getElementById('calcResult')?.textContent || ''));
+
+
+
+// Vibration measurement calculator – embedded mobile version based on the WUCHTVORLAGE Excel sheet
+const VIB_STORAGE_KEY = 'serviceVibrationWuchtorte.v1';
+const vibDefaultState = {
+  A: { division: '16', start: '4.3', weights: {} },
+  B: { division: '26', start: '2.9', weights: {} }
+};
+let vibState = vibLoadState();
+let vibActiveSide = 'A';
+
+function openVibrationsCalc(){
+  document.getElementById('calcMenu')?.classList.add('hidden');
+  document.getElementById('calcForm')?.classList.add('hidden');
+  document.getElementById('kinematicsForm')?.classList.add('hidden');
+  document.getElementById('vibrationsForm')?.classList.remove('hidden');
+  applyI18n();
+  vibState = vibLoadState();
+  vibRender();
+}
+function vibClone(obj){ return JSON.parse(JSON.stringify(obj)); }
+function vibParseNumber(value){
+  if(value === null || value === undefined) return NaN;
+  const normalized = String(value).trim().replace(/\s/g, '').replace(',', '.');
+  if(normalized === '') return NaN;
+  const n = Number(normalized);
+  return Number.isFinite(n) ? n : NaN;
+}
+function vibFormatNumber(value, decimals=3){
+  if(!Number.isFinite(value)) return '–';
+  const fixed = Number(value).toFixed(decimals);
+  return fixed.replace(/\.000$/, '').replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+}
+function vibEscapeHtml(value){
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+function vibCalculatePositions(divisionInput, startInput){
+  const divisionRaw = vibParseNumber(divisionInput);
+  const start = vibParseNumber(startInput);
+  const division = Math.round(divisionRaw);
+  if(!Number.isFinite(divisionRaw) || !Number.isFinite(start) || division < 1){
+    return { division:0, step:NaN, positions:[] };
+  }
+  const step = 360 / division;
+  const positions = [];
+  let angle = start;
+  for(let i=1; i<=division; i++){
+    positions.push({ no:i, angle });
+    let next = angle + step;
+    if(next > 360) next -= 360;
+    angle = next;
+  }
+  return { division, step, positions };
+}
+function vibLoadState(){
+  try{
+    const raw = localStorage.getItem(VIB_STORAGE_KEY);
+    if(!raw) return vibClone(vibDefaultState);
+    const parsed = JSON.parse(raw);
+    return {
+      A: { ...vibClone(vibDefaultState.A), ...(parsed.A || {}) },
+      B: { ...vibClone(vibDefaultState.B), ...(parsed.B || {}) }
+    };
+  }catch(e){ return vibClone(vibDefaultState); }
+}
+function vibSaveState(){
+  try{ localStorage.setItem(VIB_STORAGE_KEY, JSON.stringify(vibState)); }catch(e){}
+}
+function vibRender(){
+  const container = document.getElementById('vibSideCards');
+  if(!container) return;
+  const side = vibActiveSide === 'B' ? 'B' : 'A';
+  container.innerHTML = vibRenderSide(side);
+  document.getElementById('vibTabA')?.classList.toggle('active', side === 'A');
+  document.getElementById('vibTabB')?.classList.toggle('active', side === 'B');
+}
+function vibShowSide(side){
+  vibActiveSide = side === 'B' ? 'B' : 'A';
+  vibRender();
+}
+function vibRenderSide(side){
+  const label = side === 'A' ? t('vib_a_label') : t('vib_b_label');
+  const data = vibState[side];
+  const result = vibCalculatePositions(data.division, data.start);
+  const valid = result.positions.length > 0;
+  return `<section class="kin-section" data-vib-side="${side}">
+    <div class="vib-side-head">
+      <h3>${label}</h3>
+      <span class="kin-pill">${valid ? result.division + ' ' + t('vib_places') : t('vib_no_calc')}</span>
+    </div>
+    <div class="kin-fields">
+      <div class="kin-field"><label for="vibDivision${side}">${t('vib_division')}<span class="kin-hint">${t('vib_division_hint')}</span></label><input id="vibDivision${side}" inputmode="decimal" autocomplete="off" type="text" value="${vibEscapeHtml(data.division)}" oninput="vibUpdateInput('${side}','division',this.value)"></div>
+      <div class="kin-field"><label for="vibStart${side}">${t('vib_start')}<span class="kin-hint">${t('vib_start_hint')}</span></label><input id="vibStart${side}" inputmode="decimal" autocomplete="off" type="text" value="${vibEscapeHtml(data.start)}" oninput="vibUpdateInput('${side}','start',this.value)"></div>
+    </div>
+    <div class="vib-metrics">
+      <div class="vib-metric"><span>${t('vib_step')}</span><strong>${vibFormatNumber(result.step,6)}°</strong></div>
+      <div class="vib-metric"><span>${t('vib_last_position')}</span><strong>${valid ? vibFormatNumber(result.positions[result.positions.length-1].angle,3) + '°' : '–'}</strong></div>
+    </div>
+    <div class="vib-actions">
+      <button class="btn" type="button" onclick="vibCopySide('${side}')">${t('btn_copy')} ${label}</button>
+      <button class="btn" type="button" onclick="vibResetSide('${side}')">Reset ${label}</button>
+    </div>
+    <div class="vib-result-list">
+      ${valid ? result.positions.map(item => vibRenderRow(side, item)).join('') : `<div class="kin-warning warn">${t('vib_valid_warning')}</div>`}
+    </div>
+  </section>`;
+}
+function vibRenderRow(side, item){
+  const weight = vibState[side]?.weights?.[item.no] || '';
+  return `<div class="vib-row">
+    <div class="vib-no">${item.no}</div>
+    <div class="vib-angle">${vibFormatNumber(item.angle,3)}°<small>Spindel Pos</small></div>
+    <input class="vib-weight" inputmode="decimal" type="text" placeholder="${t('vib_weight')}" value="${vibEscapeHtml(weight)}" oninput="vibUpdateWeight('${side}',${item.no},this.value)">
+  </div>`;
+}
+function vibUpdateInput(side, field, value){
+  vibState[side][field] = value;
+  vibSaveState();
+  vibRender();
+  requestAnimationFrame(()=>{
+    const el = document.getElementById(field === 'division' ? `vibDivision${side}` : `vibStart${side}`);
+    if(el){ el.focus(); const len=el.value.length; try{ el.setSelectionRange(len,len); }catch(e){} }
+  });
+}
+function vibUpdateWeight(side, no, value){
+  if(!vibState[side].weights) vibState[side].weights = {};
+  vibState[side].weights[no] = value;
+  vibSaveState();
+}
+function vibResetSide(side){
+  vibState[side] = vibClone(vibDefaultState[side]);
+  vibSaveState();
+  vibRender();
+  toast(`${side} ${t('vib_side_reset')}`);
+}
+function vibClearWeights(){
+  vibState.A.weights = {};
+  vibState.B.weights = {};
+  vibSaveState();
+  vibRender();
+  toast(t('vib_weight_deleted'));
+}
+function vibGetSideText(side){
+  const label = side === 'A' ? t('vib_a_label') : t('vib_b_label');
+  const data = vibState[side];
+  const result = vibCalculatePositions(data.division, data.start);
+  const lines = [`${label}`, `Počet otvorů: ${data.division}`, `První poloha: ${data.start}`, `Rozteč: ${vibFormatNumber(result.step,6)}°`, ''];
+  result.positions.forEach(item=>{
+    const weight = data.weights?.[item.no] ? ` | ${t('vib_weight')}: ${data.weights[item.no]}` : '';
+    lines.push(`${item.no}. ${vibFormatNumber(item.angle,3)}°${weight}`);
+  });
+  return lines.join('\n');
+}
+async function vibCopySide(side){
+  await copyText(vibGetSideText(side));
+  toast(`${side} ${t('vib_side_copied')}`);
+}
+async function vibCopyAll(){
+  await copyText(`${vibGetSideText('A')}\n\n${vibGetSideText('B')}`);
+  toast(t('vib_all_copied'));
+}
+document.getElementById('vibClearWeightsBtn')?.addEventListener('click', vibClearWeights);
+document.getElementById('vibCopyABtn')?.addEventListener('click', ()=>vibCopySide('A'));
+document.getElementById('vibCopyBBtn')?.addEventListener('click', ()=>vibCopySide('B'));
+document.getElementById('vibCopyAllBtn')?.addEventListener('click', vibCopyAll);
+
+// Kinematics calculator – embedded mobile version based on the Excel sheets
+const KIN_STORAGE_KEY = 'serviceKinematics.v1';
+const kinFields = [
+  'kin-c-p0','kin-c-p1','kin-c-p2','kin-c-p4','kin-c-p5','kin-c-x','kin-c-y','kin-c-z',
+  'kin-a-p0','kin-a-p1','kin-a-p2','kin-a-p4','kin-a-p5','kin-a-x','kin-a-y','kin-a-z'
+];
+const kinLabels = {
+  '7530.0': 'C v X / X',
+  '7530.1': 'C v Y / Y',
+  '7530.2': 'Stůl v Z / Z',
+  '7530.4': 'A v Y / IY',
+  '7530.5': 'A v Z / IZ'
+};
+function openKinematicsCalc(){
+  document.getElementById('calcMenu')?.classList.add('hidden');
+  document.getElementById('calcForm')?.classList.add('hidden');
+  document.getElementById('vibrationsForm')?.classList.add('hidden');
+  document.getElementById('kinematicsForm')?.classList.remove('hidden');
+  applyI18n();
+  kinLoadState();
+  kinRenderAll();
+}
+function kinShowScreen(which){
+  document.getElementById('kinScreenC')?.classList.toggle('active', which === 'c');
+  document.getElementById('kinScreenA')?.classList.toggle('active', which === 'a');
+  document.getElementById('kinTabC')?.classList.toggle('active', which === 'c');
+  document.getElementById('kinTabA')?.classList.toggle('active', which === 'a');
+}
+function kinParse(id){
+  const el = document.getElementById(id);
+  if(!el) return NaN;
+  const raw = String(el.value || '').trim().replace(/\s/g, '').replace(',', '.');
+  if(!raw) return NaN;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : NaN;
+}
+function kinCleanZero(value){ return Math.abs(value) < 0.0005 ? 0 : value; }
+function kinFmt(value, digits=3){ return Number.isFinite(value) ? kinCleanZero(value).toFixed(digits) : '–'; }
+function kinSetValue(id, value){
+  const el=document.getElementById(id); if(!el) return;
+  el.value = Number.isFinite(value) ? kinCleanZero(value).toFixed(3) : '';
+}
+function kinCalcC(){
+  const p0=kinParse('kin-c-p0'), p1=kinParse('kin-c-p1'), p2=kinParse('kin-c-p2'), p4=kinParse('kin-c-p4'), p5=kinParse('kin-c-p5');
+  const x=kinParse('kin-c-x'), y=kinParse('kin-c-y'), z=kinParse('kin-c-z');
+  return {
+    old:{'7530.0':p0,'7530.1':p1,'7530.2':p2,'7530.4':p4,'7530.5':p5},
+    values:{
+      '7530.0': Number.isFinite(p0) && Number.isFinite(x) ? p0 + (x / 2) : NaN,
+      '7530.1': Number.isFinite(p1) && Number.isFinite(y) ? p1 + (y / 2) : NaN,
+      '7530.2': p2,
+      '7530.4': p4,
+      '7530.5': p5
+    },
+    measurement:{x,y,z}
+  };
+}
+function kinCalcA(){
+  const p0=kinParse('kin-a-p0'), p1=kinParse('kin-a-p1'), p2=kinParse('kin-a-p2'), p4=kinParse('kin-a-p4'), p5=kinParse('kin-a-p5');
+  const x=kinParse('kin-a-x'), y=kinParse('kin-a-y'), z=kinParse('kin-a-z');
+  const avg = Number.isFinite(y) && Number.isFinite(z) ? (y + z) / 2 : NaN;
+  const iyCorrection = Number.isFinite(y) && Number.isFinite(avg) ? y - avg : NaN;
+  const izCorrection = avg;
+  return {
+    old:{'7530.0':p0,'7530.1':p1,'7530.2':p2,'7530.4':p4,'7530.5':p5},
+    values:{
+      '7530.0': p0,
+      '7530.1': p1,
+      '7530.2': p2,
+      '7530.4': Number.isFinite(p4) && Number.isFinite(iyCorrection) ? p4 + iyCorrection : NaN,
+      '7530.5': Number.isFinite(p5) && Number.isFinite(izCorrection) ? p5 + izCorrection : NaN
+    },
+    measurement:{x,y,z}, avg, iyCorrection, izCorrection,
+    yDiff: Number.isFinite(y) && Number.isFinite(avg) ? y - avg : NaN,
+    zDiff: Number.isFinite(z) && Number.isFinite(avg) ? z - avg : NaN
+  };
+}
+function kinResultRow(param, desc, oldValue, newValue){
+  const txt = `${param} = ${kinFmt(newValue)}`;
+  return `<div class="kin-result-row">
+    <div>
+      <div class="kin-param">${param}</div>
+      <div class="kin-desc">${desc}</div>
+      <div class="kin-values"><span class="kin-old">${t('kin_old')}: ${kinFmt(oldValue)}</span><span>${t('kin_new')}: <span class="kin-new">${kinFmt(newValue)}</span></span></div>
+    </div>
+    <button class="btn kin-copy-btn" type="button" data-kin-copy="${txt}">⧉</button>
+  </div>`;
+}
+function kinRenderC(){
+  const c=kinCalcC();
+  const body=document.getElementById('kinCResults');
+  if(body) body.innerHTML = [
+    kinResultRow('7530.0', kinLabels['7530.0'], c.old['7530.0'], c.values['7530.0']),
+    kinResultRow('7530.1', kinLabels['7530.1'], c.old['7530.1'], c.values['7530.1']),
+    kinResultRow('7530.2', kinLabels['7530.2'], c.old['7530.2'], c.values['7530.2']),
+    kinResultRow('7530.4', kinLabels['7530.4'], c.old['7530.4'], c.values['7530.4']),
+    kinResultRow('7530.5', kinLabels['7530.5'], c.old['7530.5'], c.values['7530.5'])
+  ].join('');
+  const warn=document.getElementById('kinCWarning');
+  const z=c.measurement.z;
+  if(warn){
+    if(!Number.isFinite(z)){ warn.className='kin-warning ok'; warn.textContent=t('kin_no_values'); }
+    else if(Math.abs(z) > 0.015){ warn.className='kin-warning warn'; warn.textContent=t('kin_z_warn'); }
+    else { warn.className='kin-warning ok'; warn.textContent=t('kin_z_ok'); }
+  }
+}
+function kinRenderA(){
+  const a=kinCalcA();
+  const helper=document.getElementById('kinAHelper');
+  if(helper) helper.innerHTML = `
+    <span class="kin-pill">${t('kin_avg_yz')}: <strong>${kinFmt(a.avg)}</strong></span>
+    <span class="kin-pill">${t('kin_corr_75304')}: <strong>${kinFmt(a.iyCorrection)}</strong></span>
+    <span class="kin-pill">${t('kin_corr_75305')}: <strong>${kinFmt(a.izCorrection)}</strong></span>
+    <span class="kin-pill">${t('kin_dev_y')}: <strong>${kinFmt(a.yDiff)}</strong></span>
+    <span class="kin-pill">${t('kin_dev_z')}: <strong>${kinFmt(a.zDiff)}</strong></span>`;
+  const body=document.getElementById('kinAResults');
+  if(body) body.innerHTML = [
+    kinResultRow('7530.0', kinLabels['7530.0'], a.old['7530.0'], a.values['7530.0']),
+    kinResultRow('7530.1', kinLabels['7530.1'], a.old['7530.1'], a.values['7530.1']),
+    kinResultRow('7530.2', kinLabels['7530.2'], a.old['7530.2'], a.values['7530.2']),
+    kinResultRow('7530.4', kinLabels['7530.4'], a.old['7530.4'], a.values['7530.4']),
+    kinResultRow('7530.5', kinLabels['7530.5'], a.old['7530.5'], a.values['7530.5'])
+  ].join('');
+  const warn=document.getElementById('kinAWarning');
+  const x=a.measurement.x;
+  if(warn){
+    if(!Number.isFinite(x)){ warn.className='kin-warning ok'; warn.textContent=t('kin_no_values'); }
+    else if(Math.abs(x) > 0.020){ warn.className='kin-warning warn'; warn.textContent=t('kin_x_warn'); }
+    else { warn.className='kin-warning ok'; warn.textContent=t('kin_x_ok'); }
+  }
+}
+function kinSaveState(){
+  const data={};
+  kinFields.forEach(id=>{ const el=document.getElementById(id); if(el) data[id]=el.value; });
+  try{ localStorage.setItem(KIN_STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+}
+function kinLoadState(){
+  try{
+    const raw=localStorage.getItem(KIN_STORAGE_KEY); if(!raw) return false;
+    const data=JSON.parse(raw);
+    kinFields.forEach(id=>{ const el=document.getElementById(id); if(el && data[id] !== undefined) el.value=data[id]; });
+    return true;
+  }catch(e){ return false; }
+}
+function kinRenderAll(){ kinRenderC(); kinRenderA(); kinSaveState(); }
+function kinApplyCToA(){
+  const c=kinCalcC();
+  kinSetValue('kin-a-p0', c.values['7530.0']);
+  kinSetValue('kin-a-p1', c.values['7530.1']);
+  kinSetValue('kin-a-p2', c.values['7530.2']);
+  kinSetValue('kin-a-p4', c.values['7530.4']);
+  kinSetValue('kin-a-p5', c.values['7530.5']);
+  kinRenderAll();
+  toast(t('kin_c_copied'));
+}
+function kinBuildResultText(which){
+  const data = which === 'c' ? kinCalcC() : kinCalcA();
+  const title = which === 'c' ? `${t('calc_kinematics')} C – ${t('kin_result_c')}` : `${t('calc_kinematics')} A – ${t('kin_result_a')}`;
+  return [title,
+    `7530.0 = ${kinFmt(data.values['7530.0'])}`,
+    `7530.1 = ${kinFmt(data.values['7530.1'])}`,
+    `7530.2 = ${kinFmt(data.values['7530.2'])}`,
+    `7530.4 = ${kinFmt(data.values['7530.4'])}`,
+    `7530.5 = ${kinFmt(data.values['7530.5'])}`
+  ].join('\n');
+}
+function kinLoadExample(){
+  kinSetValue('kin-c-p0', -418.604);
+  kinSetValue('kin-c-p1', 421.020);
+  kinSetValue('kin-c-p2', -663.586);
+  kinSetValue('kin-c-p4', -0.020);
+  kinSetValue('kin-c-p5', 75.119);
+  kinSetValue('kin-c-x', -0.098);
+  kinSetValue('kin-c-y', 0.108);
+  kinSetValue('kin-c-z', -0.010);
+  kinSetValue('kin-a-x', -0.015);
+  kinSetValue('kin-a-y', -0.077);
+  kinSetValue('kin-a-z', -0.131);
+  kinApplyCToA();
+  kinShowScreen('c');
+  toast(t('kin_example_loaded'));
+}
+function kinClearAll(){
+  kinFields.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  try{ localStorage.removeItem(KIN_STORAGE_KEY); }catch(e){}
+  kinRenderAll();
+  toast(t('kin_cleared'));
+}
+document.getElementById('kinTabC')?.addEventListener('click', ()=>kinShowScreen('c'));
+document.getElementById('kinTabA')?.addEventListener('click', ()=>kinShowScreen('a'));
+document.getElementById('kinApplyCBtn')?.addEventListener('click', kinApplyCToA);
+document.getElementById('kinApplyCBtn2')?.addEventListener('click', kinApplyCToA);
+document.getElementById('kinCopyCBtn')?.addEventListener('click', ()=>copyText(kinBuildResultText('c')));
+document.getElementById('kinCopyABtn')?.addEventListener('click', ()=>copyText(kinBuildResultText('a')));
+document.getElementById('kinExampleBtn')?.addEventListener('click', kinLoadExample);
+document.getElementById('kinClearBtn')?.addEventListener('click', kinClearAll);
+kinFields.forEach(id=>document.getElementById(id)?.addEventListener('input', kinRenderAll));
+document.addEventListener('click', (event)=>{
+  const btn = event.target.closest('[data-kin-copy]');
+  if(btn) copyText(btn.getAttribute('data-kin-copy') || '');
+});
+kinLoadState();
+kinRenderAll();
 
 // Quick reuse: last used machine (icon button shown only when machine is empty)
 (function initUseLastMachine(){
@@ -2078,7 +3070,7 @@ function attachPhoneFormatter(inputEl){
 }
 
 function escapeHtml(str){
-  return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch]));
+  return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
 
 function machineIconSvg(){
