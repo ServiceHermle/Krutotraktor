@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_19-help-q-ios';
+const CACHE_VER = 'hdh-code-v3_1_20-level2-balance';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

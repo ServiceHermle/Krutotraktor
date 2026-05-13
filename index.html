@@ -4536,16 +4536,16 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
   function tools(){
-    level=2; const s=gameSize(), W=s.W, H=s.H; const targetScore=2000, maxActive=4; let score=0,missed=0,last=performance.now(),spawn=.3; let man={x:W/2-28,y:H-96,w:56,h:48}; const items=[]; const names=['🔧','🔩','🪛','⚙️','🔨','🧰'];
+    level=2; const s=gameSize(), W=s.W, H=s.H; const targetScore=2400, maxActive=6; let score=0,missed=0,last=performance.now(),spawn=.25; let man={x:W/2-28,y:H-96,w:56,h:48}; const items=[]; const names=['🔧','🔩','🪛','⚙️','🔨','🧰','🪚','🗜️'];
     function toolRank(m){
-      if(m<=10) return '🏆 Pracovník měsíce';
-      if(m<=20) return '😇 Snaživý ližprdínek';
-      if(m<=30) return '🤹 Levoruký mamlas';
-      if(m<=40) return '😂 Skoro jako Tomáš';
-      if(m<=50) return '🫠 Mimořádný mamlas';
+      if(m<=2) return '🏆 Pracovník měsíce';
+      if(m<=5) return '😇 Snaživý ližprdínek';
+      if(m<=8) return '🤹 Levoruký mamlas';
+      if(m<=12) return '😂 Skoro jako Tomáš';
+      if(m<=16) return '🫠 Mimořádný mamlas';
       return '☢️ Katastrofa skladu a postrach dílny';
     }
-    function loop(now){ if(!running||mode!=='tools'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(.05,(now-last)/1000||0.016); last=now; if(left())man.x-=360*dt; if(right())man.x+=360*dt; man.x=Math.max(0,Math.min(W-man.w,man.x)); spawn-=dt; if(spawn<=0 && items.length<maxActive){spawn=Math.max(.38,.65-(score/100)*.008);items.push({x:24+Math.random()*(W-48),y:-20,vy:135+Math.random()*85,txt:names[Math.floor(Math.random()*names.length)]});}
+    function loop(now){ if(!running||mode!=='tools'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(.05,(now-last)/1000||0.016); last=now; if(left())man.x-=360*dt; if(right())man.x+=360*dt; man.x=Math.max(0,Math.min(W-man.w,man.x)); spawn-=dt; if(spawn<=0 && items.length<maxActive){spawn=Math.max(.22,.50-(score/100)*.007);items.push({x:24+Math.random()*(W-48),y:-20,vy:145+Math.random()*100,txt:names[Math.floor(Math.random()*names.length)]});}
       for(let i=items.length-1;i>=0;i--){let it=items[i];it.y+=it.vy*dt; if(rect({x:man.x-8,y:man.y-8,w:man.w+16,h:man.h+16},{x:it.x-20,y:it.y-20,w:40,h:40})){ score+=100; items.splice(i,1); } else if(it.y>H+30){ missed++; items.splice(i,1); } }
       if(score>=targetScore){const rank=toolRank(missed); show('Level 2 hotový<br><small>Dosažené skóre: '+score+' / '+targetScore+' bodů<br>Postrácel jsi nářadí: '+missed+' ks<br>Hodnocení: '+rank+'<br>Za 3 sekundy startuje Level 3: Had</small>'); setTimeout(()=>{if(isOpen())startLevel('snake')},3000); running=false; return;}
       ctx.clearRect(0,0,W,H); ctx.fillStyle='#172033';ctx.fillRect(0,0,W,H); ctx.fillStyle='#24324d';ctx.fillRect(0,H-82,W,82); ctx.font='32px Arial'; items.forEach(it=>{ctx.fillText(it.txt,it.x-16,it.y+12)}); 
