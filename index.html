@@ -4397,9 +4397,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
     style.textContent=`
       #retroEggOverlay{position:fixed;inset:0;z-index:999999;display:none;background:#101827;color:#fff;font-family:Arial,sans-serif;touch-action:none;overflow:hidden}
       #retroEggOverlay.retro-open{display:block}
-      #retroHud{position:absolute;left:10px;right:10px;top:8px;z-index:6;display:flex;flex-direction:column;gap:8px;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.4);font-size:14px;pointer-events:none}
+      #retroHud{position:absolute;left:10px;right:10px;top:8px;z-index:6;display:flex;flex-direction:column;gap:0;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.4);font-size:14px;pointer-events:none}
       #retroHudTop{display:flex;justify-content:space-between;gap:8px;align-items:center;pointer-events:auto}
-      #retroHudText{background:rgba(0,0,0,.35);border-radius:14px;padding:8px 10px;line-height:1.35;max-width:100%;align-self:flex-start}
+      #retroHudText{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;overflow:hidden!important;padding:0!important;margin:0!important;border:0!important}
       #retroHudBtns{display:flex;gap:8px;white-space:nowrap}
       #retroHudBtns button{border:0;border-radius:14px;background:rgba(0,0,0,.66);color:#fff;font-weight:900;padding:11px 13px;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
       #retroCloseBtn{background:#d92525!important;min-width:132px}
@@ -4411,9 +4411,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
     `;
     document.head.appendChild(style);
     overlay=document.createElement('div'); overlay.id='retroEggOverlay';
-    overlay.innerHTML=`<canvas id="retroCanvas"></canvas><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button></div></div><div id="retroHudText"></div></div><div id="retroMsg"></div><div id="retroControls"><div class="retroPad"><button class="retroBtn" id="retroLeft" type="button">‹</button><button class="retroBtn" id="retroRight" type="button">›</button></div><div class="retroPad"><button class="retroBtn" id="retroDown" type="button">↓</button><button class="retroBtn" id="retroJump" type="button">↑</button></div></div>`;
+    overlay.innerHTML=`<canvas id="retroCanvas"></canvas><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button></div></div></div><div id="retroMsg"></div><div id="retroControls"><div class="retroPad"><button class="retroBtn" id="retroLeft" type="button">‹</button><button class="retroBtn" id="retroRight" type="button">›</button></div><div class="retroPad"><button class="retroBtn" id="retroDown" type="button">↓</button><button class="retroBtn" id="retroJump" type="button">↑</button></div></div>`;
     document.body.appendChild(overlay);
-    canvas=document.getElementById('retroCanvas'); ctx=canvas.getContext('2d'); hud=document.getElementById('retroHudText'); msg=document.getElementById('retroMsg');
+    canvas=document.getElementById('retroCanvas'); ctx=canvas.getContext('2d'); hud=document.getElementById('retroHudText') || document.createElement('div'); msg=document.getElementById('retroMsg');
     document.getElementById('retroCloseBtn').addEventListener('click',closeRetroEgg);
     document.getElementById('retroRestartBtn').addEventListener('click',()=>startLevel(['platformer','tools','snake','invaders'].includes(mode)?mode:'platformer'));
     bindBtn('retroLeft','left'); bindBtn('retroRight','right'); bindBtn('retroJump','up'); bindBtn('retroDown','down'); bindSnakeSwipe();
