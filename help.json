@@ -1,0 +1,30 @@
+{
+  "title": "Funkce aplikace",
+  "intro": "Přehled hlavních částí aplikace a k čemu slouží.",
+  "sections": [
+    {
+      "title": "🧮 Výpočet",
+      "text": "Hlavní výpočet přístupových hodnot podle data a čísla stroje. Výsledky můžeš kopírovat jednotlivě, zkopírovat vše najednou nebo sdílet."
+    },
+    {
+      "title": "📅 Období",
+      "text": "Výpočet nebo přehled hodnot pro vybrané období. Hodí se, když potřebuješ pracovat s více dny najednou."
+    },
+    {
+      "title": "🔐 Pevné kódy",
+      "text": "Přehled uložených pevných kódů, které není potřeba znovu počítat."
+    },
+    {
+      "title": "🏭 Zákazníci",
+      "text": "Evidence zákazníků a jejich strojů. Slouží pro rychlejší orientaci a práci se servisními informacemi."
+    },
+    {
+      "title": "🧰 Kalkulačky",
+      "text": "Servisní kalkulačky pro pomocné výpočty, například orientace vřetene, kinematika, měření vibrací a utahovací moment pro hákové klíče."
+    },
+    {
+      "title": "🛌 Hotely",
+      "text": "Seznam hotelů pro servisní výjezdy. U hotelů můžeš ukládat informace, volat, otevřít navigaci a data exportovat nebo importovat."
+    }
+  ]
+}

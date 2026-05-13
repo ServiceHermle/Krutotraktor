@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_5-whatsnew-5_9_49';
+const CACHE_VER = 'hdh-code-v3_1_19-help-q-ios';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
