@@ -4386,10 +4386,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
 (function(){
   'use strict';
   const SECRET_MACHINE = '123';
-  let ready=false, raf=0, mode='platformer', level=1, running=false;
+  let ready=false, raf=0, mode='platformer', level=1, running=false, gameRunId=0;
   let canvas, ctx, hud, msg, overlay;
+  let levelTimeouts=[];
   const keys=Object.create(null);
   const touch={left:false,right:false,up:false,down:false,fire:false,last:null};
+  function clearLevelTimeouts(){ levelTimeouts.forEach(id=>clearTimeout(id)); levelTimeouts=[]; }
+  function queueLevelTimeout(fn, ms){ const id=setTimeout(()=>{ levelTimeouts=levelTimeouts.filter(v=>v!==id); fn(); }, ms); levelTimeouts.push(id); return id; }
 
   function ensureRetroEgg(){
     if(ready) return; ready=true;
@@ -4442,28 +4445,29 @@ document.addEventListener("DOMContentLoaded", ()=>{
   function gameSize(){ const r=canvas.getBoundingClientRect(); return {W:Math.max(1,r.width||innerWidth), H:Math.max(1,r.height||(innerHeight-104))}; }
   function isOpen(){ return overlay && overlay.classList.contains('retro-open'); }
   function openRetroEgg(){ ensureRetroEgg(); overlay.classList.add('retro-open'); startLevel('platformer'); }
-  function closeRetroEgg(){ if(overlay) overlay.classList.remove('retro-open'); running=false; if(raf) cancelAnimationFrame(raf); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; }
+  function closeRetroEgg(){ if(overlay) overlay.classList.remove('retro-open'); running=false; gameRunId++; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); if(ctx&&canvas){ ctx.clearRect(0,0,canvas.width,canvas.height); } Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; }
   function show(html){ msg.innerHTML=html; msg.style.display='block'; }
   function hide(){ msg.style.display='none'; }
   function left(){ return keys.ArrowLeft||keys.a||touch.left; } function right(){ return keys.ArrowRight||keys.d||touch.right; } function up(){ return keys.ArrowUp||keys.w||keys[' ']||touch.up; } function down(){ return keys.ArrowDown||keys.s||touch.down; }
   function rect(a,b){ return !(a.x+a.w<b.x||a.x>b.x+b.w||a.y+a.h<b.y||a.y>b.y+b.h); }
-  function startLevel(which){ if(raf) cancelAnimationFrame(raf); running=true; hide(); mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); }
+  function startLevel(which){ running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); }
 
   function platformer(){
+    const runId=gameRunId;
     level=1; const s=gameSize(), W=s.W, H=s.H, floor=H-44, world=3000; let cam=0,score=0,lives=3,inv=0,done=false,last=0;
     let p={x:40,y:floor-42,w:34,h:42,vx:0,vy:0,onGround:false};
     const platforms=[]; for(let x=620;x<world;x+=540) platforms.push({x:x-8,y:floor-92,w:70,h:18});
     const coins=[]; for(let i=0;i<28;i++) coins.push({x:120+i*100,y:floor-118-(i%3)*30,r:12,got:false});
     const enemies=[560,980,1420,1880,2320,2680].map((x,i)=>({x,y:floor-28,w:34,h:28,base:x,dir:i%2?1:-1,dead:false}));
     function clearJump(){ touch.up=false; keys.ArrowUp=false; keys.w=false; keys[' ']=false; }
-    function loop(t){ if(!running||mode!=='platformer'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(2,(t-last)/16.67||1); last=t;
+    function loop(t){ if(runId!==gameRunId||!running||mode!=='platformer'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(2,(t-last)/16.67||1); last=t;
       p.vx=(left()?-4.5:right()?4.5:0); if(up()&&p.onGround){p.vy=-13; p.onGround=false; clearJump();}
       const oldX=p.x, oldY=p.y; p.vy+=0.62*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.onGround=false;
       platforms.forEach(pl=>{ if(!rect(p,pl))return; const wasAbove=oldY+p.h<=pl.y+6, wasBelow=oldY>=pl.y+pl.h-2, wasLeft=oldX+p.w<=pl.x+4, wasRight=oldX>=pl.x+pl.w-4; if(p.vy>=0&&wasAbove){p.y=pl.y-p.h;p.vy=0;p.onGround=true;} else if(p.vy<0&&wasBelow){p.y=pl.y+pl.h;p.vy=0;} else if(p.vx>0&&wasLeft){p.x=pl.x-p.w;} else if(p.vx<0&&wasRight){p.x=pl.x+pl.w;} });
       if(p.y>floor-p.h){p.y=floor-p.h;p.vy=0;p.onGround=true;} p.x=Math.max(0,Math.min(world-p.w,p.x)); cam=Math.max(0,Math.min(world-W,p.x-W*.35)); if(inv>0)inv-=dt;
       enemies.forEach(e=>{ if(e.dead)return; e.x+=e.dir*1.35*dt; if(Math.abs(e.x-e.base)>120)e.dir*=-1; if(inv<=0&&rect(p,e)){ if(p.vy>0&&p.y+p.h<e.y+18){e.dead=true;p.vy=-8}else{lives--;inv=80;p.x=Math.max(20,p.x-180); if(lives<=0){done=true;show('Konec Levelu 1<br><small>Restart = nový pokus</small>');}} }});
       coins.forEach(c=>{ if(!c.got&&Math.hypot((p.x+p.w/2)-c.x,(p.y+p.h/2)-c.y)<30){c.got=true;score++;} });
-      if(p.x>world-80&&!done){ done=true; show('Level 1 hotový<br><small>Za 2 sekundy startuje Level 2: chytej nářadí</small>'); setTimeout(()=>{ if(isOpen()) startLevel('tools');},2000); }
+      if(p.x>world-80&&!done){ done=true; show('Level 1 hotový<br><small>Za 2 sekundy startuje Level 2: chytej nářadí</small>'); queueLevelTimeout(()=>{ if(isOpen() && runId===gameRunId) startLevel('tools');},2000); }
       drawPlatformer(W,H,floor,world,cam,p,platforms,coins,enemies,score,lives,inv,done); hud.innerHTML='LEVEL 1 / 3<br>Coiny: '+score+'/28 &nbsp; Životy: '+lives+'<br><small>Cíl je na konci mapy</small>';
     } loop(0);
   }
@@ -4536,6 +4540,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
   function tools(){
+    const runId=gameRunId;
     level=2; const s=gameSize(), W=s.W, H=s.H; const targetScore=2400, maxActive=6; let score=0,missed=0,last=performance.now(),spawn=.25; let man={x:W/2-28,y:H-96,w:56,h:48}; const items=[]; const names=['🔧','🔩','🪛','⚙️','🔨','🧰','🪚','🗜️'];
     function toolRank(m){
       if(m<=2) return '🏆 Pracovník měsíce';
@@ -4545,9 +4550,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(m<=16) return '🫠 Mimořádný mamlas';
       return '☢️ Katastrofa skladu a postrach dílny';
     }
-    function loop(now){ if(!running||mode!=='tools'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(.05,(now-last)/1000||0.016); last=now; if(left())man.x-=360*dt; if(right())man.x+=360*dt; man.x=Math.max(0,Math.min(W-man.w,man.x)); spawn-=dt; if(spawn<=0 && items.length<maxActive){spawn=Math.max(.22,.50-(score/100)*.007);items.push({x:24+Math.random()*(W-48),y:-20,vy:145+Math.random()*100,txt:names[Math.floor(Math.random()*names.length)]});}
+    function loop(now){ if(runId!==gameRunId||!running||mode!=='tools'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(.05,(now-last)/1000||0.016); last=now; if(left())man.x-=360*dt; if(right())man.x+=360*dt; man.x=Math.max(0,Math.min(W-man.w,man.x)); spawn-=dt; if(spawn<=0 && items.length<maxActive){spawn=Math.max(.22,.50-(score/100)*.007);items.push({x:24+Math.random()*(W-48),y:-20,vy:145+Math.random()*100,txt:names[Math.floor(Math.random()*names.length)]});}
       for(let i=items.length-1;i>=0;i--){let it=items[i];it.y+=it.vy*dt; if(rect({x:man.x-8,y:man.y-8,w:man.w+16,h:man.h+16},{x:it.x-20,y:it.y-20,w:40,h:40})){ score+=100; items.splice(i,1); } else if(it.y>H+30){ missed++; items.splice(i,1); } }
-      if(score>=targetScore){const rank=toolRank(missed); show('Level 2 hotový<br><small>Dosažené skóre: '+score+' / '+targetScore+' bodů<br>Postrácel jsi nářadí: '+missed+' ks<br>Hodnocení: '+rank+'<br>Za 3 sekundy startuje Level 3: Had</small>'); setTimeout(()=>{if(isOpen())startLevel('snake')},3000); running=false; return;}
+      if(score>=targetScore){const rank=toolRank(missed); show('Level 2 hotový<br><small>Dosažené skóre: '+score+' / '+targetScore+' bodů<br>Postrácel jsi nářadí: '+missed+' ks<br>Hodnocení: '+rank+'<br>Za 3 sekundy startuje Level 3: Had</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('snake')},3000); running=false; return;}
       ctx.clearRect(0,0,W,H); ctx.fillStyle='#172033';ctx.fillRect(0,0,W,H); ctx.fillStyle='#24324d';ctx.fillRect(0,H-82,W,82); ctx.font='32px Arial'; items.forEach(it=>{ctx.fillText(it.txt,it.x-16,it.y+12)}); 
       ctx.fillStyle='#6d7887'; ctx.fillRect(man.x-6,man.y+30,man.w+12,10); ctx.fillStyle='#3f4652'; ctx.fillRect(man.x-10,man.y+20,8,28); ctx.fillRect(man.x+man.w+2,man.y+20,8,28);
       drawServiceTech(man.x-2,man.y-14,man.w+8,man.h+22,'tools');
@@ -4557,6 +4562,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
   function snake(){
+    const runId=gameRunId;
     level=3; const s=gameSize(), W=s.W, H=s.H, cell=22, cols=Math.floor(W/cell), rows=Math.floor((H-24)/cell); let dir={x:1,y:0},next={x:1,y:0},lives=5,score=0,last=0,acc=0; let snake,food;
     function reset(){ snake=[{x:Math.floor(cols/2),y:Math.floor(rows/2)},{x:Math.floor(cols/2)-1,y:Math.floor(rows/2)}]; dir={x:1,y:0};next={x:1,y:0}; food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)}; }
     reset();
@@ -4564,12 +4570,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
       const k = touch.last || (keys.ArrowUp||keys.w?'up':keys.ArrowDown||keys.s?'down':keys.ArrowLeft||keys.a?'left':keys.ArrowRight||keys.d?'right':null);
       touch.last=null; touch.left=false; touch.right=false; touch.up=false; touch.down=false;
       if(k==='up'&&dir.y!==1)next={x:0,y:-1}; else if(k==='down'&&dir.y!==-1)next={x:0,y:1}; else if(k==='left'&&dir.x!==1)next={x:-1,y:0}; else if(k==='right'&&dir.x!==-1)next={x:1,y:0};
-      dir=next; const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y}; const crash=head.x<0||head.y<0||head.x>=cols||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y); if(crash){lives--; if(lives<=0){show('Had přišel o 5 životů<br><small>Spouštím bonus: Dlaždice...</small>'); setTimeout(()=>{if(isOpen())startLevel('invaders')},1800); running=false; return;} reset(); return;} snake.unshift(head); if(head.x===food.x&&head.y===food.y){score++; food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)};} else snake.pop(); }
-    function loop(t){ if(!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); hud.innerHTML='LEVEL 3 / 3<br>Had: ťukni na šipku nebo táhni po ploše<br>Skóre: '+score+' &nbsp; Životy: '+lives+' / 5<br><small>Směr se bere jako jeden povel, ne držení tlačítka</small>'; }
+      dir=next; const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y}; const crash=head.x<0||head.y<0||head.x>=cols||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y); if(crash){lives--; if(lives<=0){show('Had přišel o 5 životů<br><small>Spouštím bonus: Dlaždice...</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},1800); running=false; return;} reset(); return;} snake.unshift(head); if(head.x===food.x&&head.y===food.y){score++; food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)};} else snake.pop(); }
+    function loop(t){ if(runId!==gameRunId||!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); hud.innerHTML='LEVEL 3 / 3<br>Had: ťukni na šipku nebo táhni po ploše<br>Skóre: '+score+' &nbsp; Životy: '+lives+' / 5<br><small>Směr se bere jako jeden povel, ne držení tlačítka</small>'; }
     loop(0);
   }
 
   function invaders(){
+    const runId=gameRunId;
     const s=gameSize(), W=s.W, H=s.H;
     let paddle={w:Math.min(118,Math.max(92,W*0.24)),h:14,x:W/2-55,y:H-34};
     let ball={x:paddle.x+paddle.w/2,y:paddle.y-10,r:8,vx:190,vy:-230};
@@ -4581,9 +4588,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const bricks=[];
     for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) bricks.push({x:12+c*(brickW+gap),y:top+r*(brickH+gap),w:brickW,h:brickH,alive:true,color:colors[r%colors.length]});
     function resetBall(){ paddle.x=W/2-paddle.w/2; ball.x=paddle.x+paddle.w/2; ball.y=paddle.y-10; ball.vx=(Math.random()<.5?-1:1)*(170+Math.random()*30); ball.vy=-220; resetCd=.85; }
+    if(ctx&&canvas){ ctx.clearRect(0,0,canvas.width,canvas.height); }
     function ballHitsRect(b,r){ return b.x+b.r>r.x && b.x-b.r<r.x+r.w && b.y+b.r>r.y && b.y-b.r<r.y+r.h; }
     function loop(now){
-      if(!running||mode!=='invaders'||!isOpen())return;
+      if(runId!==gameRunId||!running||mode!=='invaders'||!isOpen())return;
       raf=requestAnimationFrame(loop);
       const dt=Math.min(.05,(now-last)/1000||.016); last=now;
       if(left()) paddle.x-=360*dt; if(right()) paddle.x+=360*dt; paddle.x=Math.max(0,Math.min(W-paddle.w,paddle.x));

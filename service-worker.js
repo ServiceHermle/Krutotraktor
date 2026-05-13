@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_22-hide-game-info-all';
+const CACHE_VER = 'hdh-code-v3_1_23-restart-fix';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
