@@ -1,5 +1,5 @@
 {
-  "version": "5.8.77",
+  "version": "5.9.49",
   "title": "Co je nového",
   "items": [
     "Na stránku Výpočet jsem přidal tlačítko Kalkulačky.",
@@ -8,6 +8,7 @@
     "Měření kinematiky – mělo by fungovat stejně jako původní Excel pro starší stroje.",
     "Měření vibrací – slouží hlavně jako pomocný zápis pro měření vřeten a zadávání závaží.",
     "Výpočet utahovacího momentu pro hákové klíče – je to jednoduchý výpočet, ale často se musí dohledávat. Dole je navíc možnost uložit si vlastní nářadí, takže ho není potřeba pokaždé měřit znovu. Stačí vybrat, s čím právě chcete pracovat.",
-    "Kdyby cokoliv nefungovalo, stačí mi napsat. Budu rád i za jakýkoliv nápad na další funkce."
+    "Kdyby cokoliv nefungovalo, stačí mi napsat. Budu rád i za jakýkoliv nápad na další funkce.",
+    "Až se budeš nudit, zadej číslo stroje 123 a zmáčkni přepočítat."
   ]
 }

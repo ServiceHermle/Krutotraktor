@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>Hermle (v5.8.53 Thomas Pospisil)</title>
+<title>Hermle (v5.8.54 Thomas Pospisil)</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#f7f7f9" name="theme-color"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
@@ -227,12 +227,13 @@ input[type="search"] {
 /* Whats new popup */
 .news-overlay{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.38);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
 .news-overlay.show{display:flex;}
-.news-card{width:min(460px,100%);max-height:min(80dvh,720px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.18);}
+.news-card{width:min(460px,100%);max-height:min(80dvh,720px);background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:0 20px 50px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden;}
+.news-content{overflow:auto;padding:18px 18px 10px 18px;-webkit-overflow-scrolling:touch;}
 .news-card h2{margin:0 0 8px 0;font-size:1.8rem;line-height:1.1;}
 .news-ver{font-weight:800;opacity:.8;margin-bottom:10px;}
 .news-list{margin:0;padding-left:22px;display:grid;gap:10px;}
 .news-list li{font-size:1.05rem;line-height:1.45;}
-.news-actions{margin-top:16px;display:flex;justify-content:flex-end;}
+.news-actions{padding:12px 18px 18px 18px;display:flex;justify-content:flex-end;background:var(--card);border-top:1px solid var(--border);box-shadow:0 -10px 22px rgba(0,0,0,.08);}
 
 input, select, textarea { font-size:16px !important; }
 
@@ -2083,9 +2084,11 @@ function ensureWhatsNewUI(){
     overlay.setAttribute("aria-hidden", "true");
     overlay.innerHTML = `
       <div class="news-card">
-        <h2>Co je nového</h2>
-        <div class="news-ver" id="whatsNewVersion"></div>
-        <ul class="news-list" id="whatsNewList"></ul>
+        <div class="news-content">
+          <h2>Co je nového</h2>
+          <div class="news-ver" id="whatsNewVersion"></div>
+          <ul class="news-list" id="whatsNewList"></ul>
+        </div>
         <div class="news-actions">
           <button class="btn primary" id="whatsNewConfirm" type="button">Rozumím</button>
         </div>
@@ -4214,6 +4217,257 @@ document.addEventListener("DOMContentLoaded", ()=>{
       </div>
     </form>
   </dialog>
+
+
+<script>
+(function(){
+  'use strict';
+  const SECRET_MACHINE = '123';
+  let ready=false, raf=0, mode='platformer', level=1, running=false;
+  let canvas, ctx, hud, msg, overlay;
+  const keys=Object.create(null);
+  const touch={left:false,right:false,up:false,down:false,fire:false,last:null};
+
+  function ensureRetroEgg(){
+    if(ready) return; ready=true;
+    const style=document.createElement('style');
+    style.textContent=`
+      #retroEggOverlay{position:fixed;inset:0;z-index:999999;display:none;background:#101827;color:#fff;font-family:Arial,sans-serif;touch-action:none;overflow:hidden}
+      #retroEggOverlay.retro-open{display:block}
+      #retroHud{position:absolute;left:10px;right:10px;top:8px;z-index:3;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.4);font-size:14px;pointer-events:none}
+      #retroHudText{background:rgba(0,0,0,.35);border-radius:14px;padding:8px 10px;line-height:1.35;max-width:72%}
+      #retroHudBtns{pointer-events:auto;white-space:nowrap}#retroHudBtns button{border:0;border-radius:12px;background:rgba(0,0,0,.58);color:#fff;font-weight:900;padding:10px 12px;font-size:15px;margin-left:4px}
+      #retroCanvas{position:absolute;left:0;right:0;top:0;bottom:104px;width:100%;height:auto;display:block;background:#67c8ff}
+      #retroMsg{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:4;background:rgba(0,0,0,.78);padding:16px 20px;border-radius:16px;text-align:center;font-weight:900;line-height:1.35;display:none;min-width:240px}
+      #retroControls{position:absolute;left:0;right:0;bottom:0;min-height:104px;z-index:5;display:flex;align-items:flex-end;justify-content:space-between;padding:8px 22px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(180deg,rgba(16,24,39,0),rgba(16,24,39,.72) 36%,rgba(16,24,39,.92))}.retroPad{display:flex;justify-content:space-between;gap:18px;width:158px;pointer-events:auto}.retroBtn{width:68px;height:68px;border-radius:999px;border:0;background:rgba(0,0,0,.64);color:#fff;font-size:32px;font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.28);touch-action:manipulation}.retroBtn:active{transform:scale(.94);background:rgba(0,0,0,.78)}@media(max-width:390px){#retroCanvas{bottom:98px}#retroControls{min-height:98px;padding-left:14px;padding-right:14px;padding-top:6px}.retroPad{gap:16px;width:146px}.retroBtn{width:64px;height:64px;font-size:30px}}
+    `;
+    document.head.appendChild(style);
+    overlay=document.createElement('div'); overlay.id='retroEggOverlay';
+    overlay.innerHTML=`<canvas id="retroCanvas"></canvas><div id="retroHud"><div id="retroHudText"></div><div id="retroHudBtns"><button id="retroRestartBtn" type="button">Restart</button><button id="retroCloseBtn" type="button">Zavřít</button></div></div><div id="retroMsg"></div><div id="retroControls"><div class="retroPad"><button class="retroBtn" id="retroLeft" type="button">‹</button><button class="retroBtn" id="retroRight" type="button">›</button></div><div class="retroPad"><button class="retroBtn" id="retroDown" type="button">↓</button><button class="retroBtn" id="retroJump" type="button">↑</button></div></div>`;
+    document.body.appendChild(overlay);
+    canvas=document.getElementById('retroCanvas'); ctx=canvas.getContext('2d'); hud=document.getElementById('retroHudText'); msg=document.getElementById('retroMsg');
+    document.getElementById('retroCloseBtn').addEventListener('click',closeRetroEgg);
+    document.getElementById('retroRestartBtn').addEventListener('click',()=>startLevel(mode==='invaders'? 'invaders':'platformer'));
+    bindBtn('retroLeft','left'); bindBtn('retroRight','right'); bindBtn('retroJump','up'); bindBtn('retroDown','down'); bindSnakeSwipe();
+    window.addEventListener('resize',resizeCanvas);
+    document.addEventListener('keydown',e=>{ if(isOpen()){ keys[e.key]=true; if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault(); }});
+    document.addEventListener('keyup',e=>{ keys[e.key]=false; });
+    resizeCanvas();
+  }
+  function bindBtn(id,name){ const b=document.getElementById(id); const on=e=>{e.preventDefault();touch[name]=true;touch.last=name}; const off=e=>{e.preventDefault();touch[name]=false}; b.addEventListener('touchstart',on,{passive:false}); b.addEventListener('touchend',off,{passive:false}); b.addEventListener('touchcancel',off,{passive:false}); b.addEventListener('mousedown',on); b.addEventListener('mouseup',off); b.addEventListener('mouseleave',off); }
+  function bindSnakeSwipe(){
+    if(!canvas || canvas.dataset.snakeSwipeBound) return;
+    canvas.dataset.snakeSwipeBound = '1';
+    let sx=0, sy=0;
+    canvas.addEventListener('touchstart', e=>{
+      if(!e.touches || !e.touches[0]) return;
+      sx=e.touches[0].clientX; sy=e.touches[0].clientY;
+    }, {passive:true});
+    canvas.addEventListener('touchend', e=>{
+      if(mode!=='snake' || !e.changedTouches || !e.changedTouches[0]) return;
+      const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+      if(Math.max(Math.abs(dx),Math.abs(dy))<24) return;
+      touch.last = Math.abs(dx)>Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up');
+    }, {passive:true});
+  }
+  function resizeCanvas(){ if(!canvas)return; const d=Math.max(1,Math.min(2,window.devicePixelRatio||1)); const r=canvas.getBoundingClientRect(); const w=Math.max(1,r.width||innerWidth); const h=Math.max(1,r.height||(innerHeight-104)); canvas.width=Math.floor(w*d); canvas.height=Math.floor(h*d); ctx.setTransform(d,0,0,d,0,0); }
+  function gameSize(){ const r=canvas.getBoundingClientRect(); return {W:Math.max(1,r.width||innerWidth), H:Math.max(1,r.height||(innerHeight-104))}; }
+  function isOpen(){ return overlay && overlay.classList.contains('retro-open'); }
+  function openRetroEgg(){ ensureRetroEgg(); overlay.classList.add('retro-open'); startLevel('platformer'); }
+  function closeRetroEgg(){ if(overlay) overlay.classList.remove('retro-open'); running=false; if(raf) cancelAnimationFrame(raf); }
+  function show(html){ msg.innerHTML=html; msg.style.display='block'; }
+  function hide(){ msg.style.display='none'; }
+  function left(){ return keys.ArrowLeft||keys.a||touch.left; } function right(){ return keys.ArrowRight||keys.d||touch.right; } function up(){ return keys.ArrowUp||keys.w||keys[' ']||touch.up; } function down(){ return keys.ArrowDown||keys.s||touch.down; }
+  function rect(a,b){ return !(a.x+a.w<b.x||a.x>b.x+b.w||a.y+a.h<b.y||a.y>b.y+b.h); }
+  function startLevel(which){ if(raf) cancelAnimationFrame(raf); running=true; hide(); mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); }
+
+  function platformer(){
+    level=1; const s=gameSize(), W=s.W, H=s.H, floor=H-44, world=3000; let cam=0,score=0,lives=3,inv=0,done=false,last=0;
+    let p={x:40,y:floor-42,w:34,h:42,vx:0,vy:0,onGround:false};
+    const platforms=[]; for(let x=620;x<world;x+=540) platforms.push({x:x-8,y:floor-92,w:70,h:18});
+    const coins=[]; for(let i=0;i<28;i++) coins.push({x:120+i*100,y:floor-118-(i%3)*30,r:12,got:false});
+    const enemies=[560,980,1420,1880,2320,2680].map((x,i)=>({x,y:floor-28,w:34,h:28,base:x,dir:i%2?1:-1,dead:false}));
+    function clearJump(){ touch.up=false; keys.ArrowUp=false; keys.w=false; keys[' ']=false; }
+    function loop(t){ if(!running||mode!=='platformer'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(2,(t-last)/16.67||1); last=t;
+      p.vx=(left()?-4.5:right()?4.5:0); if(up()&&p.onGround){p.vy=-13; p.onGround=false; clearJump();}
+      const oldX=p.x, oldY=p.y; p.vy+=0.62*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.onGround=false;
+      platforms.forEach(pl=>{ if(!rect(p,pl))return; const wasAbove=oldY+p.h<=pl.y+6, wasBelow=oldY>=pl.y+pl.h-2, wasLeft=oldX+p.w<=pl.x+4, wasRight=oldX>=pl.x+pl.w-4; if(p.vy>=0&&wasAbove){p.y=pl.y-p.h;p.vy=0;p.onGround=true;} else if(p.vy<0&&wasBelow){p.y=pl.y+pl.h;p.vy=0;} else if(p.vx>0&&wasLeft){p.x=pl.x-p.w;} else if(p.vx<0&&wasRight){p.x=pl.x+pl.w;} });
+      if(p.y>floor-p.h){p.y=floor-p.h;p.vy=0;p.onGround=true;} p.x=Math.max(0,Math.min(world-p.w,p.x)); cam=Math.max(0,Math.min(world-W,p.x-W*.35)); if(inv>0)inv-=dt;
+      enemies.forEach(e=>{ if(e.dead)return; e.x+=e.dir*1.35*dt; if(Math.abs(e.x-e.base)>120)e.dir*=-1; if(inv<=0&&rect(p,e)){ if(p.vy>0&&p.y+p.h<e.y+18){e.dead=true;p.vy=-8}else{lives--;inv=80;p.x=Math.max(20,p.x-180); if(lives<=0){done=true;show('Konec Levelu 1<br><small>Restart = nový pokus</small>');}} }});
+      coins.forEach(c=>{ if(!c.got&&Math.hypot((p.x+p.w/2)-c.x,(p.y+p.h/2)-c.y)<30){c.got=true;score++;} });
+      if(p.x>world-80&&!done){ done=true; show('Level 1 hotový<br><small>Za 2 sekundy startuje Level 2: chytej nářadí</small>'); setTimeout(()=>{ if(isOpen()) startLevel('tools');},2000); }
+      drawPlatformer(W,H,floor,world,cam,p,platforms,coins,enemies,score,lives,inv,done); hud.innerHTML='LEVEL 1 / 3<br>Coiny: '+score+'/28 &nbsp; Životy: '+lives+'<br><small>Cíl je na konci mapy</small>';
+    } loop(0);
+  }
+  function drawServiceTech(x,y,w,h,variant='platformer'){ 
+    const helmet = variant==='tools' ? '#ffbf1f' : '#d62b2b';
+    const vest = variant==='tools' ? '#f3cc27' : '#f0d13f';
+    const jacket = variant==='tools' ? '#4c5668' : '#596273';
+    const pants = '#233d8f';
+    const skin = '#ffce9e';
+    const boot = '#1a1a1a';
+    const outline = '#111';
+    ctx.save();
+    ctx.strokeStyle=outline; ctx.lineWidth=2;
+    ctx.fillStyle='rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(x+w*0.5,y+h-2,w*0.42,6,0,0,7); ctx.fill();
+    ctx.fillStyle=boot; ctx.fillRect(x+4,y+h-8,w*0.28,8); ctx.fillRect(x+w*0.58,y+h-8,w*0.24,8);
+    ctx.fillStyle=pants; ctx.fillRect(x+6,y+h*0.57,w*0.26,h*0.26); ctx.fillRect(x+w*0.56,y+h*0.57,w*0.2,h*0.26);
+    ctx.fillStyle=jacket; ctx.fillRect(x+4,y+h*0.28,w-8,h*0.34);
+    ctx.fillStyle=vest; ctx.fillRect(x+w*0.26,y+h*0.3,w*0.48,h*0.28);
+    ctx.fillStyle='#8b96a4'; ctx.fillRect(x+w*0.33,y+h*0.35,w*0.08,h*0.18); ctx.fillRect(x+w*0.59,y+h*0.35,w*0.08,h*0.18);
+    ctx.fillStyle=skin; ctx.fillRect(x+w*0.08,y+h*0.34,7,11); ctx.fillRect(x+w-12,y+h*0.34,7,11);
+    ctx.fillStyle=helmet; ctx.fillRect(x+w*0.18,y+3,w*0.64,10); ctx.fillRect(x+w*0.23,y+11,w*0.54,4);
+    ctx.fillStyle=skin; ctx.fillRect(x+w*0.24,y+15,w*0.52,h*0.18);
+    ctx.fillStyle='#222'; ctx.fillRect(x+w*0.35,y+21,3,3); ctx.fillRect(x+w*0.59,y+21,3,3); ctx.fillRect(x+w*0.42,y+27,w*0.18,2);
+    ctx.fillStyle='#3b3b3b'; ctx.fillRect(x+w*0.68,y+h*0.46,9,12); ctx.fillStyle='#8ad8ff'; ctx.fillRect(x+w*0.7,y+h*0.49,5,7);
+    ctx.strokeRect(x+4,y+h*0.28,w-8,h*0.34); ctx.strokeRect(x+w*0.24,y+15,w*0.52,h*0.18);
+    ctx.restore();
+  }
+  function drawMachineEnemy(x,y,w,h,phase=0){
+    ctx.save();
+    const body='#d8dde2', frame='#525962', dark='#2e3339', glass='#8fdcff', accent='#e43a3a', warn='#f2c230';
+    // base and machine body
+    ctx.fillStyle=dark; ctx.fillRect(x+2,y+h-6,w-4,6);
+    ctx.fillStyle=body; ctx.fillRect(x,y+2,w,h-8);
+    ctx.strokeStyle=frame; ctx.lineWidth=2; ctx.strokeRect(x+1,y+3,w-2,h-9);
+    // work area / door
+    ctx.fillStyle=frame; ctx.fillRect(x+4,y+6,w*0.48,h*0.58);
+    ctx.fillStyle=glass; ctx.fillRect(x+7,y+9,w*0.42,h*0.5);
+    ctx.fillStyle='rgba(255,255,255,.25)'; ctx.fillRect(x+10,y+11,w*0.12,h*0.42);
+    // spindle head
+    ctx.fillStyle=dark; ctx.fillRect(x+w*0.2,y+10,w*0.1,h*0.18);
+    ctx.fillStyle='#b7bec8'; ctx.fillRect(x+w*0.225,y+10,w*0.05,h*0.26);
+    ctx.fillStyle='#7a828c'; ctx.fillRect(x+w*0.24,y+18,w*0.02,h*0.18);
+    // control panel right side
+    ctx.fillStyle=frame; ctx.fillRect(x+w*0.58,y+7,w*0.24,h*0.42);
+    ctx.fillStyle='#1d2227'; ctx.fillRect(x+w*0.61,y+10,w*0.18,h*0.16);
+    ctx.fillStyle=glass; ctx.fillRect(x+w*0.625,y+12,w*0.09,h*0.08);
+    ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(x+w*0.75,y+14,3,0,7); ctx.fill();
+    ctx.fillStyle=warn; ctx.fillRect(x+w*0.63,y+22,4,4); ctx.fillRect(x+w*0.69,y+22,4,4); ctx.fillRect(x+w*0.75,y+22,4,4);
+    // service door lines and feet
+    ctx.strokeStyle='#8e97a1'; ctx.lineWidth=1.5; ctx.strokeRect(x+5,y+6,w*0.48,h*0.58);
+    ctx.beginPath(); ctx.moveTo(x+w*0.5,y+6); ctx.lineTo(x+w*0.5,y+h-10); ctx.stroke();
+    ctx.fillStyle='#aeb5be'; ctx.fillRect(x+4,y+h-5,6,3); ctx.fillRect(x+w-10,y+h-5,6,3);
+    // little moving arm detail to make it lively
+    const armY = y+h*0.48 + Math.sin(phase*0.6)*2;
+    ctx.fillStyle='#c6ccd4'; ctx.fillRect(x-4,armY,8,3);
+    ctx.fillRect(x+w-4,armY+3,8,3);
+    ctx.restore();
+  }
+  function drawPlatformer(W,H,floor,world,cam,p,platforms,coins,enemies,score,lives,inv,done){ 
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#67c8ff'; ctx.fillRect(0,0,W,H); 
+    ctx.fillStyle='rgba(255,255,255,.85)'; 
+    for(let i=0;i<10;i++){let x=(i*330-cam*.25)% (W+180); if(x< -100)x+=W+180; ctx.beginPath();ctx.ellipse(x,90+(i%3)*45,55,18,0,0,7);ctx.fill();}
+    ctx.fillStyle='#74cf55';ctx.fillRect(0,floor,W,H-floor);ctx.fillStyle='#8b5429';ctx.fillRect(0,floor,W,H-floor);
+    ctx.fillStyle='#12a23d'; 
+    platforms.forEach(pl=>{ctx.fillRect(pl.x+8-cam,floor-80,54,80);ctx.fillRect(pl.x-cam,pl.y,pl.w,pl.h); ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fillRect(pl.x-cam+8,pl.y+3,pl.w-16,3); ctx.fillStyle='#12a23d';});
+    coins.forEach(c=>{if(c.got)return;ctx.fillStyle='#ffd33d';ctx.beginPath();ctx.arc(c.x-cam,c.y,12,0,7);ctx.fill();ctx.strokeStyle='#a06a00';ctx.lineWidth=3;ctx.stroke();});
+    enemies.forEach((e,i)=>{if(e.dead)return;drawMachineEnemy(e.x-cam,e.y,e.w,e.h,i);});
+    ctx.fillStyle='#eee';ctx.fillRect(world-45-cam,floor-150,10,150);ctx.fillStyle='#e62929';ctx.fillRect(world-35-cam,floor-145,78,34);
+    ctx.globalAlpha=inv>0?.45:1; drawServiceTech(p.x-cam-4,p.y-8,p.w+12,p.h+14,'platformer'); ctx.globalAlpha=1; 
+  }
+
+  function tools(){
+    level=2; const s=gameSize(), W=s.W, H=s.H; const targetScore=2000, maxActive=4; let score=0,missed=0,last=performance.now(),spawn=.3; let man={x:W/2-28,y:H-96,w:56,h:48}; const items=[]; const names=['🔧','🔩','🪛','⚙️','🔨','🧰'];
+    function toolRank(m){
+      if(m<=10) return '🏆 Pracovník měsíce';
+      if(m<=20) return '😇 Snaživý ližprdínek';
+      if(m<=30) return '🤹 Levoruký mamlas';
+      if(m<=40) return '😂 Skoro jako Tomáš';
+      if(m<=50) return '🫠 Mimořádný mamlas';
+      return '☢️ Katastrofa skladu a postrach dílny';
+    }
+    function loop(now){ if(!running||mode!=='tools'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(.05,(now-last)/1000||0.016); last=now; if(left())man.x-=360*dt; if(right())man.x+=360*dt; man.x=Math.max(0,Math.min(W-man.w,man.x)); spawn-=dt; if(spawn<=0 && items.length<maxActive){spawn=Math.max(.38,.65-(score/100)*.008);items.push({x:24+Math.random()*(W-48),y:-20,vy:135+Math.random()*85,txt:names[Math.floor(Math.random()*names.length)]});}
+      for(let i=items.length-1;i>=0;i--){let it=items[i];it.y+=it.vy*dt; if(rect({x:man.x-8,y:man.y-8,w:man.w+16,h:man.h+16},{x:it.x-20,y:it.y-20,w:40,h:40})){ score+=100; items.splice(i,1); } else if(it.y>H+30){ missed++; items.splice(i,1); } }
+      if(score>=targetScore){const rank=toolRank(missed); show('Level 2 hotový<br><small>Dosažené skóre: '+score+' / '+targetScore+' bodů<br>Postrácel jsi nářadí: '+missed+' ks<br>Hodnocení: '+rank+'<br>Za 3 sekundy startuje Level 3: Had</small>'); setTimeout(()=>{if(isOpen())startLevel('snake')},3000); running=false; return;}
+      ctx.clearRect(0,0,W,H); ctx.fillStyle='#172033';ctx.fillRect(0,0,W,H); ctx.fillStyle='#24324d';ctx.fillRect(0,H-82,W,82); ctx.font='32px Arial'; items.forEach(it=>{ctx.fillText(it.txt,it.x-16,it.y+12)}); 
+      ctx.fillStyle='#6d7887'; ctx.fillRect(man.x-6,man.y+30,man.w+12,10); ctx.fillStyle='#3f4652'; ctx.fillRect(man.x-10,man.y+20,8,28); ctx.fillRect(man.x+man.w+2,man.y+20,8,28);
+      drawServiceTech(man.x-2,man.y-14,man.w+8,man.h+22,'tools');
+      ctx.fillStyle='#d8dde5'; ctx.fillRect(man.x+man.w-6,man.y+4,12,16); ctx.fillStyle='#77d6ff'; ctx.fillRect(man.x+man.w-3,man.y+8,6,8);
+      hud.innerHTML='LEVEL 2 / 3<br>Chytej nářadí do skóre '+targetScore+'<br>Skóre: '+score+' / '+targetScore+'<br><small>Spadlé nářadí: '+missed+' ks</small>';
+    } loop(last);
+  }
+
+  function snake(){
+    level=3; const s=gameSize(), W=s.W, H=s.H, cell=22, cols=Math.floor(W/cell), rows=Math.floor((H-24)/cell); let dir={x:1,y:0},next={x:1,y:0},lives=5,score=0,last=0,acc=0; let snake,food;
+    function reset(){ snake=[{x:Math.floor(cols/2),y:Math.floor(rows/2)},{x:Math.floor(cols/2)-1,y:Math.floor(rows/2)}]; dir={x:1,y:0};next={x:1,y:0}; food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)}; }
+    reset();
+    function step(){ 
+      const k = touch.last || (keys.ArrowUp||keys.w?'up':keys.ArrowDown||keys.s?'down':keys.ArrowLeft||keys.a?'left':keys.ArrowRight||keys.d?'right':null);
+      touch.last=null; touch.left=false; touch.right=false; touch.up=false; touch.down=false;
+      if(k==='up'&&dir.y!==1)next={x:0,y:-1}; else if(k==='down'&&dir.y!==-1)next={x:0,y:1}; else if(k==='left'&&dir.x!==1)next={x:-1,y:0}; else if(k==='right'&&dir.x!==-1)next={x:1,y:0};
+      dir=next; const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y}; const crash=head.x<0||head.y<0||head.x>=cols||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y); if(crash){lives--; if(lives<=0){show('Had přišel o 5 životů<br><small>Spouštím bonus: Dlaždice...</small>'); setTimeout(()=>{if(isOpen())startLevel('invaders')},1800); running=false; return;} reset(); return;} snake.unshift(head); if(head.x===food.x&&head.y===food.y){score++; food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)};} else snake.pop(); }
+    function loop(t){ if(!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); hud.innerHTML='LEVEL 3 / 3<br>Had: ťukni na šipku nebo táhni po ploše<br>Skóre: '+score+' &nbsp; Životy: '+lives+' / 5<br><small>Směr se bere jako jeden povel, ne držení tlačítka</small>'; }
+    loop(0);
+  }
+
+  function invaders(){
+    const s=gameSize(), W=s.W, H=s.H;
+    let paddle={w:Math.min(118,Math.max(92,W*0.24)),h:14,x:W/2-55,y:H-34};
+    let ball={x:paddle.x+paddle.w/2,y:paddle.y-10,r:8,vx:190,vy:-230};
+    let score=0,lives=3,last=performance.now(),resetCd=.9;
+    let hits=[];
+    const gap=6, rows=5, cols=Math.max(6,Math.min(8,Math.floor((W-30)/50)));
+    const brickW=Math.floor((W-24-(cols-1)*gap)/cols), brickH=20, top=62;
+    const colors=['#ff7a7a','#ffb36b','#ffe16b','#86e87b','#6ec8ff'];
+    const bricks=[];
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) bricks.push({x:12+c*(brickW+gap),y:top+r*(brickH+gap),w:brickW,h:brickH,alive:true,color:colors[r%colors.length]});
+    function resetBall(){ paddle.x=W/2-paddle.w/2; ball.x=paddle.x+paddle.w/2; ball.y=paddle.y-10; ball.vx=(Math.random()<.5?-1:1)*(170+Math.random()*30); ball.vy=-220; resetCd=.85; }
+    function ballHitsRect(b,r){ return b.x+b.r>r.x && b.x-b.r<r.x+r.w && b.y+b.r>r.y && b.y-b.r<r.y+r.h; }
+    function loop(now){
+      if(!running||mode!=='invaders'||!isOpen())return;
+      raf=requestAnimationFrame(loop);
+      const dt=Math.min(.05,(now-last)/1000||.016); last=now;
+      if(left()) paddle.x-=360*dt; if(right()) paddle.x+=360*dt; paddle.x=Math.max(0,Math.min(W-paddle.w,paddle.x));
+      if(resetCd>0){ resetCd-=dt; ball.x=paddle.x+paddle.w/2; ball.y=paddle.y-10; }
+      else {
+        const oldX=ball.x, oldY=ball.y;
+        ball.x += ball.vx*dt; ball.y += ball.vy*dt;
+        if(ball.x-ball.r<0){ ball.x=ball.r; ball.vx=Math.abs(ball.vx); }
+        if(ball.x+ball.r>W){ ball.x=W-ball.r; ball.vx=-Math.abs(ball.vx); }
+        if(ball.y-ball.r<0){ ball.y=ball.r; ball.vy=Math.abs(ball.vy); }
+        if(ball.y+ball.r>=paddle.y && ball.y-ball.r<=paddle.y+paddle.h && ball.x>=paddle.x-4 && ball.x<=paddle.x+paddle.w+4 && ball.vy>0){
+          ball.y=paddle.y-ball.r;
+          const rel=((ball.x-(paddle.x+paddle.w/2))/(paddle.w/2));
+          ball.vx=rel*280;
+          ball.vy=-Math.max(170,Math.abs(ball.vy));
+          hits.push({x:ball.x,y:paddle.y,t:.16,color:'#7dff8a'});
+        }
+        for(const br of bricks){
+          if(!br.alive) continue;
+          if(ballHitsRect(ball,br)){
+            br.alive=false; score+=100; hits.push({x:br.x+br.w/2,y:br.y+br.h/2,t:.28,color:br.color});
+            const fromTop = oldY + ball.r <= br.y + 2;
+            const fromBottom = oldY - ball.r >= br.y + br.h - 2;
+            if(fromTop) ball.vy=-Math.abs(ball.vy);
+            else if(fromBottom) ball.vy=Math.abs(ball.vy);
+            else ball.vx*=-1;
+            break;
+          }
+        }
+        if(ball.y-ball.r>H){ lives--; if(lives<=0){ show('Dlaždice konec<br><small>Restart = nový pokus</small>'); running=false; } else resetBall(); }
+      }
+      hits.forEach(h=>h.t-=dt); hits=hits.filter(h=>h.t>0);
+      if(bricks.every(b=>!b.alive)){ show('Všechno hotovo 🧱<br><small>Rozbil jsi všechny dlaždice</small>'); running=false; }
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#09111d'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#132238'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='rgba(255,255,255,.06)'; for(let i=0;i<60;i++) ctx.fillRect((i*89)%W,(i*47)%H,2,2);
+      bricks.forEach(br=>{ if(!br.alive) return; ctx.fillStyle=br.color; ctx.fillRect(br.x,br.y,br.w,br.h); ctx.fillStyle='rgba(255,255,255,.23)'; ctx.fillRect(br.x+2,br.y+2,br.w-4,4); });
+      ctx.fillStyle='#51e36f'; ctx.fillRect(paddle.x,paddle.y,paddle.w,paddle.h);
+      ctx.fillStyle='#d3ffd9'; ctx.fillRect(paddle.x+8,paddle.y+2,paddle.w-16,3);
+      ctx.fillStyle='#ffd33d'; ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,7); ctx.fill();
+      hits.forEach(h=>{ ctx.globalAlpha=Math.max(0,h.t/.28); ctx.fillStyle=h.color; ctx.beginPath(); ctx.arc(h.x,h.y,8+(1-h.t/.28)*12,0,7); ctx.fill(); ctx.globalAlpha=1; });
+      hud.innerHTML='BONUS: DLAŽDICE<br>Pohybuj plošinkou doleva a doprava<br>Skóre: '+score+' &nbsp; Životy: '+lives+'<br><small>Rozbij všechny bloky nahoře</small>';
+    }
+    loop(last);
+  }
+
+  function isSecretMachine(){ const input=document.getElementById('machine'); return input&&String(input.value).trim()===SECRET_MACHINE; }
+  window.addEventListener('DOMContentLoaded',function(){ const recalc=document.getElementById('recalc'); if(recalc) recalc.addEventListener('click',function(){ if(isSecretMachine()) setTimeout(openRetroEgg,80); }); });
+})();
+</script>
+
 
 </body>
 </html>
