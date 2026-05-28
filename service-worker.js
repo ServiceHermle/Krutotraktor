@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_49-whatsnew-exact-original';
+const CACHE_VER = 'hdh-code-v3_1_50-whatsnew-all-languages';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
