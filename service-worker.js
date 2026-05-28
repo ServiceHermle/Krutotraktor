@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_42-retro-disgruntled-customers';
+const CACHE_VER = 'hdh-code-v3_1_45-bomber-powerups-customer-attacks';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

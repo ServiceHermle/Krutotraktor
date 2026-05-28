@@ -4498,7 +4498,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     `;
     document.head.appendChild(style);
     overlay=document.createElement('div'); overlay.id='retroEggOverlay';
-    overlay.innerHTML=`<div id="retroStage"><canvas id="retroCanvas"></canvas></div><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button><button id="retroMenuBtn" type="button">Výběr her</button></div></div><div id="retroHudText">Vyber stroj 123 a spusť přepočet.</div></div><div id="retroMsg"></div><div id="retroPicker"><div id="retroPickerCard"><div id="retroPickerHead"><div id="retroPickerTitle">Výběr minihry</div><button id="retroPickerClose" type="button">Zavřít</button></div><div id="retroGameList"><button class="retroGamePick" data-game="platformer" type="button"><span>Level 1: Servisák<small>Skákej přes překážky a sbírej coiny</small></span><span class="retroGameScore" data-score="platformer">TOP: 0</span></button><button class="retroGamePick" data-game="tools" type="button"><span>Level 2: Chytej nářadí<small>Chytej padající nářadí</small></span><span class="retroGameScore" data-score="tools">TOP: 0</span></button><button class="retroGamePick" data-game="snake" type="button"><span>Level 3: Had<small>Klasický had s dotykovým ovládáním</small></span><span class="retroGameScore" data-score="snake">TOP: 0</span></button><button class="retroGamePick" data-game="invaders" type="button"><span>Bonus: Dlaždice<small>Rozbij všechny bloky</small></span><span class="retroGameScore" data-score="invaders">TOP: 0</span></button><button class="retroGamePick" data-game="bomber" type="button"><span>Bonus: Servis Bomber<small>Polož bombu, znič bedny a vyhni se alarmům</small></span><span class="retroGameScore" data-score="bomber">TOP: 0</span></button><button class="retroGamePick" data-game="wolf" type="button"><span>Bonus: Disgruntled Customers<small>Vtipná 3D akce proti nespokojeným zákazníkům</small></span><span class="retroGameScore" data-score="wolf">TOP: 0</span></button></div></div></div><div id="retroControls"><div class="retroDpad"><button class="retroBtn" id="retroJump" type="button" draggable="false">↑</button><button class="retroBtn" id="retroLeft" type="button" draggable="false">‹</button><div class="retroDpadCenter"></div><button class="retroBtn" id="retroRight" type="button" draggable="false">›</button><button class="retroBtn" id="retroDown" type="button" draggable="false">↓</button></div><div class="retroFirePad"><button class="retroFireBtn" id="retroFire" type="button" draggable="false" aria-label="Akce"></button></div></div>`;
+    overlay.innerHTML=`<div id="retroStage"><canvas id="retroCanvas"></canvas></div><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button><button id="retroMenuBtn" type="button">Výběr her</button></div></div><div id="retroHudText">Vyber stroj 123 a spusť přepočet.</div></div><div id="retroMsg"></div><div id="retroPicker"><div id="retroPickerCard"><div id="retroPickerHead"><div id="retroPickerTitle">Výběr minihry</div><button id="retroPickerClose" type="button">Zavřít</button></div><div id="retroGameList"><button class="retroGamePick" data-game="platformer" type="button"><span>Level 1: Servisák<small>Skákej přes překážky a sbírej coiny</small></span><span class="retroGameScore" data-score="platformer">TOP: 0</span></button><button class="retroGamePick" data-game="tools" type="button"><span>Level 2: Chytej nářadí<small>Chytej padající nářadí</small></span><span class="retroGameScore" data-score="tools">TOP: 0</span></button><button class="retroGamePick" data-game="snake" type="button"><span>Level 3: Had<small>Klasický had s dotykovým ovládáním</small></span><span class="retroGameScore" data-score="snake">TOP: 0</span></button><button class="retroGamePick" data-game="invaders" type="button"><span>Bonus: Dlaždice<small>Rozbij všechny bloky</small></span><span class="retroGameScore" data-score="invaders">TOP: 0</span></button><button class="retroGamePick" data-game="bomber" type="button"><span>Bonus: Servis Bomber<small>Tři levely a power-upy: range, bomby, speed, shield</small></span><span class="retroGameScore" data-score="bomber">TOP: 0</span></button><button class="retroGamePick" data-game="wolf" type="button"><span>Bonus: Disgruntled Customers<small>Tři levely a různé druhy útoků zákazníků</small></span><span class="retroGameScore" data-score="wolf">TOP: 0</span></button></div></div></div><div id="retroControls"><div class="retroDpad"><button class="retroBtn" id="retroJump" type="button" draggable="false">↑</button><button class="retroBtn" id="retroLeft" type="button" draggable="false">‹</button><div class="retroDpadCenter"></div><button class="retroBtn" id="retroRight" type="button" draggable="false">›</button><button class="retroBtn" id="retroDown" type="button" draggable="false">↓</button></div><div class="retroFirePad"><button class="retroFireBtn" id="retroFire" type="button" draggable="false" aria-label="Akce"></button></div></div>`;
     document.body.appendChild(overlay);
     stage=document.getElementById('retroStage');
     picker=document.getElementById('retroPicker');
@@ -4775,46 +4775,72 @@ document.addEventListener("DOMContentLoaded", ()=>{
   function wolfRun(){
     const runId=gameRunId;
     const s=gameSize(), W=s.W, H=s.H;
-    const mapRows=[
-      '##############',
-      '#@....#..A...#',
-      '#.##..#..##..#',
-      '#..e..#...g..#',
-      '##.##...##...#',
-      '#..M..K....#.#',
-      '#.##.###.#.#X#',
-      '#....e..A....#',
-      '#.######.#.#.#',
-      '#..g...M...e.#',
-      '#.....#......#',
-      '##############'
-    ];
-    const MW=mapRows[0].length, MH=mapRows.length;
-    let px=1.5, py=1.5, pa=0, score=0, armor=100, ammo=24, fireLatch=false, last=performance.now();
-    let hasKey=false, won=false, muzzle=0, hurtFlash=0, bark='Najdi klíč od dílny a uteč nespokojeným zákazníkům.';
-    const FOV=Math.PI/3;
-    const enemies=[];
-    const pickups=[];
-    let exitPos={x:12.5,y:6.5};
-
-    for(let y=0;y<MH;y++){
-      for(let x=0;x<MW;x++){
-        const c=mapRows[y][x];
-        if(c==='@'){ px=x+0.5; py=y+0.5; }
-        if(c==='e') enemies.push({x:x+0.5,y:y+0.5,hp:1,type:'guard',hit:0,cd:1.6,speed:0.55});
-        if(c==='g') enemies.push({x:x+0.5,y:y+0.5,hp:2,type:'elite',hit:0,cd:1.1,speed:0.72});
-        if(c==='A') pickups.push({x:x+0.5,y:y+0.5,type:'ammo',taken:false});
-        if(c==='M') pickups.push({x:x+0.5,y:y+0.5,type:'med',taken:false});
-        if(c==='K') pickups.push({x:x+0.5,y:y+0.5,type:'key',taken:false});
-        if(c==='X') exitPos={x:x+0.5,y:y+0.5};
+    const levelDefs=[
+      {
+        name:'Level 1',
+        intro:'Recepce – první vlna stížností',
+        map:[
+          '##############',
+          '#@....#..A...#',
+          '#.##..#..##..#',
+          '#..e..#...g..#',
+          '##.##...##...#',
+          '#..M..K....#.#',
+          '#.##.###.#.#X#',
+          '#....e..A....#',
+          '#.######.#.#.#',
+          '#..g...M...e.#',
+          '#.....#......#',
+          '##############'
+        ]
+      },
+      {
+        name:'Level 2',
+        intro:'Dílna – zákazníci jsou blíž a hlasitější',
+        map:[
+          '##############',
+          '#@..A....#...#',
+          '#.##.##..#.#.#',
+          '#..e..#..g...#',
+          '#.##..#..##..#',
+          '#..M..#..A..K#',
+          '##..#.#.##.#X#',
+          '#..e..#...g..#',
+          '#.#######.#..#',
+          '#....M....e..#',
+          '#..#......#..#',
+          '##############'
+        ]
+      },
+      {
+        name:'Level 3',
+        intro:'Escalace – VIP zákazník přišel osobně',
+        map:[
+          '##############',
+          '#@....#..A..X#',
+          '#.##..#..##..#',
+          '#..g..#...B..#',
+          '#.##..#..##..#',
+          '#..M..K..A...#',
+          '#.##.###.#.#.#',
+          '#....g.....e.#',
+          '#.######.#.#.#',
+          '#..e...M...g.#',
+          '#.....#......#',
+          '##############'
+        ]
       }
-    }
+    ];
+    let level=0, score=0, armor=100, ammo=24, fireLatch=false, last=performance.now();
+    let px=1.5, py=1.5, pa=0, MW=0, MH=0, mapRows=[], enemies=[], pickups=[], exitPos={x:0,y:0}, projectiles=[];
+    let hasKey=false, muzzle=0, hurtFlash=0, bark='Najdi klíč od dílny a uteč nespokojeným zákazníkům.', transitioning=false;
+    const FOV=Math.PI/3;
 
-    function mapCell(x,y){ if(x<0||y<0||x>=MW||y>=MH) return '#'; return mapRows[y][x]; }
-    function isWall(x,y){ return mapCell(x,y)==='#'; }
     function dist(ax,ay,bx,by){ return Math.hypot(ax-bx, ay-by); }
     function normAng(a){ while(a<-Math.PI)a+=Math.PI*2; while(a>Math.PI)a-=Math.PI*2; return a; }
     function speak(text){ bark=text; }
+    function mapCell(x,y){ if(x<0||y<0||x>=MW||y>=MH) return '#'; return mapRows[y][x]; }
+    function isWall(x,y){ return mapCell(x,y)==='#'; }
     function lineClear(ax,ay,bx,by){
       const dx=bx-ax, dy=by-ay, steps=Math.ceil(Math.hypot(dx,dy)*16);
       for(let i=1;i<steps;i++){
@@ -4828,16 +4854,40 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(!isWall(Math.floor(nx-pad),Math.floor(py-pad)) && !isWall(Math.floor(nx+pad),Math.floor(py-pad)) && !isWall(Math.floor(nx-pad),Math.floor(py+pad)) && !isWall(Math.floor(nx+pad),Math.floor(py+pad))) px=nx;
       if(!isWall(Math.floor(px-pad),Math.floor(ny-pad)) && !isWall(Math.floor(px+pad),Math.floor(ny-pad)) && !isWall(Math.floor(px-pad),Math.floor(ny+pad)) && !isWall(Math.floor(px+pad),Math.floor(ny+pad))) py=ny;
     }
-    function applyDamage(v){
-      if(won) return;
+    function initLevel(idx){
+      const def=levelDefs[idx];
+      mapRows=def.map.slice(); MW=mapRows[0].length; MH=mapRows.length;
+      enemies=[]; pickups=[]; hasKey=false; exitPos={x:0,y:0}; pa=0; muzzle=0; hurtFlash=0; projectiles=[];
+      if(idx>0){ ammo+=8; armor=Math.min(100, armor+18); }
+      for(let y=0;y<MH;y++){
+        for(let x=0;x<MW;x++){
+          const c=mapRows[y][x];
+          if(c==='@'){ px=x+0.5; py=y+0.5; }
+          if(c==='e') enemies.push({x:x+0.5,y:y+0.5,hp:1,type:'guard',hit:0,cd:1.3+Math.random()*.5,speed:0.50});
+          if(c==='g') enemies.push({x:x+0.5,y:y+0.5,hp:2,type:'elite',hit:0,cd:1.0+Math.random()*.35,speed:0.66});
+          if(c==='B') enemies.push({x:x+0.5,y:y+0.5,hp:5,type:'boss',hit:0,cd:0.9,speed:0.58});
+          if(c==='A') pickups.push({x:x+0.5,y:y+0.5,type:'ammo',taken:false});
+          if(c==='M') pickups.push({x:x+0.5,y:y+0.5,type:'med',taken:false});
+          if(c==='K') pickups.push({x:x+0.5,y:y+0.5,type:'key',taken:false});
+          if(c==='X') exitPos={x:x+0.5,y:y+0.5};
+        }
+      }
+      bark=def.intro;
+      last=performance.now();
+    }
+    function applyDamage(v,msg){
+      if(transitioning) return;
       armor=Math.max(0, armor-v);
       hurtFlash=.45;
-      speak(v>=18?'Velká stížnost!':'Další stížnost! Kryj se.');
+      if(msg) speak(msg);
       if(armor<=0){
         saveRetroBest('wolf', score);
         show('Disgruntled Customers konec<br><small>Skóre: '+score+' &nbsp; TOP: '+getBestScore('wolf')+' &nbsp; Restart = nový pokus</small>');
         running=false;
       }
+    }
+    function spawnProjectile(type, x, y, ang, speed, dmg, color){
+      projectiles.push({type, x, y, vx:Math.cos(ang)*speed, vy:Math.sin(ang)*speed, t:2.6, dmg, color});
     }
     function fire(){
       if(ammo<=0){ speak('Bez argumentů.'); return; }
@@ -4850,9 +4900,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
         if(Math.abs(ang)<0.11 && d<8.5 && lineClear(px,py,e.x,e.y) && d<bestDist){ best=e; bestDist=d; }
       }
       if(best){
-        best.hp--; best.hit=.18; score+=best.hp<=0 ? (best.type==='elite'?240:160) : 50;
+        best.hp--; best.hit=.18;
+        score += best.hp<=0 ? (best.type==='boss'?450:(best.type==='elite'?240:160)) : 50;
         speak(best.hp<=0 ? 'Zákazník uklidněn.' : 'Dobrá připomínka přijata.');
-      }
+      } else speak('Tentokrát bez efektu.');
     }
     function pickupCheck(){
       for(const p of pickups){
@@ -4865,73 +4916,94 @@ document.addEventListener("DOMContentLoaded", ()=>{
         }
       }
     }
-    function checkWin(){
-      if(hasKey && dist(px,py,exitPos.x,exitPos.y)<0.68){
-        won=true;
+    function advanceLevel(){
+      if(level>=levelDefs.length-1){
         const alive=enemies.filter(e=>e.hp>0).length;
         const finalScore=score + armor*4 + ammo*6 + (alive===0?180:0);
         saveRetroBest('wolf', finalScore);
         show('Disgruntled Customers hotovo<br><small>Skóre: '+finalScore+' &nbsp; TOP: '+getBestScore('wolf')+' &nbsp; Restart = nový pokus</small>');
         running=false;
+        return;
       }
+      transitioning=true;
+      score += 150 + armor;
+      show('Disgruntled Customers<br><small>'+levelDefs[level].name+' hotov. Přichází '+levelDefs[level+1].name+'.</small>');
+      queueLevelTimeout(()=>{
+        if(runId===gameRunId && running && mode==='wolf' && isOpen()){
+          level++;
+          initLevel(level);
+          hide();
+          transitioning=false;
+        }
+      }, 1600);
     }
+    function checkWin(){ if(hasKey && dist(px,py,exitPos.x,exitPos.y)<0.68 && !transitioning) advanceLevel(); }
     function drawEnemySprite(sp, sx, sy, size){
+      const shadowY = sp.type==='boss' ? sy+size*0.22 : sy+size*0.13;
+      ctx.fillStyle='rgba(0,0,0,.20)'; ctx.beginPath(); ctx.ellipse(sx, shadowY, size*(sp.type==='boss'?0.18:0.12), size*0.035, 0, 0, Math.PI*2); ctx.fill();
+      if(sp.type==='boss'){
+        const bodyColor = sp.hit>0 ? '#ffd1b7' : '#f3bb97';
+        ctx.fillStyle=bodyColor; ctx.fillRect(sx-size*0.19, sy-size*0.64, size*0.38, size*0.25);
+        ctx.fillStyle='#52361f'; ctx.fillRect(sx-size*0.20, sy-size*0.70, size*0.40, size*0.08);
+        ctx.strokeStyle='#2b1b13'; ctx.lineWidth=Math.max(1,size*0.018);
+        ctx.beginPath(); ctx.moveTo(sx-size*0.10, sy-size*0.54); ctx.lineTo(sx-size*0.03, sy-size*0.57); ctx.moveTo(sx+size*0.10, sy-size*0.54); ctx.lineTo(sx+size*0.03, sy-size*0.57); ctx.stroke();
+        ctx.fillStyle='#fff'; ctx.fillRect(sx-size*0.09, sy-size*0.50, size*0.05, size*0.035); ctx.fillRect(sx+size*0.04, sy-size*0.50, size*0.05, size*0.035);
+        ctx.fillStyle='#451d15'; ctx.fillRect(sx-size*0.06, sy-size*0.485, size*0.025, size*0.02); ctx.fillRect(sx+size*0.055, sy-size*0.485, size*0.025, size*0.02);
+        ctx.strokeStyle='#7a1b1b'; ctx.beginPath(); ctx.moveTo(sx-size*0.08, sy-size*0.43); ctx.lineTo(sx+size*0.08, sy-size*0.43); ctx.stroke();
+        ctx.fillStyle='#7b1f26'; ctx.fillRect(sx-size*0.23, sy-size*0.35, size*0.46, size*0.34);
+        ctx.fillStyle='#e7c03d'; ctx.fillRect(sx-size*0.05, sy-size*0.34, size*0.10, size*0.18);
+        ctx.fillStyle=bodyColor; ctx.fillRect(sx-size*0.29, sy-size*0.31, size*0.08, size*0.22); ctx.fillRect(sx+size*0.21, sy-size*0.31, size*0.08, size*0.22);
+        ctx.fillStyle='#f2f2f2'; ctx.fillRect(sx+size*0.15, sy-size*0.22, size*0.12, size*0.15);
+        ctx.fillStyle='#d33'; ctx.fillRect(sx+size*0.17, sy-size*0.19, size*0.08, size*0.02);
+        ctx.fillStyle='#2c2c35'; ctx.fillRect(sx-size*0.17, sy-size*0.01, size*0.13, size*0.22); ctx.fillRect(sx+size*0.04, sy-size*0.01, size*0.13, size*0.22);
+        ctx.fillStyle='#111'; ctx.fillRect(sx-size*0.18, sy+size*0.18, size*0.14, size*0.05); ctx.fillRect(sx+size*0.04, sy+size*0.18, size*0.14, size*0.05);
+        return;
+      }
       const angry = sp.hit>0;
       const bodyColor = sp.type==='elite' ? (angry ? '#f1a06b' : '#e18c56') : (angry ? '#ffcc9f' : '#f2bd90');
       const shirtColor = sp.type==='elite' ? '#8a1f25' : '#3d6fb6';
       const trouserColor = sp.type==='elite' ? '#2c2c35' : '#304055';
       const hairColor = sp.type==='elite' ? '#5a3a20' : '#403125';
-      // head
-      ctx.fillStyle=bodyColor;
-      ctx.fillRect(sx-size*0.16, sy-size*0.60, size*0.32, size*0.22);
-      ctx.fillStyle=hairColor;
-      ctx.fillRect(sx-size*0.17, sy-size*0.64, size*0.34, size*0.08);
-      // angry eyebrows + eyes
+      ctx.fillStyle=bodyColor; ctx.fillRect(sx-size*0.16, sy-size*0.60, size*0.32, size*0.22);
+      ctx.fillStyle=hairColor; ctx.fillRect(sx-size*0.17, sy-size*0.64, size*0.34, size*0.08);
       ctx.strokeStyle='#2b1b13'; ctx.lineWidth=Math.max(1,size*0.018);
-      ctx.beginPath();
-      ctx.moveTo(sx-size*0.09, sy-size*0.52); ctx.lineTo(sx-size*0.03, sy-size*0.54);
-      ctx.moveTo(sx+size*0.09, sy-size*0.52); ctx.lineTo(sx+size*0.03, sy-size*0.54);
-      ctx.stroke();
-      ctx.fillStyle='#ffffff';
-      ctx.fillRect(sx-size*0.08, sy-size*0.50, size*0.04, size*0.03);
-      ctx.fillRect(sx+size*0.04, sy-size*0.50, size*0.04, size*0.03);
-      ctx.fillStyle='#321c15';
-      ctx.fillRect(sx-size*0.05, sy-size*0.48, size*0.02, size*0.02);
-      ctx.fillRect(sx+size*0.05, sy-size*0.48, size*0.02, size*0.02);
-      // mouth
-      ctx.strokeStyle='#7a1b1b'; ctx.lineWidth=Math.max(1,size*0.014);
-      ctx.beginPath(); ctx.moveTo(sx-size*0.06, sy-size*0.42); ctx.lineTo(sx+size*0.06, sy-size*0.42); ctx.stroke();
-      // shirt
-      ctx.fillStyle=shirtColor;
-      ctx.fillRect(sx-size*0.20, sy-size*0.36, size*0.40, size*0.28);
-      // tie
-      ctx.fillStyle='#a51522';
-      ctx.fillRect(sx-size*0.02, sy-size*0.34, size*0.04, size*0.14);
-      // arms
-      ctx.fillStyle=bodyColor;
-      ctx.fillRect(sx-size*0.25, sy-size*0.33, size*0.06, size*0.18);
-      ctx.fillRect(sx+size*0.19, sy-size*0.33, size*0.06, size*0.18);
-      // complaint paper / tablet for elite
-      if(sp.type==='elite'){
-        ctx.fillStyle='#f2f2f2';
-        ctx.fillRect(sx+size*0.14, sy-size*0.26, size*0.10, size*0.12);
-        ctx.fillStyle='#d33';
-        ctx.fillRect(sx+size*0.16, sy-size*0.23, size*0.06, size*0.02);
+      ctx.beginPath(); ctx.moveTo(sx-size*0.09, sy-size*0.52); ctx.lineTo(sx-size*0.03, sy-size*0.54); ctx.moveTo(sx+size*0.09, sy-size*0.52); ctx.lineTo(sx+size*0.03, sy-size*0.54); ctx.stroke();
+      ctx.fillStyle='#ffffff'; ctx.fillRect(sx-size*0.08, sy-size*0.50, size*0.04, size*0.03); ctx.fillRect(sx+size*0.04, sy-size*0.50, size*0.04, size*0.03);
+      ctx.fillStyle='#321c15'; ctx.fillRect(sx-size*0.05, sy-size*0.48, size*0.02, size*0.02); ctx.fillRect(sx+size*0.05, sy-size*0.48, size*0.02, size*0.02);
+      ctx.strokeStyle='#7a1b1b'; ctx.lineWidth=Math.max(1,size*0.014); ctx.beginPath(); ctx.moveTo(sx-size*0.06, sy-size*0.42); ctx.lineTo(sx+size*0.06, sy-size*0.42); ctx.stroke();
+      ctx.fillStyle=shirtColor; ctx.fillRect(sx-size*0.20, sy-size*0.36, size*0.40, size*0.28);
+      ctx.fillStyle='#a51522'; ctx.fillRect(sx-size*0.02, sy-size*0.34, size*0.04, size*0.14);
+      ctx.fillStyle=bodyColor; ctx.fillRect(sx-size*0.25, sy-size*0.33, size*0.06, size*0.18); ctx.fillRect(sx+size*0.19, sy-size*0.33, size*0.06, size*0.18);
+      if(sp.type==='elite'){ ctx.fillStyle='#f2f2f2'; ctx.fillRect(sx+size*0.14, sy-size*0.26, size*0.10, size*0.12); ctx.fillStyle='#d33'; ctx.fillRect(sx+size*0.16, sy-size*0.23, size*0.06, size*0.02); }
+      ctx.fillStyle=trouserColor; ctx.fillRect(sx-size*0.16, sy-size*0.08, size*0.12, size*0.20); ctx.fillRect(sx+size*0.04, sy-size*0.08, size*0.12, size*0.20);
+      ctx.fillStyle='#111'; ctx.fillRect(sx-size*0.17, sy+size*0.10, size*0.13, size*0.04); ctx.fillRect(sx+size*0.04, sy+size*0.10, size*0.13, size*0.04);
+    }
+    function drawProjectile(pr, zBuf){
+      const dx=pr.x-px, dy=pr.y-py, d=Math.hypot(dx,dy);
+      if(d<0.12) return;
+      const ang=normAng(Math.atan2(dy,dx)-pa);
+      if(Math.abs(ang)>FOV*0.8) return;
+      const size=Math.min(H*0.18, H/d*0.08);
+      const sx=(ang/(FOV/2))*W/2 + W/2;
+      const sy=H/2 + size*0.05;
+      const ix=Math.floor(sx);
+      if(ix<0||ix>=W||d>=zBuf[ix]) return;
+      if(pr.type==='email'){
+        ctx.fillStyle='#a8e4ff'; ctx.fillRect(sx-size*0.55, sy-size*0.32, size*1.1, size*0.64);
+        ctx.strokeStyle='#347ca8'; ctx.strokeRect(sx-size*0.55, sy-size*0.32, size*1.1, size*0.64);
+        ctx.strokeStyle='#347ca8'; ctx.beginPath(); ctx.moveTo(sx-size*0.50, sy-size*0.30); ctx.lineTo(sx, sy); ctx.lineTo(sx+size*0.50, sy-size*0.30); ctx.stroke();
+      } else if(pr.type==='bossSpread'){
+        ctx.fillStyle='#ff66d9'; ctx.beginPath(); ctx.arc(sx, sy, size*0.55, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,.45)'; ctx.beginPath(); ctx.arc(sx-size*0.15, sy-size*0.15, size*0.18, 0, Math.PI*2); ctx.fill();
+      } else {
+        ctx.fillStyle='#ffd166'; ctx.beginPath(); ctx.arc(sx, sy, size*0.48, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle='#8a5b00'; ctx.beginPath(); ctx.arc(sx, sy, size*0.22, 0, Math.PI*2); ctx.fill();
       }
-      // legs
-      ctx.fillStyle=trouserColor;
-      ctx.fillRect(sx-size*0.16, sy-size*0.08, size*0.12, size*0.20);
-      ctx.fillRect(sx+size*0.04, sy-size*0.08, size*0.12, size*0.20);
-      // shoes
-      ctx.fillStyle='#111';
-      ctx.fillRect(sx-size*0.17, sy+size*0.10, size*0.13, size*0.04);
-      ctx.fillRect(sx+size*0.04, sy+size*0.10, size*0.13, size*0.04);
     }
     function draw(){
       ctx.clearRect(0,0,W,H);
       const horizon=H*0.53;
-      const sky=ctx.createLinearGradient(0,0,0,horizon);
-      sky.addColorStop(0,'#87b8e8'); sky.addColorStop(1,'#5f89b1');
+      const sky=ctx.createLinearGradient(0,0,0,horizon); sky.addColorStop(0,'#87b8e8'); sky.addColorStop(1,'#5f89b1');
       ctx.fillStyle=sky; ctx.fillRect(0,0,W,horizon);
       ctx.fillStyle='#7d7766'; ctx.fillRect(0,horizon,W,H-horizon);
       ctx.strokeStyle='rgba(255,255,255,.06)';
@@ -4941,7 +5013,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       const zBuf=new Array(W);
       for(let x=0;x<W;x++){
         const rayA=pa - FOV/2 + (x/W)*FOV;
-        const sin=Math.sin(rayA), cos=Math.cos(rayA);
+        const cos=Math.cos(rayA), sin=Math.sin(rayA);
         let d=0.02, hit=false, side=0, tex=0;
         while(d<16 && !hit){
           d += 0.025;
@@ -4953,14 +5025,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
             tex=side ? (ry-Math.floor(ry)) : (rx-Math.floor(rx));
           }
         }
-        const corr=d*Math.cos(rayA-pa);
-        zBuf[x]=corr;
-        const wallH=Math.min(H, H/(corr*0.88));
-        const top=(H-wallH)/2;
-        let shade=Math.max(48, 176-corr*10 - side*18);
-        if(((tex*8)|0)%2===0) shade-=12;
-        ctx.fillStyle=`rgb(${shade},${Math.max(38,shade-20)},${Math.max(28,shade-46)})`;
-        ctx.fillRect(x, top, 1, wallH);
+        const corr=d*Math.cos(rayA-pa); zBuf[x]=corr;
+        const wallH=Math.min(H, H/(corr*0.88)); const top=(H-wallH)/2;
+        let shade=Math.max(48, 176-corr*10 - side*18); if(((tex*8)|0)%2===0) shade-=12;
+        ctx.fillStyle=`rgb(${shade},${Math.max(38,shade-20)},${Math.max(28,shade-46)})`; ctx.fillRect(x, top, 1, wallH);
         if(((top/12)|0)%2===0){ ctx.fillStyle='rgba(255,255,255,.05)'; ctx.fillRect(x, top, 1, wallH*0.12); }
       }
 
@@ -4969,21 +5037,20 @@ document.addEventListener("DOMContentLoaded", ()=>{
       for(const p of pickups){ if(!p.taken) sprites.push({type:p.type, x:p.x, y:p.y}); }
       sprites.push({type:'exit', x:exitPos.x, y:exitPos.y});
       sprites.sort((a,b)=>dist(px,py,b.x,b.y)-dist(px,py,a.x,a.y));
-
       for(const sp of sprites){
         const dx=sp.x-px, dy=sp.y-py, d=Math.hypot(dx,dy);
         if(!lineClear(px,py,sp.x,sp.y)) continue;
         const ang=normAng(Math.atan2(dy,dx)-pa);
         if(Math.abs(ang)>FOV*0.75 || d<0.14) continue;
-        const size=Math.min(H*0.66, H/d*((sp.type==='guard'||sp.type==='elite')?0.62:0.48));
+        const baseScale = (sp.type==='boss')?0.78:((sp.type==='guard'||sp.type==='elite')?0.62:0.48);
+        const size=Math.min(H*0.72, H/d*baseScale);
         const sx=(ang/(FOV/2))*W/2 + W/2;
-        const sy=H/2 + ((sp.type==='guard'||sp.type==='elite')? size*0.02 : size*0.12);
+        const sy=H/2 + ((sp.type==='guard'||sp.type==='elite')? size*0.30 : (sp.type==='boss'? size*0.24 : size*0.12));
         const left=Math.floor(sx-size/2), right=Math.floor(sx+size/2);
         let visible=false;
         for(let x=Math.max(0,left); x<Math.min(W,right); x++){ if(d < zBuf[x]+0.16){ visible=true; break; } }
         if(!visible) continue;
-
-        if(sp.type==='guard' || sp.type==='elite') drawEnemySprite(sp,sx,sy,size);
+        if(['guard','elite','boss'].includes(sp.type)) drawEnemySprite(sp,sx,sy,size);
         else if(sp.type==='ammo'){
           ctx.fillStyle='#63c6ff'; ctx.fillRect(sx-size*0.14, sy-size*0.26, size*0.28, size*0.20);
           ctx.fillStyle='#0b1d2c'; ctx.fillRect(sx-size*0.05, sy-size*0.23, size*0.10, size*0.14);
@@ -5000,6 +5067,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
           if(hasKey){ ctx.fillStyle='#89ff9d'; ctx.fillRect(sx-size*0.05, sy-size*0.33, size*0.10, size*0.10); }
         }
       }
+      projectiles.forEach(pr=>drawProjectile(pr,zBuf));
 
       const ms=9, mx=10, my=10;
       ctx.globalAlpha=.94;
@@ -5010,7 +5078,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
         ctx.fillRect(mx+x*ms,my+y*ms,ms-1,ms-1);
       }
       for(const p of pickups){ if(!p.taken){ ctx.fillStyle=p.type==='ammo' ? '#63c6ff' : p.type==='med' ? '#f0f0f0' : '#d4b021'; ctx.fillRect(mx+p.x*ms-2,my+p.y*ms-2,4,4); } }
-      for(const e of enemies){ if(e.hp>0){ ctx.fillStyle=e.type==='elite' ? '#ff9b61' : '#ff5151'; ctx.fillRect(mx+e.x*ms-2,my+e.y*ms-2,4,4); } }
+      for(const e of enemies){ if(e.hp>0){ ctx.fillStyle=e.type==='boss' ? '#ff00a8' : e.type==='elite' ? '#ff9b61' : '#ff5151'; ctx.fillRect(mx+e.x*ms-2,my+e.y*ms-2,4,4); } }
+      projectiles.forEach(pr=>{ ctx.fillStyle=pr.color; ctx.fillRect(mx+pr.x*ms-1.5, my+pr.y*ms-1.5, 3, 3); });
       ctx.fillStyle='#6ad4ff'; ctx.beginPath(); ctx.arc(mx+px*ms,my+py*ms,3,0,Math.PI*2); ctx.fill();
       ctx.strokeStyle='#6ad4ff'; ctx.beginPath(); ctx.moveTo(mx+px*ms,my+py*ms); ctx.lineTo(mx+px*ms+Math.cos(pa)*7,my+py*ms+Math.sin(pa)*7); ctx.stroke();
       ctx.globalAlpha=1;
@@ -5021,15 +5090,25 @@ document.addEventListener("DOMContentLoaded", ()=>{
       ctx.fillStyle='#63c6ff'; ctx.fillRect(W-146,34,Math.min(126, ammo*4),10);
       ctx.fillStyle='#fff'; ctx.font='bold 11px Arial'; ctx.fillText('ARMOR '+armor, W-144, 27); ctx.fillText('AMMO '+ammo, W-144, 43);
 
-      ctx.strokeStyle='rgba(255,255,255,.65)';
-      ctx.beginPath(); ctx.moveTo(W/2-9,H/2); ctx.lineTo(W/2+9,H/2); ctx.moveTo(W/2,H/2-9); ctx.lineTo(W/2,H/2+9); ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,.65)'; ctx.beginPath(); ctx.moveTo(W/2-9,H/2); ctx.lineTo(W/2+9,H/2); ctx.moveTo(W/2,H/2-9); ctx.lineTo(W/2,H/2+9); ctx.stroke();
       if(muzzle>0){ ctx.fillStyle='rgba(255,208,92,.24)'; ctx.beginPath(); ctx.arc(W/2,H*0.82,50*muzzle/.12,0,Math.PI*2); ctx.fill(); }
       if(hurtFlash>0){ ctx.fillStyle='rgba(255,64,64,'+(0.28*Math.min(1,hurtFlash/.45))+')'; ctx.fillRect(0,0,W,H); }
 
       const alive=enemies.filter(e=>e.hp>0).length;
-      setHud('BONUS: DISGRUNTLED CUSTOMERS<br>↑/↓ pohyb, ←/→ otáčení, červené tlačítko = střelba<br>Armor: '+armor+' &nbsp; Munice: '+ammo+' &nbsp; Klíč: '+(hasKey?'ANO':'NE')+' &nbsp; Nepřátelé: '+alive+' &nbsp; TOP: '+getBestScore('wolf')+'<br><small>'+bark+'</small>');
+      setHud('BONUS: DISGRUNTLED CUSTOMERS<br>'+levelDefs[level].name+' / '+levelDefs.length+' &nbsp; Armor: '+armor+' &nbsp; Munice: '+ammo+' &nbsp; Klíč: '+(hasKey?'ANO':'NE')+' &nbsp; Nepřátelé: '+alive+' &nbsp; TOP: '+getBestScore('wolf')+'<br><small>Typy útoků: guard = complaint bubble, elite = email shot, boss = triple rant &nbsp; | &nbsp; '+bark+'</small>');
     }
-
+    function updateProjectiles(dt){
+      for(let i=projectiles.length-1;i>=0;i--){
+        const pr=projectiles[i];
+        pr.x += pr.vx*dt; pr.y += pr.vy*dt; pr.t -= dt;
+        if(pr.t<=0 || isWall(Math.floor(pr.x), Math.floor(pr.y))){ projectiles.splice(i,1); continue; }
+        if(dist(px,py,pr.x,pr.y)<0.28){
+          const msg = pr.type==='email' ? 'E-mailová stížnost zasáhla.' : (pr.type==='bossSpread' ? 'Boss zákazník spustil rant.' : 'Stížnost tě zasáhla.');
+          applyDamage(pr.dmg, msg);
+          projectiles.splice(i,1);
+        }
+      }
+    }
     function loop(t){
       if(runId!==gameRunId||!running||mode!=='wolf'||!isOpen()) return;
       raf=requestAnimationFrame(loop);
@@ -5037,76 +5116,98 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(muzzle>0) muzzle-=dt;
       if(hurtFlash>0) hurtFlash-=dt;
       for(const e of enemies){ if(e.hit>0) e.hit-=dt; }
+      if(transitioning){ draw(); return; }
 
-      const rot=(left()?-1:0) + (right()?1:0);
-      pa += rot*2.3*dt;
-      const mv=(up()?1:0) + (down()?-1:0);
-      if(mv!==0){ const speed=2.35*mv; tryMove(px+Math.cos(pa)*speed*dt, py+Math.sin(pa)*speed*dt); }
-
+      const rot=(left()?-1:0) + (right()?1:0); pa += rot*2.3*dt;
+      const mv=(up()?1:0) + (down()?-1:0); if(mv!==0){ const speed=2.35*mv; tryMove(px+Math.cos(pa)*speed*dt, py+Math.sin(pa)*speed*dt); }
       if(touch.fire && !fireLatch){ fire(); fireLatch=true; }
       if(!touch.fire && !keys[' '] && !keys.Enter) fireLatch=false;
 
-      pickupCheck();
-      checkWin();
-
+      pickupCheck(); checkWin();
       for(const e of enemies){
         if(e.hp<=0) continue;
         const d=dist(px,py,e.x,e.y);
-        if(d<7 && lineClear(e.x,e.y,px,py)){
-          if(d>1.25){
-            const sp=e.speed*dt;
-            const nx=e.x+(px-e.x)/d*sp, ny=e.y+(py-e.y)/d*sp;
+        if(d<7.5 && lineClear(e.x,e.y,px,py)){
+          if(d>1.35){
+            const sp=e.speed*dt; const nx=e.x+(px-e.x)/d*sp, ny=e.y+(py-e.y)/d*sp;
             if(!isWall(Math.floor(nx),Math.floor(e.y))) e.x=nx;
             if(!isWall(Math.floor(e.x),Math.floor(ny))) e.y=ny;
           }
           e.cd-=dt;
           if(e.cd<=0){
-            e.cd = e.type==='elite' ? 1.0 : 1.45;
-            if(d<5.5){ applyDamage(e.type==='elite'?18:12); speak(e.type==='elite' ? 'VIP zákazník je opravdu rozladěný.' : 'Zákazník si hlasitě stěžuje.'); }
+            const ang=Math.atan2(py-e.y, px-e.x);
+            if(e.type==='guard'){
+              spawnProjectile('complaint', e.x, e.y, ang, 2.35, 10, '#ffd166');
+              e.cd=1.55+Math.random()*.35; speak('Zákazník vypustil další stížnost.');
+            } else if(e.type==='elite'){
+              spawnProjectile('email', e.x, e.y, ang, 3.15, 15, '#7dd3ff');
+              e.cd=1.2+Math.random()*.3; speak('VIP zákazník posílá urgentní e-mail.');
+            } else {
+              spawnProjectile('bossSpread', e.x, e.y, ang-0.18, 3.0, 12, '#ff66d9');
+              spawnProjectile('bossSpread', e.x, e.y, ang, 3.2, 14, '#ff66d9');
+              spawnProjectile('bossSpread', e.x, e.y, ang+0.18, 3.0, 12, '#ff66d9');
+              e.cd=1.05+Math.random()*.25; speak('Boss zákazník spustil trojitý rant.');
+            }
           }
         }
       }
+      updateProjectiles(dt);
       draw();
     }
-
-    show('Disgruntled Customers<br><small>Vyhni se nespokojeným zákazníkům, seber klíč a uteč k východu.</small>');
-    queueLevelTimeout(()=>{ if(runId===gameRunId&&mode==='wolf') hide(); }, 1900);
+    initLevel(level);
+    show('Disgruntled Customers<br><small>Tři levely. Teď mají zákazníci různé druhy útoků.</small>');
+    queueLevelTimeout(()=>{ if(runId===gameRunId&&mode==='wolf') hide(); }, 1800);
     draw();
     raf=requestAnimationFrame(loop);
   }
 
-function bomberRun(){
+
+  function bomberRun(){
     const runId=gameRunId;
     const s=gameSize(), W=s.W, H=s.H;
     const cols=13, rows=11;
     const cell=Math.floor(Math.min(W/cols, H/rows));
     const ox=Math.floor((W-cols*cell)/2), oy=Math.floor((H-rows*cell)/2);
-    let score=0, lives=3, time=75, last=performance.now(), fireLatch=false, moveCd=0;
-    const grid=[];
-    for(let y=0;y<rows;y++){
-      grid[y]=[];
-      for(let x=0;x<cols;x++){
-        const solid = x===0||y===0||x===cols-1||y===rows-1||(x%2===0&&y%2===0);
-        const safe = (x<=2&&y<=2);
-        grid[y][x]= solid ? 1 : (!safe && Math.random()<.43 ? 2 : 0);
-      }
-    }
-    let player={x:1,y:1,hit:0};
-    let bombs=[], blasts=[];
-    const enemies=[
-      {x:cols-2,y:rows-2,dx:-1,dy:0,step:.45},
-      {x:cols-2,y:1,dx:0,dy:1,step:.55},
-      {x:1,y:rows-2,dx:1,dy:0,step:.6}
+    const levelDefs=[
+      {name:'Level 1', crates:.34, time:78, bombRange:2, enemies:[{x:11,y:9,dx:-1,dy:0,step:.45,color:'#ff4e4e'},{x:11,y:1,dx:0,dy:1,step:.55,color:'#ff7a4e'}]},
+      {name:'Level 2', crates:.42, time:75, bombRange:2, enemies:[{x:11,y:9,dx:-1,dy:0,step:.42,color:'#ff4e4e'},{x:11,y:1,dx:0,dy:1,step:.50,color:'#ff7a4e'},{x:1,y:9,dx:1,dy:0,step:.52,color:'#ffb84e'}]},
+      {name:'Level 3', crates:.48, time:72, bombRange:3, enemies:[{x:11,y:9,dx:-1,dy:0,step:.40,color:'#ff4e4e'},{x:11,y:1,dx:0,dy:1,step:.46,color:'#ff7a4e'},{x:1,y:9,dx:1,dy:0,step:.48,color:'#ffb84e'},{x:9,y:5,dx:0,dy:1,step:.38,color:'#ff6cff'}]}
     ];
-    function free(x,y){
-      if(x<0||y<0||x>=cols||y>=rows) return false;
-      if(grid[y][x]!==0) return false;
-      if(bombs.some(b=>b.x===x&&b.y===y)) return false;
-      return true;
+    let level=0, score=0, lives=3, time=levelDefs[0].time, last=performance.now(), fireLatch=false, moveCd=0, transitioning=false;
+    let grid=[], player={x:1,y:1,hit:0}, bombs=[], blasts=[], enemies=[], powerups=[];
+    let rangeBonus=0, bombLimit=1, speedBonus=0, shield=0;
+
+    function initLevel(idx){
+      const cfg=levelDefs[idx];
+      time=cfg.time; bombs=[]; blasts=[]; enemies=[]; powerups=[]; moveCd=0; fireLatch=false; player={x:1,y:1,hit:0}; grid=[];
+      for(let y=0;y<rows;y++){
+        grid[y]=[];
+        for(let x=0;x<cols;x++){
+          const solid = x===0||y===0||x===cols-1||y===rows-1||(x%2===0&&y%2===0);
+          const safe = (x<=2&&y<=2);
+          grid[y][x]= solid ? 1 : (!safe && Math.random()<cfg.crates ? 2 : 0);
+        }
+      }
+      cfg.enemies.forEach(e=>enemies.push({...e}));
+      last=performance.now();
     }
+    function currentCfg(){ return levelDefs[level]; }
+    function currentRange(){ return currentCfg().bombRange + rangeBonus; }
+    function currentMoveDelay(){ return Math.max(.055, .12 - speedBonus*.02); }
+    function free(x,y){ if(x<0||y<0||x>=cols||y>=rows) return false; if(grid[y][x]!==0) return false; if(bombs.some(b=>b.x===x&&b.y===y)) return false; return true; }
     function tryMove(o,dx,dy){ const nx=o.x+dx, ny=o.y+dy; if(free(nx,ny)){ o.x=nx; o.y=ny; return true; } return false; }
-    function placeBomb(){ if(bombs.some(b=>b.x===player.x&&b.y===player.y)) return; bombs.push({x:player.x,y:player.y,t:1.7,r:2}); }
+    function placeBomb(){ if(bombs.length>=bombLimit) return; if(bombs.some(b=>b.x===player.x&&b.y===player.y)) return; bombs.push({x:player.x,y:player.y,t:1.65,r:currentRange()}); }
     function addBlast(x,y){ blasts.push({x,y,t:.34}); }
+    function maybeDropPowerup(x,y){
+      if(Math.random()>.34) return;
+      const r=Math.random();
+      let type='range';
+      if(r<.32) type='range';
+      else if(r<.58) type='bomb';
+      else if(r<.82) type='speed';
+      else type='shield';
+      powerups.push({x,y,type});
+    }
     function explode(b){
       addBlast(b.x,b.y);
       const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
@@ -5116,16 +5217,61 @@ function bomberRun(){
           if(x<0||y<0||x>=cols||y>=rows) break;
           if(grid[y][x]===1) break;
           addBlast(x,y);
-          if(grid[y][x]===2){ grid[y][x]=0; score+=50; break; }
+          if(grid[y][x]===2){ grid[y][x]=0; score+=50; maybeDropPowerup(x,y); break; }
         }
       }
     }
     function blastAt(x,y){ return blasts.some(b=>b.x===x&&b.y===y); }
+    function collectPowerups(){
+      for(let i=powerups.length-1;i>=0;i--){
+        const p=powerups[i];
+        if(p.x===player.x && p.y===player.y){
+          if(p.type==='range'){ rangeBonus=Math.min(3, rangeBonus+1); score+=40; }
+          else if(p.type==='bomb'){ bombLimit=Math.min(4, bombLimit+1); score+=50; }
+          else if(p.type==='speed'){ speedBonus=Math.min(3, speedBonus+1); score+=45; }
+          else if(p.type==='shield'){ shield=Math.min(2, shield+1); score+=55; }
+          powerups.splice(i,1);
+        }
+      }
+    }
     function hurt(){
-      if(player.hit>0) return;
+      if(player.hit>0 || transitioning) return;
+      if(shield>0){ shield--; player.hit=.8; return; }
       lives--; player.hit=1.2;
       if(lives<=0){ saveRetroBest('bomber',score); show('Servis Bomber konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
       else { player.x=1; player.y=1; }
+    }
+    function advanceLevel(){
+      if(level>=levelDefs.length-1){
+        const finalScore=score+Math.ceil(time)*10 + lives*120 + rangeBonus*35 + bombLimit*30 + speedBonus*25 + shield*20;
+        saveRetroBest('bomber', finalScore);
+        show('Servis Bomber hotovo 💣<br><small>3 levely dokončeny &nbsp; Skóre: '+finalScore+' &nbsp; Restart = nový pokus</small>');
+        running=false;
+        return;
+      }
+      transitioning=true;
+      score += Math.ceil(time)*10;
+      show('Servis Bomber<br><small>'+levelDefs[level].name+' hotov. Připrav se na '+levelDefs[level+1].name+'.</small>');
+      queueLevelTimeout(()=>{
+        if(runId===gameRunId && running && mode==='bomber' && isOpen()){
+          level++;
+          initLevel(level);
+          hide();
+          transitioning=false;
+        }
+      }, 1500);
+    }
+    function drawPowerup(px,py,type){
+      if(type==='range'){
+        ctx.fillStyle='#5ec8ff'; ctx.beginPath(); ctx.arc(px+cell*.5, py+cell*.5, cell*.20, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle='#ffffff'; ctx.beginPath(); ctx.moveTo(px+cell*.32,py+cell*.5); ctx.lineTo(px+cell*.68,py+cell*.5); ctx.stroke();
+      } else if(type==='bomb'){
+        ctx.fillStyle='#60d26f'; ctx.fillRect(px+cell*.26,py+cell*.26,cell*.48,cell*.48); ctx.fillStyle='#123'; ctx.fillRect(px+cell*.46,py+cell*.18,cell*.08,cell*.14);
+      } else if(type==='speed'){
+        ctx.fillStyle='#ffd54f'; ctx.beginPath(); ctx.moveTo(px+cell*.35,py+cell*.22); ctx.lineTo(px+cell*.60,py+cell*.22); ctx.lineTo(px+cell*.48,py+cell*.46); ctx.lineTo(px+cell*.66,py+cell*.46); ctx.lineTo(px+cell*.38,py+cell*.80); ctx.lineTo(px+cell*.46,py+cell*.54); ctx.lineTo(px+cell*.30,py+cell*.54); ctx.closePath(); ctx.fill();
+      } else {
+        ctx.fillStyle='#ff6fd1'; ctx.beginPath(); ctx.arc(px+cell*.5,py+cell*.5,cell*.20,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.fillRect(px+cell*.46,py+cell*.34,cell*.08,cell*.32); ctx.fillRect(px+cell*.36,py+cell*.46,cell*.28,cell*.08);
+      }
     }
     function draw(){
       ctx.clearRect(0,0,W,H);
@@ -5137,36 +5283,32 @@ function bomberRun(){
         if(grid[y][x]===1){ ctx.fillStyle='#667083'; ctx.fillRect(px+2,py+2,cell-5,cell-5); ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fillRect(px+5,py+5,cell-10,4); }
         if(grid[y][x]===2){ ctx.fillStyle='#a96c35'; ctx.fillRect(px+4,py+4,cell-8,cell-8); ctx.strokeStyle='#70451f'; ctx.lineWidth=2; ctx.strokeRect(px+5,py+5,cell-10,cell-10); }
       }
+      powerups.forEach(p=>drawPowerup(ox+p.x*cell, oy+p.y*cell, p.type));
       blasts.forEach(b=>{ const px=ox+b.x*cell, py=oy+b.y*cell; ctx.fillStyle='rgba(255,211,61,.85)'; ctx.fillRect(px+3,py+3,cell-7,cell-7); ctx.fillStyle='rgba(255,90,60,.75)'; ctx.fillRect(px+cell*.28,py+cell*.28,cell*.44,cell*.44); });
       bombs.forEach(b=>{ const px=ox+b.x*cell+cell/2, py=oy+b.y*cell+cell/2; ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(px,py,cell*.28,0,7); ctx.fill(); ctx.fillStyle='#ff4b4b'; ctx.fillRect(px+cell*.12,py-cell*.26,cell*.1,cell*.1); });
-      enemies.forEach(e=>{ const px=ox+e.x*cell, py=oy+e.y*cell; ctx.fillStyle='#ff4e4e'; ctx.fillRect(px+cell*.22,py+cell*.22,cell*.56,cell*.56); ctx.fillStyle='#fff'; ctx.font=Math.max(12,cell*.42)+'px Arial'; ctx.fillText('!',px+cell*.42,py+cell*.65); });
+      enemies.forEach(e=>{ const px=ox+e.x*cell, py=oy+e.y*cell; ctx.fillStyle=e.color||'#ff4e4e'; ctx.fillRect(px+cell*.20,py+cell*.20,cell*.60,cell*.60); ctx.fillStyle='#fff'; ctx.font=Math.max(12,cell*.42)+'px Arial'; ctx.fillText('!',px+cell*.42,py+cell*.65); });
       ctx.globalAlpha=player.hit>0 && Math.floor(performance.now()/120)%2 ? .45 : 1;
       drawServiceTech(ox+player.x*cell+cell*.13, oy+player.y*cell+cell*.05, cell*.74, cell*.86, 'oil');
       ctx.globalAlpha=1;
-      setHud('BONUS: SERVIS BOMBER<br>Pohyb šipkami, B / mezerník = bomba<br>Skóre: '+score+' &nbsp; Životy: '+lives+' &nbsp; TOP: '+getBestScore('bomber')+'<br><small>Čas: '+Math.ceil(time)+' s</small>');
+      setHud('BONUS: SERVIS BOMBER<br>'+levelDefs[level].name+' / '+levelDefs.length+' &nbsp; Skóre: '+score+' &nbsp; Životy: '+lives+' &nbsp; TOP: '+getBestScore('bomber')+'<br><small>Čas: '+Math.ceil(time)+' s &nbsp; Dosah: '+currentRange()+' &nbsp; Bomby: '+bombs.length+'/'+bombLimit+' &nbsp; Speed: '+(speedBonus+1)+' &nbsp; Shield: '+shield+'</small>');
     }
     function loop(now){
       if(runId!==gameRunId||!running||mode!=='bomber'||!isOpen())return;
       raf=requestAnimationFrame(loop);
-      const dt=Math.min(.05,(now-last)/1000||.016); last=now; time-=dt; moveCd-=dt; if(player.hit>0)player.hit-=dt;
+      const dt=Math.min(.05,(now-last)/1000||.016); last=now;
+      if(transitioning){ draw(); return; }
+      time-=dt; moveCd-=dt; if(player.hit>0)player.hit-=dt;
       if(time<=0){ saveRetroBest('bomber',score); show('Servis Bomber konec<br><small>Skóre: '+score+' &nbsp; Čas vypršel</small>'); running=false; return; }
-
-      if(moveCd<=0){
-        let dx=0,dy=0; if(left())dx=-1; else if(right())dx=1; else if(up())dy=-1; else if(down())dy=1;
-        if(dx||dy){ tryMove(player,dx,dy); moveCd=.12; }
-      }
+      if(moveCd<=0){ let dx=0,dy=0; if(left())dx=-1; else if(right())dx=1; else if(up())dy=-1; else if(down())dy=1; if(dx||dy){ tryMove(player,dx,dy); moveCd=currentMoveDelay(); } }
       if(touch.fire && !fireLatch){ placeBomb(); fireLatch=true; }
       if(!touch.fire && !keys[' '] && !keys.Enter) fireLatch=false;
-
-      bombs.forEach(b=>b.t-=dt);
-      const exp=bombs.filter(b=>b.t<=0); bombs=bombs.filter(b=>b.t>0); exp.forEach(explode);
+      bombs.forEach(b=>b.t-=dt); const exp=bombs.filter(b=>b.t<=0); bombs=bombs.filter(b=>b.t>0); exp.forEach(explode);
       blasts.forEach(b=>b.t-=dt); blasts=blasts.filter(b=>b.t>0);
-
       enemies.forEach(e=>{
         e.step-=dt;
         if(e.step<=0){
-          e.step=.32+Math.random()*.28;
-          if(!tryMove(e,e.dx,e.dy) || Math.random()<.24){
+          e.step=.28+Math.random()*.24;
+          if(!tryMove(e,e.dx,e.dy) || Math.random()<.28){
             const dirs=[[1,0],[-1,0],[0,1],[0,-1]].sort(()=>Math.random()-.5);
             for(const d of dirs){ if(free(e.x+d[0],e.y+d[1])){ e.dx=d[0]; e.dy=d[1]; break; } }
           }
@@ -5175,20 +5317,18 @@ function bomberRun(){
       for(let i=enemies.length-1;i>=0;i--){ if(blastAt(enemies[i].x,enemies[i].y)){ enemies.splice(i,1); score+=200; } }
       if(blastAt(player.x,player.y)) hurt();
       if(enemies.some(e=>e.x===player.x&&e.y===player.y)) hurt();
-
-      if(enemies.length===0 && !grid.some(row=>row.includes(2))){
-        const finalScore=score+Math.ceil(time)*10;
-        saveRetroBest('bomber',finalScore);
-        show('Servis Bomber hotovo 💣<br><small>Skóre: '+finalScore+'<br>Za 2 sekundy startuje bonus: Servis Shooter</small>');
-        queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('bomber')},2000); running=false; return;
-      }
+      collectPowerups();
+      if(enemies.length===0 && !grid.some(row=>row.includes(2))) advanceLevel();
       draw();
     }
+    initLevel(level);
+    show('Servis Bomber<br><small>Tři levely a nové power-upy: range, extra bomba, speed a shield.</small>');
+    queueLevelTimeout(()=>{ if(runId===gameRunId&&mode==='bomber') hide(); }, 1600);
     draw(); loop(last);
   }
 
 
-function isSecretMachine(){ const input=document.getElementById('machine'); return input&&String(input.value).trim()===SECRET_MACHINE; }
+  function isSecretMachine(){ const input=document.getElementById('machine'); return input&&String(input.value).trim()===SECRET_MACHINE; }
   window.addEventListener('DOMContentLoaded',function(){ const recalc=document.getElementById('recalc'); if(recalc) recalc.addEventListener('click',function(){ if(isSecretMachine()) setTimeout(openRetroEgg,80); }); });
 })();
 </script>
