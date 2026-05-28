@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_24-fixed-codes-scroll';
+const CACHE_VER = 'hdh-code-v3_1_25-retro-game-fix';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

@@ -4450,7 +4450,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   let canvas, ctx, hud, msg, overlay;
   let levelTimeouts=[];
   const keys=Object.create(null);
-  const touch={left:false,right:false,up:false,down:false,fire:false,last:null};
+  const touch={left:false,right:false,up:false,down:false,fire:false,last:null,queue:[]};
   function clearLevelTimeouts(){ levelTimeouts.forEach(id=>clearTimeout(id)); levelTimeouts=[]; }
   function queueLevelTimeout(fn, ms){ const id=setTimeout(()=>{ levelTimeouts=levelTimeouts.filter(v=>v!==id); fn(); }, ms); levelTimeouts.push(id); return id; }
 
@@ -4467,10 +4467,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
       #retroHudBtns button{border:0;border-radius:14px;background:rgba(0,0,0,.66);color:#fff;font-weight:900;padding:11px 13px;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
       #retroCloseBtn{background:#d92525!important;min-width:132px}
       #retroRestartBtn{min-width:108px}
-      #retroCanvas{position:absolute;left:0;right:0;top:0;bottom:104px;width:100%;height:auto;display:block;background:#67c8ff}
+      #retroCanvas{position:absolute;left:0;right:0;top:76px;bottom:104px;width:100%;height:auto;display:block;background:#67c8ff}
       @media(max-width:390px){#retroHudBtns button{font-size:14px;padding:10px 10px}#retroCloseBtn{min-width:120px}#retroRestartBtn{min-width:92px}}
       #retroMsg{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:4;background:rgba(0,0,0,.78);padding:16px 20px;border-radius:16px;text-align:center;font-weight:900;line-height:1.35;display:none;min-width:240px}
-      #retroControls{position:absolute;left:0;right:0;bottom:0;min-height:104px;z-index:5;display:flex;align-items:flex-end;justify-content:space-between;padding:8px 22px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(180deg,rgba(16,24,39,0),rgba(16,24,39,.72) 36%,rgba(16,24,39,.92))}.retroPad{display:flex;justify-content:space-between;gap:18px;width:158px;pointer-events:auto}.retroBtn{width:68px;height:68px;border-radius:999px;border:0;background:rgba(0,0,0,.64);color:#fff;font-size:32px;font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.28);touch-action:manipulation}.retroBtn:active{transform:scale(.94);background:rgba(0,0,0,.78)}@media(max-width:390px){#retroCanvas{bottom:98px}#retroControls{min-height:98px;padding-left:14px;padding-right:14px;padding-top:6px}.retroPad{gap:16px;width:146px}.retroBtn{width:64px;height:64px;font-size:30px}}
+      #retroControls{position:absolute;left:0;right:0;bottom:0;min-height:104px;z-index:5;display:flex;align-items:flex-end;justify-content:space-between;padding:8px 22px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(180deg,rgba(16,24,39,0),rgba(16,24,39,.72) 36%,rgba(16,24,39,.92))}.retroPad{display:flex;justify-content:space-between;gap:18px;width:158px;pointer-events:auto}.retroBtn{width:68px;height:68px;border-radius:999px;border:0;background:rgba(0,0,0,.64);color:#fff;font-size:32px;font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.28);touch-action:manipulation}.retroBtn:active{transform:scale(.94);background:rgba(0,0,0,.78)}@media(max-width:390px){#retroCanvas{top:74px;bottom:98px}#retroControls{min-height:98px;padding-left:14px;padding-right:14px;padding-top:6px}.retroPad{gap:16px;width:146px}.retroBtn{width:64px;height:64px;font-size:30px}}
     `;
     document.head.appendChild(style);
     overlay=document.createElement('div'); overlay.id='retroEggOverlay';
@@ -4478,14 +4478,15 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.body.appendChild(overlay);
     canvas=document.getElementById('retroCanvas'); ctx=canvas.getContext('2d'); hud=document.getElementById('retroHudText') || document.createElement('div'); msg=document.getElementById('retroMsg');
     document.getElementById('retroCloseBtn').addEventListener('click',closeRetroEgg);
-    document.getElementById('retroRestartBtn').addEventListener('click',()=>startLevel(['platformer','tools','snake','invaders'].includes(mode)?mode:'platformer'));
+    document.getElementById('retroRestartBtn').addEventListener('click',()=>startLevel(['platformer','tools','snake','invaders','oil'].includes(mode)?mode:'platformer'));
     bindBtn('retroLeft','left'); bindBtn('retroRight','right'); bindBtn('retroJump','up'); bindBtn('retroDown','down'); bindSnakeSwipe();
     window.addEventListener('resize',resizeCanvas);
-    document.addEventListener('keydown',e=>{ if(isOpen()){ if(e.key==='Escape'){ e.preventDefault(); closeRetroEgg(); return; } keys[e.key]=true; if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault(); }});
+    document.addEventListener('keydown',e=>{ if(isOpen()){ if(e.key==='Escape'){ e.preventDefault(); closeRetroEgg(); return; } keys[e.key]=true; if(mode==='snake'){ const km={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'}; if(km[e.key]) queueSnakeDir(km[e.key]); } if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault(); }});
     document.addEventListener('keyup',e=>{ keys[e.key]=false; });
     resizeCanvas();
   }
-  function bindBtn(id,name){ const b=document.getElementById(id); const on=e=>{e.preventDefault();touch[name]=true;touch.last=name}; const off=e=>{e.preventDefault();touch[name]=false}; b.addEventListener('touchstart',on,{passive:false}); b.addEventListener('touchend',off,{passive:false}); b.addEventListener('touchcancel',off,{passive:false}); b.addEventListener('mousedown',on); b.addEventListener('mouseup',off); b.addEventListener('mouseleave',off); }
+  function queueSnakeDir(name){ if(mode==='snake' && ['left','right','up','down'].includes(name)){ touch.queue.push(name); if(touch.queue.length>3) touch.queue.shift(); touch.last=name; } }
+  function bindBtn(id,name){ const b=document.getElementById(id); const on=e=>{e.preventDefault();touch[name]=true;touch.last=name;queueSnakeDir(name)}; const off=e=>{e.preventDefault();touch[name]=false}; b.addEventListener('touchstart',on,{passive:false}); b.addEventListener('touchend',off,{passive:false}); b.addEventListener('touchcancel',off,{passive:false}); b.addEventListener('mousedown',on); b.addEventListener('mouseup',off); b.addEventListener('mouseleave',off); }
   function bindSnakeSwipe(){
     if(!canvas || canvas.dataset.snakeSwipeBound) return;
     canvas.dataset.snakeSwipeBound = '1';
@@ -4497,20 +4498,20 @@ document.addEventListener("DOMContentLoaded", ()=>{
     canvas.addEventListener('touchend', e=>{
       if(mode!=='snake' || !e.changedTouches || !e.changedTouches[0]) return;
       const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
-      if(Math.max(Math.abs(dx),Math.abs(dy))<24) return;
-      touch.last = Math.abs(dx)>Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up');
+      if(Math.max(Math.abs(dx),Math.abs(dy))<24){ const r=canvas.getBoundingClientRect(); const x=e.changedTouches[0].clientX-r.left, y=e.changedTouches[0].clientY-r.top; queueSnakeDir(Math.abs(x-r.width/2)>Math.abs(y-r.height/2) ? (x>r.width/2?'right':'left') : (y>r.height/2?'down':'up')); return; }
+      queueSnakeDir(Math.abs(dx)>Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up'));
     }, {passive:true});
   }
   function resizeCanvas(){ if(!canvas)return; const d=Math.max(1,Math.min(2,window.devicePixelRatio||1)); const r=canvas.getBoundingClientRect(); const w=Math.max(1,r.width||innerWidth); const h=Math.max(1,r.height||(innerHeight-104)); canvas.width=Math.floor(w*d); canvas.height=Math.floor(h*d); ctx.setTransform(d,0,0,d,0,0); }
   function gameSize(){ const r=canvas.getBoundingClientRect(); return {W:Math.max(1,r.width||innerWidth), H:Math.max(1,r.height||(innerHeight-104))}; }
   function isOpen(){ return overlay && overlay.classList.contains('retro-open'); }
   function openRetroEgg(){ ensureRetroEgg(); overlay.classList.add('retro-open'); startLevel('platformer'); }
-  function closeRetroEgg(){ if(overlay) overlay.classList.remove('retro-open'); running=false; gameRunId++; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); if(ctx&&canvas){ ctx.clearRect(0,0,canvas.width,canvas.height); } Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; }
+  function closeRetroEgg(){ if(overlay) overlay.classList.remove('retro-open'); running=false; gameRunId++; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); if(ctx&&canvas){ ctx.clearRect(0,0,canvas.width,canvas.height); } Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; }
   function show(html){ msg.innerHTML=html; msg.style.display='block'; }
   function hide(){ msg.style.display='none'; }
   function left(){ return keys.ArrowLeft||keys.a||touch.left; } function right(){ return keys.ArrowRight||keys.d||touch.right; } function up(){ return keys.ArrowUp||keys.w||keys[' ']||touch.up; } function down(){ return keys.ArrowDown||keys.s||touch.down; }
   function rect(a,b){ return !(a.x+a.w<b.x||a.x>b.x+b.w||a.y+a.h<b.y||a.y>b.y+b.h); }
-  function startLevel(which){ running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); }
+  function startLevel(which){ running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); if(which==='oil') oilRun(); }
 
   function platformer(){
     const runId=gameRunId;
@@ -4623,15 +4624,17 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   function snake(){
     const runId=gameRunId;
-    level=3; const s=gameSize(), W=s.W, H=s.H, cell=22, cols=Math.floor(W/cell), rows=Math.floor((H-24)/cell); let dir={x:1,y:0},next={x:1,y:0},lives=5,score=0,last=0,acc=0; let snake,food;
-    function reset(){ snake=[{x:Math.floor(cols/2),y:Math.floor(rows/2)},{x:Math.floor(cols/2)-1,y:Math.floor(rows/2)}]; dir={x:1,y:0};next={x:1,y:0}; food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)}; }
+    level=3; const s=gameSize(), W=s.W, H=s.H, cell=22, cols=Math.floor(W/cell), rows=Math.floor(H/cell); let dir={x:1,y:0},next={x:1,y:0},lives=5,score=0,last=0,acc=0,winScore=12; let snake,food;
+    function placeFood(){ do{ food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)}; }while(snake.some(s=>s.x===food.x&&s.y===food.y)); }
+    function reset(){ snake=[{x:Math.floor(cols/2),y:Math.floor(rows/2)},{x:Math.floor(cols/2)-1,y:Math.floor(rows/2)}]; dir={x:1,y:0};next={x:1,y:0}; touch.queue=[]; placeFood(); }
     reset();
     function step(){ 
-      const k = touch.last || (keys.ArrowUp||keys.w?'up':keys.ArrowDown||keys.s?'down':keys.ArrowLeft||keys.a?'left':keys.ArrowRight||keys.d?'right':null);
+      let k = touch.queue.length ? touch.queue.shift() : touch.last;
+      if(!k) k = (keys.ArrowUp||keys.w?'up':keys.ArrowDown||keys.s?'down':keys.ArrowLeft||keys.a?'left':keys.ArrowRight||keys.d?'right':null);
       touch.last=null; touch.left=false; touch.right=false; touch.up=false; touch.down=false;
       if(k==='up'&&dir.y!==1)next={x:0,y:-1}; else if(k==='down'&&dir.y!==-1)next={x:0,y:1}; else if(k==='left'&&dir.x!==1)next={x:-1,y:0}; else if(k==='right'&&dir.x!==-1)next={x:1,y:0};
-      dir=next; const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y}; const crash=head.x<0||head.y<0||head.x>=cols||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y); if(crash){lives--; if(lives<=0){show('Had přišel o 5 životů<br><small>Spouštím bonus: Dlaždice...</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},1800); running=false; return;} reset(); return;} snake.unshift(head); if(head.x===food.x&&head.y===food.y){score++; food={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)};} else snake.pop(); }
-    function loop(t){ if(runId!==gameRunId||!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); hud.innerHTML='LEVEL 3 / 3<br>Had: ťukni na šipku nebo táhni po ploše<br>Skóre: '+score+' &nbsp; Životy: '+lives+' / 5<br><small>Směr se bere jako jeden povel, ne držení tlačítka</small>'; }
+      dir=next; const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y}; const crash=head.x<0||head.y<0||head.x>=cols||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y); if(crash){lives--; if(lives<=0){show('Had přišel o 5 životů<br><small>Spouštím bonus: Dlaždice...</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},1800); running=false; return;} reset(); return;} snake.unshift(head); if(head.x===food.x&&head.y===food.y){score++; if(score>=winScore){show('Had hotový 🐍<br><small>Za 2 sekundy startuje bonus: Dlaždice</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},2000); running=false; return;} placeFood();} else snake.pop(); }
+    function loop(t){ if(runId!==gameRunId||!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); hud.innerHTML='LEVEL 3 / 3<br>Had: šipky, swipe nebo krátké ťuknutí<br>Skóre: '+score+' / '+winScore+' &nbsp; Životy: '+lives+' / 5<br><small>Hrací pole začíná pod horním menu</small>'; }
     loop(0);
   }
 
@@ -4684,7 +4687,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
         if(ball.y-ball.r>H){ lives--; if(lives<=0){ show('Dlaždice konec<br><small>Restart = nový pokus</small>'); running=false; } else resetBall(); }
       }
       hits.forEach(h=>h.t-=dt); hits=hits.filter(h=>h.t>0);
-      if(bricks.every(b=>!b.alive)){ show('Všechno hotovo 🧱<br><small>Rozbil jsi všechny dlaždice</small>'); running=false; }
+      if(bricks.every(b=>!b.alive)){ show('Dlaždice hotovo 🧱<br><small>Za 2 sekundy startuje bonus: Mazání vřetena</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('oil')},2000); running=false; }
       ctx.clearRect(0,0,W,H);
       ctx.fillStyle='#09111d'; ctx.fillRect(0,0,W,H);
       ctx.fillStyle='#132238'; ctx.fillRect(0,0,W,H);
@@ -4695,6 +4698,38 @@ document.addEventListener("DOMContentLoaded", ()=>{
       ctx.fillStyle='#ffd33d'; ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,7); ctx.fill();
       hits.forEach(h=>{ ctx.globalAlpha=Math.max(0,h.t/.28); ctx.fillStyle=h.color; ctx.beginPath(); ctx.arc(h.x,h.y,8+(1-h.t/.28)*12,0,7); ctx.fill(); ctx.globalAlpha=1; });
       hud.innerHTML='BONUS: DLAŽDICE<br>Pohybuj plošinkou doleva a doprava<br>Skóre: '+score+' &nbsp; Životy: '+lives+'<br><small>Rozbij všechny bloky nahoře</small>';
+    }
+    loop(last);
+  }
+
+
+  function oilRun(){
+    const runId=gameRunId;
+    const s=gameSize(), W=s.W, H=s.H;
+    let tech={x:W/2-24,y:H-72,w:48,h:54};
+    let drops=[], alarms=[], score=0, hits=0, time=30, last=performance.now(), spawn=.15, alarmSpawn=1.2;
+    const target=18;
+    function loop(now){
+      if(runId!==gameRunId||!running||mode!=='oil'||!isOpen())return;
+      raf=requestAnimationFrame(loop);
+      const dt=Math.min(.05,(now-last)/1000||.016); last=now; time-=dt;
+      if(left()) tech.x-=360*dt; if(right()) tech.x+=360*dt; if(up()) tech.y-=300*dt; if(down()) tech.y+=300*dt;
+      tech.x=Math.max(4,Math.min(W-tech.w-4,tech.x)); tech.y=Math.max(8,Math.min(H-tech.h-8,tech.y));
+      spawn-=dt; alarmSpawn-=dt;
+      if(spawn<=0){ spawn=.55+Math.random()*.35; drops.push({x:18+Math.random()*(W-36),y:-18,r:11,vy:120+Math.random()*70}); }
+      if(alarmSpawn<=0){ alarmSpawn=1.2+Math.random()*.9; alarms.push({x:22+Math.random()*(W-44),y:-24,w:28,h:28,vy:150+Math.random()*90}); }
+      for(let i=drops.length-1;i>=0;i--){ const d=drops[i]; d.y+=d.vy*dt; if(rect(tech,{x:d.x-d.r,y:d.y-d.r,w:d.r*2,h:d.r*2})){score++; drops.splice(i,1);} else if(d.y>H+30)drops.splice(i,1); }
+      for(let i=alarms.length-1;i>=0;i--){ const a=alarms[i]; a.y+=a.vy*dt; if(rect(tech,a)){hits++; alarms.splice(i,1);} else if(a.y>H+40)alarms.splice(i,1); }
+      if(score>=target){ show('Mazání vřetena hotovo ✅<br><small>Nasbíráno: '+score+' kapek<br>Zásahy alarmem: '+hits+'</small>'); running=false; return; }
+      if(time<=0 || hits>=5){ show('Mazání vřetena konec<br><small>Skóre: '+score+' / '+target+' &nbsp; Alarmy: '+hits+' / 5</small>'); running=false; return; }
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#0b1422'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#14233a'; ctx.fillRect(0,H-52,W,52);
+      ctx.fillStyle='rgba(255,255,255,.05)'; for(let i=0;i<28;i++) ctx.fillRect((i*71)%W,(i*53)%H,34,3);
+      drops.forEach(d=>{ ctx.fillStyle='#65d6ff'; ctx.beginPath(); ctx.ellipse(d.x,d.y,d.r*.72,d.r,0,0,7); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.45)'; ctx.beginPath(); ctx.arc(d.x-3,d.y-4,3,0,7); ctx.fill(); });
+      alarms.forEach(a=>{ ctx.fillStyle='#ff4b4b'; ctx.fillRect(a.x,a.y,a.w,a.h); ctx.fillStyle='#fff'; ctx.font='20px Arial'; ctx.fillText('!',a.x+10,a.y+22); });
+      drawServiceTech(tech.x,tech.y,tech.w,tech.h,'oil');
+      hud.innerHTML='BONUS: MAZÁNÍ VŘETENA<br>Sbírej modré kapky, vyhýbej se červeným alarmům<br>Kapky: '+score+' / '+target+' &nbsp; Alarmy: '+hits+' / 5<br><small>Čas: '+Math.ceil(time)+' s</small>';
     }
     loop(last);
   }
