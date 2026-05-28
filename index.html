@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>Hermle (v5.8.54 Thomas Pospisil)</title>
+<title>Hermle (v5.8.55 Thomas Pospisil)</title>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#f7f7f9" name="theme-color"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
@@ -999,6 +999,66 @@ input[type="search"] {
 
 .icon-machine{width:22px;height:22px}
 </style>
+
+
+<style id="fixed-codes-scroll-fix">
+/* Fixed codes: stejné chování jako Zákazníci — hlavička a Import/Export zůstávají na místě, rolovat se dá jen seznam. */
+#panel-fixed:not(.hidden){
+  display:flex !important;
+  flex-direction:column !important;
+  overflow:hidden !important;
+  max-height:calc(100dvh - 92px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+  min-height:calc(100dvh - 92px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+}
+#panel-fixed:not(.hidden) > .logo,
+#panel-fixed:not(.hidden) > label,
+#panel-fixed:not(.hidden) > #f-search,
+#panel-fixed:not(.hidden) > .btnrow:not(.f-footer){
+  flex:0 0 auto !important;
+}
+#panel-fixed:not(.hidden) .fixedSplit.f-list-scroll{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+  padding-bottom:16px !important;
+  margin-top:12px !important;
+}
+#panel-fixed:not(.hidden) .f-footer{
+  flex:0 0 auto !important;
+  margin-top:auto !important;
+  position:sticky !important;
+  bottom:0 !important;
+  background:var(--card) !important;
+  border-top:1px solid var(--border) !important;
+  padding:12px 0 calc(12px + env(safe-area-inset-bottom)) !important;
+  z-index:90 !important;
+}
+#panel-fixed:not(.hidden) .fixedCol{ min-height:0 !important; }
+#panel-fixed:not(.hidden) .fixedHead{
+  position:sticky !important;
+  top:0 !important;
+  z-index:5 !important;
+  background:var(--card) !important;
+  padding:6px 0 8px !important;
+  margin:0 0 8px !important;
+}
+@media (max-width:520px){
+  #panel-fixed:not(.hidden) .fixedSplit.f-list-scroll{
+    display:block !important;
+  }
+  #panel-fixed:not(.hidden) .fixedCol + .fixedCol{ margin-top:18px !important; }
+}
+@media (max-width:430px){
+  #panel-fixed:not(.hidden){
+    max-height:calc(100dvh - 86px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    min-height:calc(100dvh - 86px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+  }
+  #panel-fixed:not(.hidden) .logo{ display:none !important; }
+  #panel-fixed:not(.hidden) .fixedSplit.f-list-scroll{ padding-bottom:18px !important; }
+}
+</style>
   <link rel="stylesheet" href="hotels_overlay.css">
 </head>
 <body>
@@ -1308,7 +1368,7 @@ Kontrola: pokud ABS(X) &gt; 0.020, Excel upozorní na kontrolu geometrie Z osy v
 <div class="btnrow">
 <button class="btn inline" data-i18n="btn_add_code" id="f-add" type="button">+ Přidat kód</button>
 </div>
-<div class="fixedSplit">
+<div class="fixedSplit f-list-scroll">
   <div class="fixedCol">
     <div class="fixedHead" data-i18n="fixed_head_codes">Pevné kódy</div>
     <div id="f-list-fixed"></div>

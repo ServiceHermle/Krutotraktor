@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_23-restart-fix';
+const CACHE_VER = 'hdh-code-v3_1_24-fixed-codes-scroll';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
