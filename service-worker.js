@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_33-retro-no-oil-probe';
+const CACHE_VER = 'hdh-code-v3_1_34-retro-better-controls';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
