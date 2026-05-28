@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_52-retro-language-switch';
+const CACHE_VER = 'hdh-code-v3_1_53-retro-topbar-fit';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
