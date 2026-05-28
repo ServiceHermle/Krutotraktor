@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_50-whatsnew-all-languages';
+const CACHE_VER = 'hdh-code-v3_1_51-json-network-first';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
@@ -7,7 +7,8 @@ const CORE_ASSETS = [
   './service-worker.js',
   './hotels_overlay.js',
   './hotels_overlay.css',
-  './whats-new.json'
+  './whats-new.json',
+  './help.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -28,6 +29,18 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
+  if (url.pathname.endsWith('/whats-new.json') || url.pathname.endsWith('/help.json')) {
+    event.respondWith((async () => {
+      try {
+        return await fetch(req, { cache: 'no-store' });
+      } catch (e) {
+        const cache = await caches.open(CACHE_VER);
+        return (await cache.match(url.pathname.endsWith('/help.json') ? './help.json' : './whats-new.json')) || Response.error();
+      }
+    })());
+    return;
+  }
+
   if (req.mode === 'navigate' || url.pathname.endsWith('/index.html') || url.pathname === '/' ) {
     event.respondWith((async () => {
       try {

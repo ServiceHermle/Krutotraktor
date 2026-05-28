@@ -2114,6 +2114,53 @@ const APP_NEWS_FALLBACK = {
   ]
 };
 let appNewsData = { ...APP_NEWS_FALLBACK };
+
+const APP_NEWS_ORIGINAL_TRANSLATIONS = {
+  cs: {
+    title: "Co je nového",
+    items: [
+      "Na stránku Výpočet jsem přidal tlačítko Kalkulačky.",
+      "Zatím jsou zde tyto kalkulačky:",
+      "Orientace vřetene – po výměně vřetene už není potřeba složitě přemýšlet nad výpočtem. Stačí zadat ideální pozici a aplikace rovnou vypočítá hodnotu, kterou je potřeba zapsat do parametru 3430.",
+      "Měření kinematiky – mělo by fungovat stejně jako původní Excel pro starší stroje.",
+      "Měření vibrací – slouží hlavně jako pomocný zápis pro měření vřeten a zadávání závaží.",
+      "Výpočet utahovacího momentu pro hákové klíče – je to jednoduchý výpočet, ale často se musí dohledávat. Dole je navíc možnost uložit si vlastní nářadí, takže ho není potřeba pokaždé měřit znovu. Stačí vybrat, s čím právě chcete pracovat.",
+      "Kdyby cokoliv nefungovalo, stačí mi napsat. Budu rád i za jakýkoliv nápad na další funkce.",
+      "Až se budeš nudit, zadej číslo stroje 123 a zmáčkni přepočítat."
+    ]
+  },
+  de: {
+    title: "Was ist neu",
+    items: [
+      "Auf der Seite Berechnung habe ich die Schaltfläche Rechner hinzugefügt.",
+      "Aktuell sind dort diese Rechner verfügbar:",
+      "Spindelorientierung – nach dem Spindeltausch muss man nicht mehr kompliziert über die Berechnung nachdenken. Einfach die ideale Position eingeben und die App berechnet direkt den Wert, der in Parameter 3430 eingetragen werden muss.",
+      "Kinematikmessung – sie sollte genauso funktionieren wie die ursprüngliche Excel-Datei für ältere Maschinen.",
+      "Vibrationsmessung – dient hauptsächlich als Hilfsnotiz für Spindelmessungen und das Eintragen von Gewichten.",
+      "Berechnung des Anzugsdrehmoments für Hakenschlüssel – es ist eine einfache Berechnung, die man aber oft nachschlagen muss. Unten gibt es zusätzlich die Möglichkeit, eigenes Werkzeug zu speichern, damit es nicht jedes Mal neu gemessen werden muss. Einfach auswählen, womit du gerade arbeiten möchtest.",
+      "Falls irgendetwas nicht funktioniert, schreib mir einfach. Ich freue mich auch über jede Idee für weitere Funktionen.",
+      "Wenn dir langweilig ist, gib die Maschinennummer 123 ein und drücke Neuberechnen."
+    ]
+  },
+  en: {
+    title: "What's new",
+    items: [
+      "I added the Calculators button to the Calculation page.",
+      "For now, these calculators are available:",
+      "Spindle orientation – after replacing the spindle, you no longer need to think through the calculation manually. Just enter the ideal position and the app directly calculates the value that needs to be written into parameter 3430.",
+      "Kinematics measurement – it should work the same way as the original Excel file for older machines.",
+      "Vibration measurement – mainly intended as a helper note for spindle measurements and entering balancing weights.",
+      "Hook wrench tightening torque calculation – it is a simple calculation, but it often has to be looked up. At the bottom there is also an option to save your own tools, so you do not have to measure them again every time. Just select what you are currently working with.",
+      "If anything does not work, just write to me. I will also be happy for any idea for more functions.",
+      "When you get bored, enter machine number 123 and press recalculate."
+    ]
+  }
+};
+function appNewsOriginalTranslation(){
+  const lang = (typeof CURRENT_LANG !== "undefined" && APP_NEWS_ORIGINAL_TRANSLATIONS[CURRENT_LANG]) ? CURRENT_LANG : "cs";
+  return APP_NEWS_ORIGINAL_TRANSLATIONS[lang] || APP_NEWS_ORIGINAL_TRANSLATIONS.cs;
+}
+
 const APP_HELP_FILE = "./help.json";
 const APP_HELP_FALLBACK = {
   title: "Funkce aplikace",
@@ -2171,14 +2218,28 @@ function buildNewsList(items){
 }
 
 function normalizeWhatsNewJson(data){
-  if(!data || typeof data !== "object") return { ...APP_NEWS_FALLBACK, items:[...APP_NEWS_FALLBACK.items] };
+  const lang = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG) ? CURRENT_LANG : "cs";
+  const original = appNewsOriginalTranslation();
+  if(!data || typeof data !== "object") return { version: APP_NEWS_FALLBACK.version, title: original.title, items:[...original.items] };
+
+  const hasLanguageBlocks = !!(data.cs || data.de || data.en || data.languages);
   const block = pickLocalizedJsonBlock(data) || {};
+
   const version = String(data.version || block.version || APP_NEWS_FALLBACK.version).trim() || APP_NEWS_FALLBACK.version;
-  const title = String(block.title || data.title || appInfoText("newsTitle") || APP_NEWS_FALLBACK.title).trim() || appInfoText("newsTitle");
-  const items = Array.isArray(block.items)
-    ? block.items.map(item => String(item || '').trim()).filter(Boolean)
-    : (Array.isArray(data.items) ? data.items.map(item => String(item || '').trim()).filter(Boolean) : []);
-  return { version, title, items: items.length ? items : [...APP_NEWS_FALLBACK.items] };
+  let title = String(block.title || data.title || original.title || appInfoText("newsTitle")).trim() || original.title;
+  let items = [];
+
+  if(Array.isArray(block.items)) items = block.items.map(item => String(item || '').trim()).filter(Boolean);
+  else if(Array.isArray(data.items)) items = data.items.map(item => String(item || '').trim()).filter(Boolean);
+
+  // If an older flat Czech whats-new.json is still served by iOS/service-worker cache,
+  // keep CZ as-is but force DE/EN to the embedded translations.
+  if(!hasLanguageBlocks && lang !== "cs" && Array.isArray(data.items)){
+    title = original.title;
+    items = [...original.items];
+  }
+
+  return { version, title, items: items.length ? items : [...original.items] };
 }
 
 function normalizeHelpJson(data){
