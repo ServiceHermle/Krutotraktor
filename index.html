@@ -4498,7 +4498,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     `;
     document.head.appendChild(style);
     overlay=document.createElement('div'); overlay.id='retroEggOverlay';
-    overlay.innerHTML=`<div id="retroStage"><canvas id="retroCanvas"></canvas></div><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button><button id="retroMenuBtn" type="button">Výběr her</button></div></div><div id="retroHudText">Vyber stroj 123 a spusť přepočet.</div></div><div id="retroMsg"></div><div id="retroPicker"><div id="retroPickerCard"><div id="retroPickerHead"><div id="retroPickerTitle">Výběr minihry</div><button id="retroPickerClose" type="button">Zavřít</button></div><div id="retroGameList"><button class="retroGamePick" data-game="platformer" type="button"><span>Level 1: Servisák<small>Skákej přes překážky a sbírej coiny</small></span><span class="retroGameScore" data-score="platformer">TOP: 0</span></button><button class="retroGamePick" data-game="tools" type="button"><span>Level 2: Chytej nářadí<small>Chytej padající nářadí</small></span><span class="retroGameScore" data-score="tools">TOP: 0</span></button><button class="retroGamePick" data-game="snake" type="button"><span>Level 3: Had<small>Klasický had s dotykovým ovládáním</small></span><span class="retroGameScore" data-score="snake">TOP: 0</span></button><button class="retroGamePick" data-game="invaders" type="button"><span>Bonus: Dlaždice<small>Rozbij všechny bloky</small></span><span class="retroGameScore" data-score="invaders">TOP: 0</span></button><button class="retroGamePick" data-game="bomber" type="button"><span>Bonus: Servis Bomber<small>Polož bombu, znič bedny a vyhni se alarmům</small></span><span class="retroGameScore" data-score="bomber">TOP: 0</span></button><button class="retroGamePick" data-game="wolf" type="button"><span>Bonus: Wolfenstein Lite<small>Jednoduché pseudo 3D, málo nepřátel a lehčí akce</small></span><span class="retroGameScore" data-score="wolf">TOP: 0</span></button></div></div></div><div id="retroControls"><div class="retroDpad"><button class="retroBtn" id="retroJump" type="button" draggable="false">↑</button><button class="retroBtn" id="retroLeft" type="button" draggable="false">‹</button><div class="retroDpadCenter"></div><button class="retroBtn" id="retroRight" type="button" draggable="false">›</button><button class="retroBtn" id="retroDown" type="button" draggable="false">↓</button></div><div class="retroFirePad"><button class="retroFireBtn" id="retroFire" type="button" draggable="false" aria-label="Akce"></button></div></div>`;
+    overlay.innerHTML=`<div id="retroStage"><canvas id="retroCanvas"></canvas></div><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button><button id="retroMenuBtn" type="button">Výběr her</button></div></div><div id="retroHudText">Vyber stroj 123 a spusť přepočet.</div></div><div id="retroMsg"></div><div id="retroPicker"><div id="retroPickerCard"><div id="retroPickerHead"><div id="retroPickerTitle">Výběr minihry</div><button id="retroPickerClose" type="button">Zavřít</button></div><div id="retroGameList"><button class="retroGamePick" data-game="platformer" type="button"><span>Level 1: Servisák<small>Skákej přes překážky a sbírej coiny</small></span><span class="retroGameScore" data-score="platformer">TOP: 0</span></button><button class="retroGamePick" data-game="tools" type="button"><span>Level 2: Chytej nářadí<small>Chytej padající nářadí</small></span><span class="retroGameScore" data-score="tools">TOP: 0</span></button><button class="retroGamePick" data-game="snake" type="button"><span>Level 3: Had<small>Klasický had s dotykovým ovládáním</small></span><span class="retroGameScore" data-score="snake">TOP: 0</span></button><button class="retroGamePick" data-game="invaders" type="button"><span>Bonus: Dlaždice<small>Rozbij všechny bloky</small></span><span class="retroGameScore" data-score="invaders">TOP: 0</span></button><button class="retroGamePick" data-game="bomber" type="button"><span>Bonus: Servis Bomber<small>Polož bombu, znič bedny a vyhni se alarmům</small></span><span class="retroGameScore" data-score="bomber">TOP: 0</span></button><button class="retroGamePick" data-game="wolf" type="button"><span>Bonus: Wolfenstein Lite<small>Vylepšená pseudo 3D akce, pickupy a lehčí přestřelky</small></span><span class="retroGameScore" data-score="wolf">TOP: 0</span></button></div></div></div><div id="retroControls"><div class="retroDpad"><button class="retroBtn" id="retroJump" type="button" draggable="false">↑</button><button class="retroBtn" id="retroLeft" type="button" draggable="false">‹</button><div class="retroDpadCenter"></div><button class="retroBtn" id="retroRight" type="button" draggable="false">›</button><button class="retroBtn" id="retroDown" type="button" draggable="false">↓</button></div><div class="retroFirePad"><button class="retroFireBtn" id="retroFire" type="button" draggable="false" aria-label="Akce"></button></div></div>`;
     document.body.appendChild(overlay);
     stage=document.getElementById('retroStage');
     picker=document.getElementById('retroPicker');
@@ -4776,205 +4776,268 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const runId=gameRunId;
     const s=gameSize(), W=s.W, H=s.H;
     const mapRows=[
-      '############',
-      '#@....#....#',
-      '#.##..#.##.#',
-      '#..e..#....#',
-      '##.##...##.#',
-      '#.....K....#',
-      '#.##.###.#X#',
-      '#....e.....#',
-      '#.######.#.#',
-      '#......e...#',
-      '############'
+      '##############',
+      '#@....#..A...#',
+      '#.##..#..##..#',
+      '#..e..#...g..#',
+      '##.##...##...#',
+      '#..M..K....#.#',
+      '#.##.###.#.#X#',
+      '#....e..A....#',
+      '#.######.#.#.#',
+      '#..g...M...e.#',
+      '#.....#......#',
+      '##############'
     ];
     const MW=mapRows[0].length, MH=mapRows.length;
-    let px=1.5, py=1.5, pa=0, score=0, lives=3, ammo=18, inv=0, fireLatch=false, last=performance.now();
-    let hasKey=false, won=false;
+    let px=1.5, py=1.5, pa=0, score=0, armor=100, ammo=24, fireLatch=false, last=performance.now();
+    let hasKey=false, won=false, muzzle=0, hurtFlash=0, bark='Najdi klíč a otevři východ.';
     const FOV=Math.PI/3;
     const enemies=[];
-    let exitPos={x:10.5,y:6.5};
+    const pickups=[];
+    let exitPos={x:12.5,y:6.5};
 
     for(let y=0;y<MH;y++){
       for(let x=0;x<MW;x++){
         const c=mapRows[y][x];
         if(c==='@'){ px=x+0.5; py=y+0.5; }
-        if(c==='e') enemies.push({x:x+0.5,y:y+0.5,hp:1,hit:0,cd:0});
+        if(c==='e') enemies.push({x:x+0.5,y:y+0.5,hp:1,type:'guard',hit:0,cd:1.6,speed:0.55});
+        if(c==='g') enemies.push({x:x+0.5,y:y+0.5,hp:2,type:'elite',hit:0,cd:1.1,speed:0.72});
+        if(c==='A') pickups.push({x:x+0.5,y:y+0.5,type:'ammo',taken:false});
+        if(c==='M') pickups.push({x:x+0.5,y:y+0.5,type:'med',taken:false});
+        if(c==='K') pickups.push({x:x+0.5,y:y+0.5,type:'key',taken:false});
         if(c==='X') exitPos={x:x+0.5,y:y+0.5};
       }
     }
 
-    function mapCell(x,y){
-      if(x<0||y<0||x>=MW||y>=MH) return '#';
-      return mapRows[y][x];
-    }
+    function mapCell(x,y){ if(x<0||y<0||x>=MW||y>=MH) return '#'; return mapRows[y][x]; }
     function isWall(x,y){ return mapCell(x,y)==='#'; }
-    function tryMove(nx,ny){
-      const pad=0.18;
-      if(!isWall(Math.floor(nx-pad),Math.floor(py)) && !isWall(Math.floor(nx+pad),Math.floor(py))) px=nx;
-      if(!isWall(Math.floor(px),Math.floor(ny-pad)) && !isWall(Math.floor(px),Math.floor(ny+pad))) py=ny;
-    }
     function dist(ax,ay,bx,by){ return Math.hypot(ax-bx, ay-by); }
     function normAng(a){ while(a<-Math.PI)a+=Math.PI*2; while(a>Math.PI)a-=Math.PI*2; return a; }
+    function speak(text){ bark=text; }
     function lineClear(ax,ay,bx,by){
-      const dx=bx-ax, dy=by-ay, steps=Math.ceil(Math.hypot(dx,dy)*12);
+      const dx=bx-ax, dy=by-ay, steps=Math.ceil(Math.hypot(dx,dy)*16);
       for(let i=1;i<steps;i++){
         const x=ax+dx*(i/steps), y=ay+dy*(i/steps);
         if(isWall(Math.floor(x),Math.floor(y))) return false;
       }
       return true;
     }
-    function hurt(){
-      if(inv>0||won) return;
-      lives--; inv=1.0;
-      if(lives<=0){ saveRetroBest('wolf', score); show('Wolfenstein Lite konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
+    function tryMove(nx,ny){
+      const pad=0.18;
+      if(!isWall(Math.floor(nx-pad),Math.floor(py-pad)) && !isWall(Math.floor(nx+pad),Math.floor(py-pad)) && !isWall(Math.floor(nx-pad),Math.floor(py+pad)) && !isWall(Math.floor(nx+pad),Math.floor(py+pad))) px=nx;
+      if(!isWall(Math.floor(px-pad),Math.floor(ny-pad)) && !isWall(Math.floor(px+pad),Math.floor(ny-pad)) && !isWall(Math.floor(px-pad),Math.floor(ny+pad)) && !isWall(Math.floor(px+pad),Math.floor(ny+pad))) py=ny;
+    }
+    function applyDamage(v){
+      if(won) return;
+      armor=Math.max(0, armor-v);
+      hurtFlash=.45;
+      speak(v>=18?'Těžký zásah!':'Zásah! Kryj se.');
+      if(armor<=0){
+        saveRetroBest('wolf', score);
+        show('Wolfenstein Lite konec<br><small>Skóre: '+score+' &nbsp; TOP: '+getBestScore('wolf')+' &nbsp; Restart = nový pokus</small>');
+        running=false;
+      }
     }
     function fire(){
-      if(ammo<=0) return;
-      ammo--; 
+      if(ammo<=0){ speak('Bez munice.'); return; }
+      ammo--; muzzle=.12;
       let best=null, bestDist=99;
       for(const e of enemies){
         if(e.hp<=0) continue;
         const dx=e.x-px, dy=e.y-py, d=Math.hypot(dx,dy);
         const ang=normAng(Math.atan2(dy,dx)-pa);
-        if(Math.abs(ang)<0.12 && d<7.5 && lineClear(px,py,e.x,e.y) && d<bestDist){ best=e; bestDist=d; }
+        if(Math.abs(ang)<0.11 && d<8.5 && lineClear(px,py,e.x,e.y) && d<bestDist){ best=e; bestDist=d; }
       }
-      if(best){ best.hp=0; score+=160; }
+      if(best){
+        best.hp--; best.hit=.18; score+=best.hp<=0 ? (best.type==='elite'?240:160) : 50;
+        speak(best.hp<=0 ? 'Cíl eliminován.' : 'Zásah potvrzen.');
+      }
+    }
+    function pickupCheck(){
+      for(const p of pickups){
+        if(p.taken) continue;
+        if(dist(px,py,p.x,p.y)<0.52){
+          p.taken=true;
+          if(p.type==='ammo'){ ammo+=10; score+=30; speak('Munice doplněna.'); }
+          else if(p.type==='med'){ armor=Math.min(100, armor+30); score+=25; speak('Lékárnička použita.'); }
+          else if(p.type==='key'){ hasKey=true; score+=120; speak('Klíč získán. Východ je odemčen.'); }
+        }
+      }
     }
     function checkWin(){
-      if(hasKey && dist(px,py,exitPos.x,exitPos.y)<0.7){
-        won=true; const finalScore=score + lives*220 + ammo*8;
+      if(hasKey && dist(px,py,exitPos.x,exitPos.y)<0.68){
+        won=true;
+        const alive=enemies.filter(e=>e.hp>0).length;
+        const finalScore=score + armor*4 + ammo*6 + (alive===0?180:0);
         saveRetroBest('wolf', finalScore);
-        show('Wolfenstein Lite hotovo<br><small>Skóre: '+finalScore+' &nbsp; Restart = nový pokus</small>');
+        show('Wolfenstein Lite hotovo<br><small>Skóre: '+finalScore+' &nbsp; TOP: '+getBestScore('wolf')+' &nbsp; Restart = nový pokus</small>');
         running=false;
+      }
+    }
+    function drawEnemySprite(sp, sx, sy, size){
+      if(sp.type==='elite'){
+        ctx.fillStyle=sp.hit>0?'#ff9d7d':'#6f2020';
+        ctx.fillRect(sx-size*0.25, sy-size*0.56, size*0.50, size*0.58);
+        ctx.fillStyle='#c79c24'; ctx.fillRect(sx-size*0.18, sy-size*0.49, size*0.36, size*0.10);
+        ctx.fillStyle='#d8d8d8'; ctx.fillRect(sx-size*0.09, sy-size*0.38, size*0.06, size*0.05); ctx.fillRect(sx+size*0.03, sy-size*0.38, size*0.06, size*0.05);
+        ctx.fillStyle='#20232a'; ctx.fillRect(sx-size*0.18, sy-size*0.02, size*0.36, size*0.18);
+        ctx.fillStyle='#a21e2b'; ctx.fillRect(sx-size*0.23, sy-size*0.66, size*0.46, size*0.14);
+      } else {
+        ctx.fillStyle=sp.hit>0?'#ff7777':'#7a101f';
+        ctx.fillRect(sx-size*0.22, sy-size*0.52, size*0.44, size*0.54);
+        ctx.fillStyle='#a91f2f'; ctx.fillRect(sx-size*0.18, sy-size*0.62, size*0.36, size*0.16);
+        ctx.fillStyle='#f0f0f0'; ctx.fillRect(sx-size*0.10, sy-size*0.42, size*0.06, size*0.06); ctx.fillRect(sx+size*0.04, sy-size*0.42, size*0.06, size*0.06);
+        ctx.fillStyle='#111'; ctx.fillRect(sx-size*0.16, sy-size*0.02, size*0.32, size*0.18);
       }
     }
     function draw(){
       ctx.clearRect(0,0,W,H);
-      ctx.fillStyle='#638db5'; ctx.fillRect(0,0,W,H*0.46);
-      ctx.fillStyle='#20202b'; ctx.fillRect(0,H*0.46,W,H*0.12);
-      ctx.fillStyle='#5e4330'; ctx.fillRect(0,H*0.58,W,H*0.42);
+      const horizon=H*0.53;
+      const sky=ctx.createLinearGradient(0,0,0,horizon);
+      sky.addColorStop(0,'#87b8e8'); sky.addColorStop(1,'#5f89b1');
+      ctx.fillStyle=sky; ctx.fillRect(0,0,W,horizon);
+      ctx.fillStyle='#7d7766'; ctx.fillRect(0,horizon,W,H-horizon);
+      ctx.strokeStyle='rgba(255,255,255,.06)';
+      for(let i=1;i<8;i++){ const y=horizon + (H-horizon)*(i/8); ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+      for(let i=-6;i<=6;i++){ ctx.beginPath(); ctx.moveTo(W/2, horizon); ctx.lineTo(W/2+i*85,H); ctx.stroke(); }
 
       const zBuf=new Array(W);
       for(let x=0;x<W;x++){
         const rayA=pa - FOV/2 + (x/W)*FOV;
         const sin=Math.sin(rayA), cos=Math.cos(rayA);
-        let d=0.02, hit=false, side=0;
+        let d=0.02, hit=false, side=0, tex=0;
         while(d<16 && !hit){
-          d += 0.03;
+          d += 0.025;
           const rx=px+cos*d, ry=py+sin*d;
           if(isWall(Math.floor(rx),Math.floor(ry))){
             hit=true;
             const fx=rx-Math.floor(rx), fy=ry-Math.floor(ry);
             side=(fx<0.06||fx>0.94)?1:0;
+            tex=side ? (ry-Math.floor(ry)) : (rx-Math.floor(rx));
           }
         }
         const corr=d*Math.cos(rayA-pa);
         zBuf[x]=corr;
-        const wallH=Math.min(H, H/(corr*0.9));
+        const wallH=Math.min(H, H/(corr*0.88));
         const top=(H-wallH)/2;
-        const shade=Math.max(50, 170-corr*11 - side*22);
-        ctx.fillStyle=`rgb(${shade},${Math.max(40,shade-18)},${Math.max(30,shade-40)})`;
+        let shade=Math.max(48, 176-corr*10 - side*18);
+        if(((tex*8)|0)%2===0) shade-=12;
+        ctx.fillStyle=`rgb(${shade},${Math.max(38,shade-20)},${Math.max(28,shade-46)})`;
         ctx.fillRect(x, top, 1, wallH);
+        if(((top/12)|0)%2===0){ ctx.fillStyle='rgba(255,255,255,.05)'; ctx.fillRect(x, top, 1, wallH*0.12); }
       }
 
       const sprites=[];
-      for(const e of enemies){ if(e.hp>0) sprites.push({type:'enemy', x:e.x, y:e.y, hit:e.hit}); }
-      if(!hasKey) sprites.push({type:'key', x:6.5, y:5.5});
+      for(const e of enemies){ if(e.hp>0) sprites.push({type:e.type, x:e.x, y:e.y, hit:e.hit}); }
+      for(const p of pickups){ if(!p.taken) sprites.push({type:p.type, x:p.x, y:p.y}); }
       sprites.push({type:'exit', x:exitPos.x, y:exitPos.y});
       sprites.sort((a,b)=>dist(px,py,b.x,b.y)-dist(px,py,a.x,a.y));
 
       for(const sp of sprites){
         const dx=sp.x-px, dy=sp.y-py, d=Math.hypot(dx,dy);
         const ang=normAng(Math.atan2(dy,dx)-pa);
-        if(Math.abs(ang)>FOV*0.75 || d<0.15) continue;
-        const size=Math.min(H*0.62, H/d*(sp.type==='enemy'?0.62:0.48));
+        if(Math.abs(ang)>FOV*0.75 || d<0.14) continue;
+        const size=Math.min(H*0.66, H/d*((sp.type==='guard'||sp.type==='elite')?0.62:0.48));
         const sx=(ang/(FOV/2))*W/2 + W/2;
-        const sy=H/2 + (sp.type==='enemy'? size*0.02 : size*0.12);
+        const sy=H/2 + ((sp.type==='guard'||sp.type==='elite')? size*0.02 : size*0.12);
         const left=Math.floor(sx-size/2), right=Math.floor(sx+size/2);
         let visible=false;
-        for(let x=Math.max(0,left); x<Math.min(W,right); x++){ if(d < zBuf[x]+0.15){ visible=true; break; } }
+        for(let x=Math.max(0,left); x<Math.min(W,right); x++){ if(d < zBuf[x]+0.16){ visible=true; break; } }
         if(!visible) continue;
 
-        if(sp.type==='enemy'){
-          ctx.fillStyle=sp.hit>0?'#ff7777':'#7a101f';
-          ctx.fillRect(sx-size*0.22, sy-size*0.52, size*0.44, size*0.54);
-          ctx.fillStyle='#a91f2f'; ctx.fillRect(sx-size*0.18, sy-size*0.62, size*0.36, size*0.16);
-          ctx.fillStyle='#f0f0f0'; ctx.fillRect(sx-size*0.10, sy-size*0.42, size*0.06, size*0.06); ctx.fillRect(sx+size*0.04, sy-size*0.42, size*0.06, size*0.06);
-          ctx.fillStyle='#111'; ctx.fillRect(sx-size*0.16, sy-size*0.02, size*0.32, size*0.18);
+        if(sp.type==='guard' || sp.type==='elite') drawEnemySprite(sp,sx,sy,size);
+        else if(sp.type==='ammo'){
+          ctx.fillStyle='#63c6ff'; ctx.fillRect(sx-size*0.14, sy-size*0.26, size*0.28, size*0.20);
+          ctx.fillStyle='#0b1d2c'; ctx.fillRect(sx-size*0.05, sy-size*0.23, size*0.10, size*0.14);
+          ctx.fillStyle='#63c6ff'; ctx.fillRect(sx-size*0.01, sy-size*0.25, size*0.02, size*0.18); ctx.fillRect(sx-size*0.06, sy-size*0.18, size*0.12, size*0.03);
+        } else if(sp.type==='med'){
+          ctx.fillStyle='#f2f2f2'; ctx.fillRect(sx-size*0.16, sy-size*0.24, size*0.32, size*0.22);
+          ctx.fillStyle='#d92626'; ctx.fillRect(sx-size*0.03, sy-size*0.21, size*0.06, size*0.16); ctx.fillRect(sx-size*0.08, sy-size*0.16, size*0.16, size*0.06);
         } else if(sp.type==='key'){
           ctx.fillStyle='#d4b021'; ctx.beginPath(); ctx.arc(sx, sy-size*0.18, size*0.12, 0, Math.PI*2); ctx.fill();
           ctx.fillRect(sx-size*0.02, sy-size*0.18, size*0.2, size*0.06); ctx.fillRect(sx+size*0.10, sy-size*0.18, size*0.03, size*0.12);
         } else if(sp.type==='exit'){
-          ctx.fillStyle=hasKey?'#28b84b':'#556b58'; ctx.fillRect(sx-size*0.20, sy-size*0.58, size*0.40, size*0.58);
-          ctx.fillStyle='#1b1b1b'; ctx.fillRect(sx-size*0.14, sy-size*0.48, size*0.28, size*0.48);
-          if(hasKey){ ctx.fillStyle='#89ff9d'; ctx.fillRect(sx-size*0.04, sy-size*0.32, size*0.08, size*0.08); }
+          ctx.fillStyle=hasKey?'#28b84b':'#556b58'; ctx.fillRect(sx-size*0.22, sy-size*0.62, size*0.44, size*0.62);
+          ctx.fillStyle='#1b1b1b'; ctx.fillRect(sx-size*0.16, sy-size*0.50, size*0.32, size*0.50);
+          if(hasKey){ ctx.fillStyle='#89ff9d'; ctx.fillRect(sx-size*0.05, sy-size*0.33, size*0.10, size*0.10); }
         }
       }
 
-      // minimap
-      const ms=10, mx=10, my=10;
-      ctx.globalAlpha=.92;
+      const ms=9, mx=10, my=10;
+      ctx.globalAlpha=.94;
       for(let y=0;y<MH;y++) for(let x=0;x<MW;x++){
         const c=mapRows[y][x];
         ctx.fillStyle=c==='#' ? '#697283' : '#1b2434';
         if(c==='X') ctx.fillStyle=hasKey ? '#23b649' : '#36423a';
-        if(c==='K' && !hasKey) ctx.fillStyle='#c9a31d';
         ctx.fillRect(mx+x*ms,my+y*ms,ms-1,ms-1);
       }
-      for(const e of enemies){ if(e.hp>0){ ctx.fillStyle='#ff5151'; ctx.fillRect(mx+e.x*ms-2,my+e.y*ms-2,4,4); } }
+      for(const p of pickups){ if(!p.taken){ ctx.fillStyle=p.type==='ammo' ? '#63c6ff' : p.type==='med' ? '#f0f0f0' : '#d4b021'; ctx.fillRect(mx+p.x*ms-2,my+p.y*ms-2,4,4); } }
+      for(const e of enemies){ if(e.hp>0){ ctx.fillStyle=e.type==='elite' ? '#ff9b61' : '#ff5151'; ctx.fillRect(mx+e.x*ms-2,my+e.y*ms-2,4,4); } }
       ctx.fillStyle='#6ad4ff'; ctx.beginPath(); ctx.arc(mx+px*ms,my+py*ms,3,0,Math.PI*2); ctx.fill();
       ctx.strokeStyle='#6ad4ff'; ctx.beginPath(); ctx.moveTo(mx+px*ms,my+py*ms); ctx.lineTo(mx+px*ms+Math.cos(pa)*7,my+py*ms+Math.sin(pa)*7); ctx.stroke();
       ctx.globalAlpha=1;
 
-      // crosshair
-      ctx.strokeStyle='rgba(255,255,255,.55)';
-      ctx.beginPath(); ctx.moveTo(W/2-8,H/2); ctx.lineTo(W/2+8,H/2); ctx.moveTo(W/2,H/2-8); ctx.lineTo(W/2,H/2+8); ctx.stroke();
-      setHud('BONUS: WOLFENSTEIN LITE<br>↑/↓ pohyb, ←/→ otáčení, červené tlačítko = výstřel / akce<br>Životy: '+lives+' &nbsp; Munice: '+ammo+' &nbsp; Klíč: '+(hasKey?'ANO':'NE')+' &nbsp; TOP: '+getBestScore('wolf'));
+      ctx.fillStyle='rgba(0,0,0,.45)'; ctx.fillRect(W-154,12,142,40);
+      ctx.fillStyle='#2f3b50'; ctx.fillRect(W-146,18,126,10); ctx.fillRect(W-146,34,126,10);
+      ctx.fillStyle='#42d36a'; ctx.fillRect(W-146,18,Math.max(0,1.26*armor),10);
+      ctx.fillStyle='#63c6ff'; ctx.fillRect(W-146,34,Math.min(126, ammo*4),10);
+      ctx.fillStyle='#fff'; ctx.font='bold 11px Arial'; ctx.fillText('ARMOR '+armor, W-144, 27); ctx.fillText('AMMO '+ammo, W-144, 43);
+
+      ctx.strokeStyle='rgba(255,255,255,.65)';
+      ctx.beginPath(); ctx.moveTo(W/2-9,H/2); ctx.lineTo(W/2+9,H/2); ctx.moveTo(W/2,H/2-9); ctx.lineTo(W/2,H/2+9); ctx.stroke();
+      if(muzzle>0){ ctx.fillStyle='rgba(255,208,92,.24)'; ctx.beginPath(); ctx.arc(W/2,H*0.82,50*muzzle/.12,0,Math.PI*2); ctx.fill(); }
+      if(hurtFlash>0){ ctx.fillStyle='rgba(255,64,64,'+(0.28*Math.min(1,hurtFlash/.45))+')'; ctx.fillRect(0,0,W,H); }
+
+      const alive=enemies.filter(e=>e.hp>0).length;
+      setHud('BONUS: WOLFENSTEIN LITE+<br>↑/↓ pohyb, ←/→ otáčení, červené tlačítko = střelba<br>Armor: '+armor+' &nbsp; Munice: '+ammo+' &nbsp; Klíč: '+(hasKey?'ANO':'NE')+' &nbsp; Nepřátelé: '+alive+' &nbsp; TOP: '+getBestScore('wolf')+'<br><small>'+bark+'</small>');
     }
 
     function loop(t){
       if(runId!==gameRunId||!running||mode!=='wolf'||!isOpen()) return;
       raf=requestAnimationFrame(loop);
       const dt=Math.min(0.045,(t-last)/1000||0.016); last=t;
-      if(inv>0) inv-=dt;
+      if(muzzle>0) muzzle-=dt;
+      if(hurtFlash>0) hurtFlash-=dt;
       for(const e of enemies){ if(e.hit>0) e.hit-=dt; }
 
       const rot=(left()?-1:0) + (right()?1:0);
-      pa += rot*2.35*dt;
+      pa += rot*2.3*dt;
       const mv=(up()?1:0) + (down()?-1:0);
-      if(mv!==0){
-        const speed=2.2*mv;
-        tryMove(px+Math.cos(pa)*speed*dt, py+Math.sin(pa)*speed*dt);
-      }
+      if(mv!==0){ const speed=2.35*mv; tryMove(px+Math.cos(pa)*speed*dt, py+Math.sin(pa)*speed*dt); }
+
       if(touch.fire && !fireLatch){ fire(); fireLatch=true; }
       if(!touch.fire && !keys[' '] && !keys.Enter) fireLatch=false;
 
-      if(!hasKey && dist(px,py,6.5,5.5)<0.6){ hasKey=true; score+=120; }
+      pickupCheck();
       checkWin();
 
       for(const e of enemies){
         if(e.hp<=0) continue;
         const d=dist(px,py,e.x,e.y);
-        if(d<5.5 && lineClear(e.x,e.y,px,py)){
-          if(d>0.72){
-            const sp=0.85*dt;
+        if(d<7 && lineClear(e.x,e.y,px,py)){
+          if(d>1.25){
+            const sp=e.speed*dt;
             const nx=e.x+(px-e.x)/d*sp, ny=e.y+(py-e.y)/d*sp;
             if(!isWall(Math.floor(nx),Math.floor(e.y))) e.x=nx;
             if(!isWall(Math.floor(e.x),Math.floor(ny))) e.y=ny;
           }
           e.cd-=dt;
-          if(d<0.8 && e.cd<=0){ e.cd=1.0; hurt(); }
+          if(e.cd<=0){
+            e.cd = e.type==='elite' ? 1.0 : 1.45;
+            if(d<5.5){ applyDamage(e.type==='elite'?18:12); speak(e.type==='elite' ? 'Elita pálí přesně.' : 'Nepřítel pálí.'); }
+          }
         }
       }
       draw();
     }
 
-    show('Wolfenstein Lite<br><small>Najdi klíč, vyřiď pár nepřátel a dojdi k zelenému východu.</small>');
-    queueLevelTimeout(()=>{ if(runId===gameRunId&&mode==='wolf') hide(); }, 1700);
+    show('Wolfenstein Lite+<br><small>Vylepšená verze: více detailů, pickupy, lepší nepřátelé a lepší atmosféra.</small>');
+    queueLevelTimeout(()=>{ if(runId===gameRunId&&mode==='wolf') hide(); }, 1900);
     draw();
     raf=requestAnimationFrame(loop);
   }
+
 function bomberRun(){
     const runId=gameRunId;
     const s=gameSize(), W=s.W, H=s.H;

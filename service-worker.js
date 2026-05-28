@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_40-retro-wolf-lite';
+const CACHE_VER = 'hdh-code-v3_1_41-retro-wolf-lite-plus';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
