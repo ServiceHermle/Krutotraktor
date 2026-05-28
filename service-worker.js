@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_34-retro-better-controls';
+const CACHE_VER = 'hdh-code-v3_1_35-retro-controls-v2';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
