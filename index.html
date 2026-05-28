@@ -2275,6 +2275,14 @@ function ensureWhatsNewUI(){
         </div>
       </div>`;
     document.body.appendChild(overlay);
+    ['selectstart','selectionchange','contextmenu','dragstart'].forEach(ev=>{
+      document.addEventListener(ev, e=>{
+        if(overlay && overlay.classList.contains('retro-open')){
+          if(ev==='selectionchange'){ try{ const sel=window.getSelection&&window.getSelection(); if(sel) sel.removeAllRanges(); }catch(_){}; return; }
+          if(e.target && (e.target===overlay || overlay.contains(e.target))){ e.preventDefault(); }
+        }
+      }, {passive:false});
+    });
   }
   const confirmBtn = document.getElementById("whatsNewConfirm");
   if(confirmBtn && !confirmBtn.dataset.bound){
@@ -4529,8 +4537,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
     if(ready) return; ready=true;
     const style=document.createElement('style');
     style.textContent=`
-      #retroEggOverlay{position:fixed;inset:0;z-index:999999;display:none;background:#101827;color:#fff;font-family:Arial,sans-serif;touch-action:none;overflow:hidden;--retro-top:84px;--retro-bottom:126px}
+      #retroEggOverlay{position:fixed;inset:0;z-index:999999;display:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;background:#101827;color:#fff;font-family:Arial,sans-serif;touch-action:none;overflow:hidden;--retro-top:84px;--retro-bottom:126px}
       #retroEggOverlay.retro-open{display:block}
+
+      #retroEggOverlay,#retroEggOverlay *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-tap-highlight-color:transparent!important}
+      #retroEggOverlay button,#retroEggOverlay canvas{touch-action:none;overscroll-behavior:none}
       #retroHud{position:absolute;left:10px;right:10px;top:8px;z-index:6;display:flex;flex-direction:column;gap:8px;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.4);font-size:14px;pointer-events:none}
       #retroHudTop{display:flex;justify-content:space-between;gap:8px;align-items:center;pointer-events:auto}
       #retroHudText{display:none!important}
@@ -4558,6 +4569,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById('retroMenuBtn').addEventListener('click',openGamePicker);
     document.getElementById('retroPickerClose').addEventListener('click',closeGamePicker);
     picker.addEventListener('click',e=>{ if(e.target===picker) closeGamePicker(); });
+    overlay.addEventListener('touchstart', e=>{ try{ const sel=window.getSelection&&window.getSelection(); if(sel) sel.removeAllRanges(); }catch(_){} }, {passive:true});
+    overlay.addEventListener('touchmove', e=>{ try{ const sel=window.getSelection&&window.getSelection(); if(sel) sel.removeAllRanges(); }catch(_){} }, {passive:true});
     picker.querySelectorAll('[data-game]').forEach(btn=>btn.addEventListener('click',()=>startLevel(btn.dataset.game)));
     bindBtn('retroLeft','left'); bindBtn('retroRight','right'); bindBtn('retroJump','up'); bindBtn('retroDown','down'); bindBtn('retroFire','fire'); bindSnakeSwipe();
     refreshPickerScores();
