@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_46-help-news-language-fix';
+const CACHE_VER = 'hdh-code-v3_1_47-whatsnew-original-text';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
