@@ -4451,7 +4451,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   let levelTimeouts=[];
   const keys=Object.create(null);
   const touch={left:false,right:false,up:false,down:false,fire:false,last:null,queue:[]};
-  const GAME_LABELS={platformer:'Level 1: Servisák',tools:'Level 2: Chytej nářadí',snake:'Level 3: Had',invaders:'Bonus: Dlaždice',bomber:'Bonus: Servis Bomber',shooter:'Bonus: Servis Shooter',heresy:'Bonus: CNC Heresy',s40000:'Bonus: Servisák 40000'};
+  const GAME_LABELS={platformer:'Level 1: Servisák',tools:'Level 2: Chytej nářadí',snake:'Level 3: Had',invaders:'Bonus: Dlaždice',bomber:'Bonus: Servis Bomber',wolf:'Bonus: Wolfenstein Lite'};
   function clearLevelTimeouts(){ levelTimeouts.forEach(id=>clearTimeout(id)); levelTimeouts=[]; }
   function queueLevelTimeout(fn, ms){ const id=setTimeout(()=>{ levelTimeouts=levelTimeouts.filter(v=>v!==id); fn(); }, ms); levelTimeouts.push(id); return id; }
   function loadRetroScores(){ try{ return JSON.parse(localStorage.getItem('krutotraktorRetroScores')||'{}')||{}; }catch(e){ return {}; } }
@@ -4498,13 +4498,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
     `;
     document.head.appendChild(style);
     overlay=document.createElement('div'); overlay.id='retroEggOverlay';
-    overlay.innerHTML=`<div id="retroStage"><canvas id="retroCanvas"></canvas></div><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button><button id="retroMenuBtn" type="button">Výběr her</button></div></div><div id="retroHudText">Vyber stroj 123 a spusť přepočet.</div></div><div id="retroMsg"></div><div id="retroPicker"><div id="retroPickerCard"><div id="retroPickerHead"><div id="retroPickerTitle">Výběr minihry</div><button id="retroPickerClose" type="button">Zavřít</button></div><div id="retroGameList"><button class="retroGamePick" data-game="platformer" type="button"><span>Level 1: Servisák<small>Skákej přes překážky a sbírej coiny</small></span><span class="retroGameScore" data-score="platformer">TOP: 0</span></button><button class="retroGamePick" data-game="tools" type="button"><span>Level 2: Chytej nářadí<small>Chytej padající nářadí</small></span><span class="retroGameScore" data-score="tools">TOP: 0</span></button><button class="retroGamePick" data-game="snake" type="button"><span>Level 3: Had<small>Klasický had s dotykovým ovládáním</small></span><span class="retroGameScore" data-score="snake">TOP: 0</span></button><button class="retroGamePick" data-game="invaders" type="button"><span>Bonus: Dlaždice<small>Rozbij všechny bloky</small></span><span class="retroGameScore" data-score="invaders">TOP: 0</span></button><button class="retroGamePick" data-game="bomber" type="button"><span>Bonus: Servis Bomber<small>Polož bombu, znič bedny a vyhni se alarmům</small></span><span class="retroGameScore" data-score="bomber">TOP: 0</span></button><button class="retroGamePick" data-game="shooter" type="button"><span>Bonus: Servis Shooter<small>Retro DOS střílečka ve stylu starých her</small></span><span class="retroGameScore" data-score="shooter">TOP: 0</span></button><button class="retroGamePick" data-game="heresy" type="button"><span>Bonus: CNC Heresy<small>Grimdark top-down akce: aktivuj terminály a kos kulty</small></span><span class="retroGameScore" data-score="heresy">TOP: 0</span></button><button class="retroGamePick" data-game="s40000" type="button"><span>Bonus: Servisák 40000<small>Arénová survival řežba v grimdark stylu</small></span><span class="retroGameScore" data-score="s40000">TOP: 0</span></button></div></div></div><div id="retroControls"><div class="retroDpad"><button class="retroBtn" id="retroJump" type="button" draggable="false">↑</button><button class="retroBtn" id="retroLeft" type="button" draggable="false">‹</button><div class="retroDpadCenter"></div><button class="retroBtn" id="retroRight" type="button" draggable="false">›</button><button class="retroBtn" id="retroDown" type="button" draggable="false">↓</button></div><div class="retroFirePad"><button class="retroFireBtn" id="retroFire" type="button" draggable="false" aria-label="Akce"></button></div></div>`;
+    overlay.innerHTML=`<div id="retroStage"><canvas id="retroCanvas"></canvas></div><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button><button id="retroMenuBtn" type="button">Výběr her</button></div></div><div id="retroHudText">Vyber stroj 123 a spusť přepočet.</div></div><div id="retroMsg"></div><div id="retroPicker"><div id="retroPickerCard"><div id="retroPickerHead"><div id="retroPickerTitle">Výběr minihry</div><button id="retroPickerClose" type="button">Zavřít</button></div><div id="retroGameList"><button class="retroGamePick" data-game="platformer" type="button"><span>Level 1: Servisák<small>Skákej přes překážky a sbírej coiny</small></span><span class="retroGameScore" data-score="platformer">TOP: 0</span></button><button class="retroGamePick" data-game="tools" type="button"><span>Level 2: Chytej nářadí<small>Chytej padající nářadí</small></span><span class="retroGameScore" data-score="tools">TOP: 0</span></button><button class="retroGamePick" data-game="snake" type="button"><span>Level 3: Had<small>Klasický had s dotykovým ovládáním</small></span><span class="retroGameScore" data-score="snake">TOP: 0</span></button><button class="retroGamePick" data-game="invaders" type="button"><span>Bonus: Dlaždice<small>Rozbij všechny bloky</small></span><span class="retroGameScore" data-score="invaders">TOP: 0</span></button><button class="retroGamePick" data-game="bomber" type="button"><span>Bonus: Servis Bomber<small>Polož bombu, znič bedny a vyhni se alarmům</small></span><span class="retroGameScore" data-score="bomber">TOP: 0</span></button><button class="retroGamePick" data-game="wolf" type="button"><span>Bonus: Wolfenstein Lite<small>Jednoduché pseudo 3D, málo nepřátel a lehčí akce</small></span><span class="retroGameScore" data-score="wolf">TOP: 0</span></button></div></div></div><div id="retroControls"><div class="retroDpad"><button class="retroBtn" id="retroJump" type="button" draggable="false">↑</button><button class="retroBtn" id="retroLeft" type="button" draggable="false">‹</button><div class="retroDpadCenter"></div><button class="retroBtn" id="retroRight" type="button" draggable="false">›</button><button class="retroBtn" id="retroDown" type="button" draggable="false">↓</button></div><div class="retroFirePad"><button class="retroFireBtn" id="retroFire" type="button" draggable="false" aria-label="Akce"></button></div></div>`;
     document.body.appendChild(overlay);
     stage=document.getElementById('retroStage');
     picker=document.getElementById('retroPicker');
     canvas=document.getElementById('retroCanvas'); ctx=canvas.getContext('2d'); hud=document.getElementById('retroHudText'); msg=document.getElementById('retroMsg');
     document.getElementById('retroCloseBtn').addEventListener('click',closeRetroEgg);
-    document.getElementById('retroRestartBtn').addEventListener('click',()=>startLevel(['platformer','tools','snake','invaders','bomber','shooter','heresy','s40000'].includes(mode)?mode:'platformer'));
+    document.getElementById('retroRestartBtn').addEventListener('click',()=>startLevel(['platformer','tools','snake','invaders','bomber','wolf'].includes(mode)?mode:'platformer'));
     document.getElementById('retroMenuBtn').addEventListener('click',openGamePicker);
     document.getElementById('retroPickerClose').addEventListener('click',closeGamePicker);
     picker.addEventListener('click',e=>{ if(e.target===picker) closeGamePicker(); });
@@ -4576,7 +4576,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   function hide(){ msg.style.display='none'; }
   function left(){ return keys.ArrowLeft||keys.a||touch.left; } function right(){ return keys.ArrowRight||keys.d||touch.right; } function up(){ return keys.ArrowUp||keys.w||keys[' ']||touch.up; } function down(){ return keys.ArrowDown||keys.s||touch.down; }
   function rect(a,b){ return !(a.x+a.w<b.x||a.x>b.x+b.w||a.y+a.h<b.y||a.y>b.y+b.h); }
-  function startLevel(which){ closeGamePicker(); running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } setHud((GAME_LABELS[which]||'Minihra')+'<br><small>Načítám…</small>'); running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); if(which==='bomber') bomberRun(); if(which==='shooter') shooterRun(); if(which==='heresy') heresyRun(); if(which==='s40000') service40kRun(); }
+  function startLevel(which){ closeGamePicker(); running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } setHud((GAME_LABELS[which]||'Minihra')+'<br><small>Načítám…</small>'); running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); if(which==='bomber') bomberRun(); if(which==='wolf') wolfRun(); }
 
   function platformer(){
     const runId=gameRunId;
@@ -4770,7 +4770,212 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 
 
-  function bomberRun(){
+  
+
+  function wolfRun(){
+    const runId=gameRunId;
+    const s=gameSize(), W=s.W, H=s.H;
+    const mapRows=[
+      '############',
+      '#@....#....#',
+      '#.##..#.##.#',
+      '#..e..#....#',
+      '##.##...##.#',
+      '#.....K....#',
+      '#.##.###.#X#',
+      '#....e.....#',
+      '#.######.#.#',
+      '#......e...#',
+      '############'
+    ];
+    const MW=mapRows[0].length, MH=mapRows.length;
+    let px=1.5, py=1.5, pa=0, score=0, lives=3, ammo=18, inv=0, fireLatch=false, last=performance.now();
+    let hasKey=false, won=false;
+    const FOV=Math.PI/3;
+    const enemies=[];
+    let exitPos={x:10.5,y:6.5};
+
+    for(let y=0;y<MH;y++){
+      for(let x=0;x<MW;x++){
+        const c=mapRows[y][x];
+        if(c==='@'){ px=x+0.5; py=y+0.5; }
+        if(c==='e') enemies.push({x:x+0.5,y:y+0.5,hp:1,hit:0,cd:0});
+        if(c==='X') exitPos={x:x+0.5,y:y+0.5};
+      }
+    }
+
+    function mapCell(x,y){
+      if(x<0||y<0||x>=MW||y>=MH) return '#';
+      return mapRows[y][x];
+    }
+    function isWall(x,y){ return mapCell(x,y)==='#'; }
+    function tryMove(nx,ny){
+      const pad=0.18;
+      if(!isWall(Math.floor(nx-pad),Math.floor(py)) && !isWall(Math.floor(nx+pad),Math.floor(py))) px=nx;
+      if(!isWall(Math.floor(px),Math.floor(ny-pad)) && !isWall(Math.floor(px),Math.floor(ny+pad))) py=ny;
+    }
+    function dist(ax,ay,bx,by){ return Math.hypot(ax-bx, ay-by); }
+    function normAng(a){ while(a<-Math.PI)a+=Math.PI*2; while(a>Math.PI)a-=Math.PI*2; return a; }
+    function lineClear(ax,ay,bx,by){
+      const dx=bx-ax, dy=by-ay, steps=Math.ceil(Math.hypot(dx,dy)*12);
+      for(let i=1;i<steps;i++){
+        const x=ax+dx*(i/steps), y=ay+dy*(i/steps);
+        if(isWall(Math.floor(x),Math.floor(y))) return false;
+      }
+      return true;
+    }
+    function hurt(){
+      if(inv>0||won) return;
+      lives--; inv=1.0;
+      if(lives<=0){ saveRetroBest('wolf', score); show('Wolfenstein Lite konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
+    }
+    function fire(){
+      if(ammo<=0) return;
+      ammo--; 
+      let best=null, bestDist=99;
+      for(const e of enemies){
+        if(e.hp<=0) continue;
+        const dx=e.x-px, dy=e.y-py, d=Math.hypot(dx,dy);
+        const ang=normAng(Math.atan2(dy,dx)-pa);
+        if(Math.abs(ang)<0.12 && d<7.5 && lineClear(px,py,e.x,e.y) && d<bestDist){ best=e; bestDist=d; }
+      }
+      if(best){ best.hp=0; score+=160; }
+    }
+    function checkWin(){
+      if(hasKey && dist(px,py,exitPos.x,exitPos.y)<0.7){
+        won=true; const finalScore=score + lives*220 + ammo*8;
+        saveRetroBest('wolf', finalScore);
+        show('Wolfenstein Lite hotovo<br><small>Skóre: '+finalScore+' &nbsp; Restart = nový pokus</small>');
+        running=false;
+      }
+    }
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#638db5'; ctx.fillRect(0,0,W,H*0.46);
+      ctx.fillStyle='#20202b'; ctx.fillRect(0,H*0.46,W,H*0.12);
+      ctx.fillStyle='#5e4330'; ctx.fillRect(0,H*0.58,W,H*0.42);
+
+      const zBuf=new Array(W);
+      for(let x=0;x<W;x++){
+        const rayA=pa - FOV/2 + (x/W)*FOV;
+        const sin=Math.sin(rayA), cos=Math.cos(rayA);
+        let d=0.02, hit=false, side=0;
+        while(d<16 && !hit){
+          d += 0.03;
+          const rx=px+cos*d, ry=py+sin*d;
+          if(isWall(Math.floor(rx),Math.floor(ry))){
+            hit=true;
+            const fx=rx-Math.floor(rx), fy=ry-Math.floor(ry);
+            side=(fx<0.06||fx>0.94)?1:0;
+          }
+        }
+        const corr=d*Math.cos(rayA-pa);
+        zBuf[x]=corr;
+        const wallH=Math.min(H, H/(corr*0.9));
+        const top=(H-wallH)/2;
+        const shade=Math.max(50, 170-corr*11 - side*22);
+        ctx.fillStyle=`rgb(${shade},${Math.max(40,shade-18)},${Math.max(30,shade-40)})`;
+        ctx.fillRect(x, top, 1, wallH);
+      }
+
+      const sprites=[];
+      for(const e of enemies){ if(e.hp>0) sprites.push({type:'enemy', x:e.x, y:e.y, hit:e.hit}); }
+      if(!hasKey) sprites.push({type:'key', x:6.5, y:5.5});
+      sprites.push({type:'exit', x:exitPos.x, y:exitPos.y});
+      sprites.sort((a,b)=>dist(px,py,b.x,b.y)-dist(px,py,a.x,a.y));
+
+      for(const sp of sprites){
+        const dx=sp.x-px, dy=sp.y-py, d=Math.hypot(dx,dy);
+        const ang=normAng(Math.atan2(dy,dx)-pa);
+        if(Math.abs(ang)>FOV*0.75 || d<0.15) continue;
+        const size=Math.min(H*0.62, H/d*(sp.type==='enemy'?0.62:0.48));
+        const sx=(ang/(FOV/2))*W/2 + W/2;
+        const sy=H/2 + (sp.type==='enemy'? size*0.02 : size*0.12);
+        const left=Math.floor(sx-size/2), right=Math.floor(sx+size/2);
+        let visible=false;
+        for(let x=Math.max(0,left); x<Math.min(W,right); x++){ if(d < zBuf[x]+0.15){ visible=true; break; } }
+        if(!visible) continue;
+
+        if(sp.type==='enemy'){
+          ctx.fillStyle=sp.hit>0?'#ff7777':'#7a101f';
+          ctx.fillRect(sx-size*0.22, sy-size*0.52, size*0.44, size*0.54);
+          ctx.fillStyle='#a91f2f'; ctx.fillRect(sx-size*0.18, sy-size*0.62, size*0.36, size*0.16);
+          ctx.fillStyle='#f0f0f0'; ctx.fillRect(sx-size*0.10, sy-size*0.42, size*0.06, size*0.06); ctx.fillRect(sx+size*0.04, sy-size*0.42, size*0.06, size*0.06);
+          ctx.fillStyle='#111'; ctx.fillRect(sx-size*0.16, sy-size*0.02, size*0.32, size*0.18);
+        } else if(sp.type==='key'){
+          ctx.fillStyle='#d4b021'; ctx.beginPath(); ctx.arc(sx, sy-size*0.18, size*0.12, 0, Math.PI*2); ctx.fill();
+          ctx.fillRect(sx-size*0.02, sy-size*0.18, size*0.2, size*0.06); ctx.fillRect(sx+size*0.10, sy-size*0.18, size*0.03, size*0.12);
+        } else if(sp.type==='exit'){
+          ctx.fillStyle=hasKey?'#28b84b':'#556b58'; ctx.fillRect(sx-size*0.20, sy-size*0.58, size*0.40, size*0.58);
+          ctx.fillStyle='#1b1b1b'; ctx.fillRect(sx-size*0.14, sy-size*0.48, size*0.28, size*0.48);
+          if(hasKey){ ctx.fillStyle='#89ff9d'; ctx.fillRect(sx-size*0.04, sy-size*0.32, size*0.08, size*0.08); }
+        }
+      }
+
+      // minimap
+      const ms=10, mx=10, my=10;
+      ctx.globalAlpha=.92;
+      for(let y=0;y<MH;y++) for(let x=0;x<MW;x++){
+        const c=mapRows[y][x];
+        ctx.fillStyle=c==='#' ? '#697283' : '#1b2434';
+        if(c==='X') ctx.fillStyle=hasKey ? '#23b649' : '#36423a';
+        if(c==='K' && !hasKey) ctx.fillStyle='#c9a31d';
+        ctx.fillRect(mx+x*ms,my+y*ms,ms-1,ms-1);
+      }
+      for(const e of enemies){ if(e.hp>0){ ctx.fillStyle='#ff5151'; ctx.fillRect(mx+e.x*ms-2,my+e.y*ms-2,4,4); } }
+      ctx.fillStyle='#6ad4ff'; ctx.beginPath(); ctx.arc(mx+px*ms,my+py*ms,3,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#6ad4ff'; ctx.beginPath(); ctx.moveTo(mx+px*ms,my+py*ms); ctx.lineTo(mx+px*ms+Math.cos(pa)*7,my+py*ms+Math.sin(pa)*7); ctx.stroke();
+      ctx.globalAlpha=1;
+
+      // crosshair
+      ctx.strokeStyle='rgba(255,255,255,.55)';
+      ctx.beginPath(); ctx.moveTo(W/2-8,H/2); ctx.lineTo(W/2+8,H/2); ctx.moveTo(W/2,H/2-8); ctx.lineTo(W/2,H/2+8); ctx.stroke();
+      setHud('BONUS: WOLFENSTEIN LITE<br>↑/↓ pohyb, ←/→ otáčení, červené tlačítko = výstřel / akce<br>Životy: '+lives+' &nbsp; Munice: '+ammo+' &nbsp; Klíč: '+(hasKey?'ANO':'NE')+' &nbsp; TOP: '+getBestScore('wolf'));
+    }
+
+    function loop(t){
+      if(runId!==gameRunId||!running||mode!=='wolf'||!isOpen()) return;
+      raf=requestAnimationFrame(loop);
+      const dt=Math.min(0.045,(t-last)/1000||0.016); last=t;
+      if(inv>0) inv-=dt;
+      for(const e of enemies){ if(e.hit>0) e.hit-=dt; }
+
+      const rot=(left()?-1:0) + (right()?1:0);
+      pa += rot*2.35*dt;
+      const mv=(up()?1:0) + (down()?-1:0);
+      if(mv!==0){
+        const speed=2.2*mv;
+        tryMove(px+Math.cos(pa)*speed*dt, py+Math.sin(pa)*speed*dt);
+      }
+      if(touch.fire && !fireLatch){ fire(); fireLatch=true; }
+      if(!touch.fire && !keys[' '] && !keys.Enter) fireLatch=false;
+
+      if(!hasKey && dist(px,py,6.5,5.5)<0.6){ hasKey=true; score+=120; }
+      checkWin();
+
+      for(const e of enemies){
+        if(e.hp<=0) continue;
+        const d=dist(px,py,e.x,e.y);
+        if(d<5.5 && lineClear(e.x,e.y,px,py)){
+          if(d>0.72){
+            const sp=0.85*dt;
+            const nx=e.x+(px-e.x)/d*sp, ny=e.y+(py-e.y)/d*sp;
+            if(!isWall(Math.floor(nx),Math.floor(e.y))) e.x=nx;
+            if(!isWall(Math.floor(e.x),Math.floor(ny))) e.y=ny;
+          }
+          e.cd-=dt;
+          if(d<0.8 && e.cd<=0){ e.cd=1.0; hurt(); }
+        }
+      }
+      draw();
+    }
+
+    show('Wolfenstein Lite<br><small>Najdi klíč, vyřiď pár nepřátel a dojdi k zelenému východu.</small>');
+    queueLevelTimeout(()=>{ if(runId===gameRunId&&mode==='wolf') hide(); }, 1700);
+    draw();
+    raf=requestAnimationFrame(loop);
+  }
+function bomberRun(){
     const runId=gameRunId;
     const s=gameSize(), W=s.W, H=s.H;
     const cols=13, rows=11;
@@ -4875,7 +5080,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
         const finalScore=score+Math.ceil(time)*10;
         saveRetroBest('bomber',finalScore);
         show('Servis Bomber hotovo 💣<br><small>Skóre: '+finalScore+'<br>Za 2 sekundy startuje bonus: Servis Shooter</small>');
-        queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('shooter')},2000); running=false; return;
+        queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('bomber')},2000); running=false; return;
       }
       draw();
     }
@@ -4883,280 +5088,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
 
-  function shooterRun(){
-    const runId=gameRunId;
-    const s=gameSize(), W=s.W, H=s.H;
-    const floor=H-44, world=2400;
-    let cam=0, score=0, lives=3, ammo=28, last=performance.now(), fireLatch=false, inv=0, done=false;
-    let p={x:42,y:floor-46,w:34,h:42,vx:0,vy:0,onGround:false,dir:1};
-    const platforms=[
-      {x:260,y:floor-88,w:120,h:16},{x:520,y:floor-136,w:110,h:16},{x:820,y:floor-92,w:140,h:16},
-      {x:1120,y:floor-150,w:140,h:16},{x:1500,y:floor-110,w:160,h:16},{x:1880,y:floor-150,w:130,h:16}
-    ];
-    const crates=[360,680,1020,1320,1680,2060].map(x=>({x,y:floor-30,w:30,h:30,alive:true}));
-    const drones=[500,780,1180,1460,1760,2140].map((x,i)=>({x,y:floor-82-(i%2)*55,w:30,h:24,base:x,dir:i%2?1:-1,alive:true,shoot:1+i*.18}));
-    const pickups=[300,920,1550,1980].map(x=>({x,y:floor-118,w:16,h:16,got:false,type:'ammo'}));
-    let bullets=[], enemyBullets=[], fx=[];
-
-    function clearJump(){ touch.up=false; keys.ArrowUp=false; keys.w=false; keys[' ']=false; }
-    function solidCollide(obj, oldX, oldY){
-      platforms.concat([{x:-999,y:floor,w:world+1999,h:80}]).forEach(pl=>{
-        if(!rect(obj,pl))return;
-        const wasAbove=oldY+obj.h<=pl.y+5, wasBelow=oldY>=pl.y+pl.h-2, wasLeft=oldX+obj.w<=pl.x+4, wasRight=oldX>=pl.x+pl.w-4;
-        if(obj.vy>=0&&wasAbove){obj.y=pl.y-obj.h;obj.vy=0;obj.onGround=true;}
-        else if(obj.vy<0&&wasBelow){obj.y=pl.y+pl.h;obj.vy=0;}
-        else if(obj.vx>0&&wasLeft){obj.x=pl.x-obj.w;}
-        else if(obj.vx<0&&wasRight){obj.x=pl.x+pl.w;}
-      });
-    }
-    function shoot(){
-      if(ammo<=0)return;
-      ammo--;
-      bullets.push({x:p.x+(p.dir>0?p.w+2:-8),y:p.y+17,w:12,h:5,vx:p.dir*520});
-    }
-    function hurt(){
-      if(inv>0)return;
-      lives--; inv=1.2; p.x=Math.max(30,p.x-90); p.vy=-7;
-      if(lives<=0){ saveRetroBest('shooter',score); show('Servis Shooter konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
-    }
-    function draw(){
-      ctx.clearRect(0,0,W,H);
-      const grd=ctx.createLinearGradient(0,0,0,H); grd.addColorStop(0,'#101827'); grd.addColorStop(.55,'#182744'); grd.addColorStop(1,'#0b1422'); ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
-      ctx.fillStyle='rgba(255,255,255,.06)'; for(let i=0;i<45;i++) ctx.fillRect((i*127-cam*.18)%W,(i*53)%Math.max(1,H-80),2,2);
-      ctx.fillStyle='#263a5a'; for(let x=-((cam*.35)%180);x<W+180;x+=180){ ctx.fillRect(x,H-170,90,126); ctx.fillStyle='rgba(119,214,255,.12)'; ctx.fillRect(x+18,H-146,18,18); ctx.fillRect(x+54,H-110,18,18); ctx.fillStyle='#263a5a'; }
-      ctx.fillStyle='#26334d'; ctx.fillRect(0,floor,W,H-floor);
-      ctx.fillStyle='#50627e'; ctx.fillRect(0,floor,W,5);
-      platforms.forEach(pl=>{ctx.fillStyle='#50627e';ctx.fillRect(pl.x-cam,pl.y,pl.w,pl.h);ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(pl.x-cam+6,pl.y+3,pl.w-12,3);});
-      crates.forEach(c=>{ if(!c.alive)return; ctx.fillStyle='#9c6630';ctx.fillRect(c.x-cam,c.y,c.w,c.h);ctx.strokeStyle='#5f3d1d';ctx.strokeRect(c.x-cam+2,c.y+2,c.w-4,c.h-4);});
-      pickups.forEach(a=>{ if(a.got)return; ctx.fillStyle='#65d6ff';ctx.fillRect(a.x-cam,a.y,a.w,a.h);ctx.fillStyle='#fff';ctx.font='12px Arial';ctx.fillText('+',a.x-cam+4,a.y+13);});
-      drones.forEach(d=>{ if(!d.alive)return; ctx.fillStyle='#ff4e4e';ctx.fillRect(d.x-cam,d.y,d.w,d.h);ctx.fillStyle='#fff';ctx.fillRect(d.x-cam+6,d.y+7,6,6);ctx.fillRect(d.x-cam+18,d.y+7,6,6);});
-      bullets.forEach(b=>{ctx.fillStyle='#ffd33d';ctx.fillRect(b.x-cam,b.y,b.w,b.h);});
-      enemyBullets.forEach(b=>{ctx.fillStyle='#ff7a7a';ctx.fillRect(b.x-cam,b.y,b.w,b.h);});
-      fx.forEach(v=>{ctx.globalAlpha=Math.max(0,v.t/.35);ctx.fillStyle=v.color;ctx.beginPath();ctx.arc(v.x-cam,v.y,8+(1-v.t/.35)*14,0,7);ctx.fill();ctx.globalAlpha=1;});
-      ctx.globalAlpha=inv>0 && Math.floor(performance.now()/110)%2 ? .45 : 1;
-      drawServiceTech(p.x-cam-3,p.y-8,p.w+10,p.h+13,'platformer');
-      ctx.globalAlpha=1;
-      ctx.fillStyle='#8cff9a'; ctx.fillRect(world-52-cam,floor-82,16,38); ctx.fillStyle='#fff'; ctx.fillRect(world-48-cam,floor-78,8,8);
-      setHud('BONUS: SERVIS SHOOTER<br>Retro DOS střílečka: šipky, skok, B / mezerník = střelba<br>Skóre: '+score+' &nbsp; Životy: '+lives+' &nbsp; Munice: '+ammo+' &nbsp; TOP: '+getBestScore('shooter')+'<br><small>Dojdi k zelenému výtahu vpravo</small>');
-    }
-    function loop(now){
-      if(runId!==gameRunId||!running||mode!=='shooter'||!isOpen())return;
-      raf=requestAnimationFrame(loop);
-      const dt=Math.min(.05,(now-last)/1000||.016); last=now; if(inv>0)inv-=dt;
-      p.vx=(left()?-220:right()?220:0); if(p.vx<0)p.dir=-1; if(p.vx>0)p.dir=1;
-      if(up()&&p.onGround){p.vy=-520; p.onGround=false; clearJump();}
-      if(touch.fire&&!fireLatch){shoot();fireLatch=true;} if(!touch.fire&&!keys[' ']&&!keys.Enter)fireLatch=false;
-      const ox=p.x, oy=p.y; p.vy+=1200*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.onGround=false; solidCollide(p,ox,oy);
-      p.x=Math.max(0,Math.min(world-p.w,p.x)); if(p.y>H+80) hurt();
-      cam=Math.max(0,Math.min(world-W,p.x-W*.35));
-      drones.forEach(d=>{ if(!d.alive)return; d.x+=d.dir*70*dt; if(Math.abs(d.x-d.base)>90)d.dir*=-1; d.shoot-=dt; if(d.shoot<=0){d.shoot=.9+Math.random()*.8; const dir=(p.x>d.x)?1:-1; enemyBullets.push({x:d.x+15,y:d.y+13,w:10,h:5,vx:dir*250});} if(rect(p,d))hurt();});
-      bullets.forEach(b=>b.x+=b.vx*dt); bullets=bullets.filter(b=>b.x>-40&&b.x<world+40);
-      enemyBullets.forEach(b=>b.x+=b.vx*dt); enemyBullets=enemyBullets.filter(b=>b.x>-40&&b.x<world+40);
-      for(let i=bullets.length-1;i>=0;i--){
-        const b=bullets[i];
-        let hit=false;
-        drones.forEach(d=>{if(!hit&&d.alive&&rect(b,d)){d.alive=false;score+=200;fx.push({x:d.x+d.w/2,y:d.y+d.h/2,t:.35,color:'#ff6464'});hit=true;}});
-        crates.forEach(c=>{if(!hit&&c.alive&&rect(b,c)){c.alive=false;score+=80;fx.push({x:c.x+c.w/2,y:c.y+c.h/2,t:.3,color:'#ffd33d'});hit=true;}});
-        if(hit)bullets.splice(i,1);
-      }
-      enemyBullets.forEach(b=>{if(rect(p,b))hurt();});
-      pickups.forEach(a=>{ if(!a.got&&rect(p,a)){a.got=true;ammo+=12;score+=50;} });
-      fx.forEach(v=>v.t-=dt); fx=fx.filter(v=>v.t>0);
-      if(p.x>world-85&&!done){ done=true; const finalScore=score+lives*200+ammo*5; saveRetroBest('shooter',finalScore); show('Servis Shooter hotovo 🔫<br><small>Skóre: '+finalScore+'<br>Za 2 sekundy startuje CNC Heresy</small>'); queueLevelTimeout(()=>{if(isOpen()&&runId===gameRunId)startLevel('heresy')},2000); running=false; return; }
-      draw();
-    }
-    draw(); loop(last);
-  }
-
-
-  function heresyRun(){
-    const runId=gameRunId;
-    const s=gameSize(), W=s.W, H=s.H;
-    let last=performance.now(), fireLatch=false, spawnCd=.6;
-    let player={x:W/2-18,y:H-88,w:36,h:36,dir:'up',lives:4,inv:0};
-    let score=0, ammo=48, bolts=[], enemyBolts=[], cultists=[], sparks=[];
-    const walls=[
-      {x:W*.18,y:H*.22,w:W*.16,h:18},{x:W*.62,y:H*.22,w:W*.16,h:18},
-      {x:W*.18,y:H*.64,w:W*.18,h:18},{x:W*.58,y:H*.64,w:W*.20,h:18},
-      {x:W*.32,y:H*.38,w:18,h:H*.18},{x:W*.66,y:H*.38,w:18,h:H*.18}
-    ].map(v=>({x:Math.round(v.x),y:Math.round(v.y),w:Math.round(v.w),h:Math.round(v.h)}));
-    const terminals=[
-      {x:64,y:70,w:26,h:26,on:false},{x:W-90,y:72,w:26,h:26,on:false},
-      {x:72,y:H-146,w:26,h:26,on:false},{x:W-98,y:H-150,w:26,h:26,on:false}
-    ];
-    function rectHit(a,b){ return !(a.x+a.w<b.x||a.x>b.x+b.w||a.y+a.h<b.y||a.y>b.y+b.h); }
-    function pointFree(x,y,w,h){
-      const r={x,y,w,h};
-      if(x<6||y<8||x+w>W-6||y+h>H-8) return false;
-      return !walls.some(w=>rectHit(r,w));
-    }
-    function spawnCultist(){
-      const pts=[[28,28],[W-56,28],[28,H-56],[W-56,H-56],[W/2-18,22],[W/2-18,H-58]];
-      const p=pts[Math.floor(Math.random()*pts.length)];
-      cultists.push({x:p[0],y:p[1],w:30,h:30,hp:2,shoot:.8+Math.random()*.8});
-    }
-    function fire(){
-      if(ammo<=0) return;
-      ammo--;
-      const v={up:[0,-380],down:[0,380],left:[-380,0],right:[380,0]}[player.dir];
-      bolts.push({x:player.x+player.w/2-4,y:player.y+player.h/2-4,w:8,h:8,vx:v[0],vy:v[1]});
-    }
-    function hurt(){
-      if(player.inv>0) return;
-      player.lives--; player.inv=1.1; player.x=W/2-18; player.y=H-88;
-      if(player.lives<=0){ saveRetroBest('heresy',score); show('CNC Heresy konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
-    }
-    function drawTerminal(t){
-      ctx.fillStyle=t.on?'#63ff92':'#406b57'; ctx.fillRect(t.x,t.y,t.w,t.h);
-      ctx.fillStyle='#08111d'; ctx.fillRect(t.x+6,t.y+6,t.w-12,t.h-12);
-      ctx.fillStyle=t.on?'#63ff92':'#9ec2a8'; ctx.fillRect(t.x+9,t.y+9,t.w-18,t.h-18);
-    }
-    function loop(now){
-      if(runId!==gameRunId||!running||mode!=='heresy'||!isOpen()) return;
-      raf=requestAnimationFrame(loop);
-      const dt=Math.min(.05,(now-last)/1000||.016); last=now;
-      if(player.inv>0) player.inv-=dt;
-      spawnCd-=dt;
-      if(spawnCd<=0 && cultists.length<8){ spawnCd=.75+Math.random()*.55; spawnCultist(); }
-      let dx=0, dy=0, speed=220;
-      if(left()){ dx=-1; player.dir='left'; } else if(right()){ dx=1; player.dir='right'; }
-      if(up()){ dy=-1; player.dir='up'; } else if(down()){ dy=1; player.dir='down'; }
-      const nx=player.x+dx*speed*dt, ny=player.y+dy*speed*dt;
-      if(pointFree(nx,player.y,player.w,player.h)) player.x=nx;
-      if(pointFree(player.x,ny,player.w,player.h)) player.y=ny;
-      if(touch.fire && !fireLatch){ fire(); fireLatch=true; }
-      if(!touch.fire && !keys[' '] && !keys.Enter) fireLatch=false;
-
-      terminals.forEach(t=>{ if(!t.on && rectHit(player,t)){ t.on=true; score+=150; sparks.push({x:t.x+t.w/2,y:t.y+t.h/2,t:.45,color:'#63ff92'}); } });
-      if(terminals.every(t=>t.on)){
-        const finalScore=score + player.lives*200 + ammo*4;
-        saveRetroBest('heresy', finalScore);
-        show('CNC Heresy hotovo ⚙️<br><small>Skóre: '+finalScore+'<br>Za 2 sekundy startuje Servisák 40000</small>');
-        queueLevelTimeout(()=>{ if(isOpen()&&runId===gameRunId) startLevel('s40000'); },2000);
-        running=false; return;
-      }
-
-      bolts.forEach(b=>{ b.x+=b.vx*dt; b.y+=b.vy*dt; });
-      enemyBolts.forEach(b=>{ b.x+=b.vx*dt; b.y+=b.vy*dt; });
-      bolts = bolts.filter(b=> b.x>-12 && b.y>-12 && b.x<W+12 && b.y<H+12 && !walls.some(w=>rectHit(b,w)));
-      enemyBolts = enemyBolts.filter(b=> b.x>-12 && b.y>-12 && b.x<W+12 && b.y<H+12 && !walls.some(w=>rectHit(b,w)));
-      cultists.forEach(c=>{
-        let vx=Math.sign(player.x-c.x), vy=Math.sign(player.y-c.y), sp=84;
-        let tx=c.x+vx*sp*dt, ty=c.y+vy*sp*dt;
-        if(pointFree(tx,c.y,c.w,c.h)) c.x=tx;
-        if(pointFree(c.x,ty,c.w,c.h)) c.y=ty;
-        c.shoot-=dt;
-        if(c.shoot<=0){
-          c.shoot=.9+Math.random()*1.2;
-          const dx=player.x-c.x, dy=player.y-c.y; const len=Math.max(1,Math.hypot(dx,dy));
-          enemyBolts.push({x:c.x+c.w/2-3,y:c.y+c.h/2-3,w:6,h:6,vx:dx/len*220,vy:dy/len*220});
-        }
-        if(rectHit(player,c)) hurt();
-      });
-      for(let i=bolts.length-1;i>=0;i--){
-        const b=bolts[i]; let hit=false;
-        for(let j=cultists.length-1;j>=0;j--){ const c=cultists[j]; if(rectHit(b,c)){ c.hp--; hit=true; if(c.hp<=0){ cultists.splice(j,1); score+=120; sparks.push({x:c.x+c.w/2,y:c.y+c.h/2,t:.35,color:'#ff5c5c'}); } break; } }
-        if(hit) bolts.splice(i,1);
-      }
-      for(let i=enemyBolts.length-1;i>=0;i--){ if(rectHit(enemyBolts[i],player)){ enemyBolts.splice(i,1); hurt(); } }
-      sparks.forEach(v=>v.t-=dt); sparks=sparks.filter(v=>v.t>0);
-
-      ctx.clearRect(0,0,W,H);
-      const grd=ctx.createLinearGradient(0,0,0,H); grd.addColorStop(0,'#0b0f1a'); grd.addColorStop(1,'#181628'); ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
-      ctx.fillStyle='#1a2236'; ctx.fillRect(18,18,W-36,H-36);
-      ctx.strokeStyle='rgba(255,255,255,.04)'; for(let x=26;x<W-20;x+=32){ ctx.beginPath(); ctx.moveTo(x,18); ctx.lineTo(x,H-18); ctx.stroke(); }
-      for(let y=26;y<H-20;y+=32){ ctx.beginPath(); ctx.moveTo(18,y); ctx.lineTo(W-18,y); ctx.stroke(); }
-      walls.forEach(w=>{ ctx.fillStyle='#47536a'; ctx.fillRect(w.x,w.y,w.w,w.h); ctx.fillStyle='rgba(255,255,255,.16)'; ctx.fillRect(w.x+3,w.y+3,Math.max(0,w.w-6),3); });
-      terminals.forEach(drawTerminal);
-      cultists.forEach(c=>{ ctx.fillStyle='#9a1f35'; ctx.fillRect(c.x,c.y,c.w,c.h); ctx.fillStyle='#fff'; ctx.fillRect(c.x+7,c.y+8,5,5); ctx.fillRect(c.x+18,c.y+8,5,5); ctx.fillStyle='#262626'; ctx.fillRect(c.x+11,c.y+19,8,4); });
-      bolts.forEach(b=>{ ctx.fillStyle='#79d6ff'; ctx.fillRect(b.x,b.y,b.w,b.h); });
-      enemyBolts.forEach(b=>{ ctx.fillStyle='#ff8b6f'; ctx.fillRect(b.x,b.y,b.w,b.h); });
-      sparks.forEach(v=>{ ctx.globalAlpha=Math.max(0,v.t/.45); ctx.fillStyle=v.color; ctx.beginPath(); ctx.arc(v.x,v.y,8+(1-v.t/.45)*14,0,7); ctx.fill(); ctx.globalAlpha=1; });
-      ctx.globalAlpha=player.inv>0 && Math.floor(performance.now()/120)%2 ? .45 : 1;
-      drawServiceTech(player.x,player.y,player.w,player.h,'oil');
-      ctx.globalAlpha=1;
-      setHud('BONUS: CNC HERESY<br>Aktivuj 4 terminály, střílej kultisty a drž halu<br>Terminály: '+terminals.filter(t=>t.on).length+' / 4 &nbsp; Životy: '+player.lives+' &nbsp; Munice: '+ammo+' &nbsp; TOP: '+getBestScore('heresy')+'<br><small>Střelba: B / mezerník</small>');
-    }
-    loop(last);
-  }
-
-  function service40kRun(){
-    const runId=gameRunId;
-    const s=gameSize(), W=s.W, H=s.H;
-    let last=performance.now(), fireCd=0, spawnCd=.5, pickupCd=4.2, time=42;
-    let player={x:W/2-18,y:H/2-18,w:36,h:36,dir:'right',lives:5,inv:0};
-    let score=0, enemies=[], slashes=[], pickups=[], sparks=[];
-    function rectHit(a,b){ return !(a.x+a.w<b.x||a.x>b.x+b.w||a.y+a.h<b.y||a.y>b.y+b.h); }
-    function spawnEnemy(){
-      const side=Math.floor(Math.random()*4); let x=0,y=0;
-      if(side===0){ x=-26; y=24+Math.random()*(H-48); }
-      if(side===1){ x=W+6; y=24+Math.random()*(H-48); }
-      if(side===2){ x=24+Math.random()*(W-48); y=-26; }
-      if(side===3){ x=24+Math.random()*(W-48); y=H+6; }
-      enemies.push({x,y,w:28,h:28,hp:1+(Math.random()<.25?1:0),speed:78+Math.random()*38});
-    }
-    function spawnPickup(){
-      const kind=Math.random()<.35?'med':'seal';
-      pickups.push({x:28+Math.random()*(W-56),y:28+Math.random()*(H-56),w:20,h:20,kind,t:9});
-    }
-    function hurt(){
-      if(player.inv>0) return;
-      player.lives--; player.inv=1.0;
-      if(player.lives<=0){ saveRetroBest('s40000',score); show('Servisák 40000 konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
-    }
-    function attack(){
-      const d=player.dir; const pad=14;
-      let a={x:player.x-pad,y:player.y-pad,w:player.w+pad*2,h:player.h+pad*2,dir:d,t:.16};
-      if(d==='left') a={x:player.x-28,y:player.y-8,w:34,h:player.h+16,dir:d,t:.16};
-      if(d==='right') a={x:player.x+player.w-6,y:player.y-8,w:34,h:player.h+16,dir:d,t:.16};
-      if(d==='up') a={x:player.x-8,y:player.y-28,w:player.w+16,h:34,dir:d,t:.16};
-      if(d==='down') a={x:player.x-8,y:player.y+player.h-6,w:player.w+16,h:34,dir:d,t:.16};
-      slashes.push(a);
-    }
-    function loop(now){
-      if(runId!==gameRunId||!running||mode!=='s40000'||!isOpen()) return;
-      raf=requestAnimationFrame(loop);
-      const dt=Math.min(.05,(now-last)/1000||.016); last=now;
-      time-=dt; if(player.inv>0) player.inv-=dt; if(fireCd>0) fireCd-=dt; spawnCd-=dt; pickupCd-=dt;
-      if(spawnCd<=0){ spawnCd=Math.max(.25,.65-time*0.004)+(Math.random()*.15); spawnEnemy(); }
-      if(pickupCd<=0 && pickups.length<3){ pickupCd=5+Math.random()*2.5; spawnPickup(); }
-      let dx=0,dy=0,speed=210;
-      if(left()){ dx=-1; player.dir='left'; } else if(right()){ dx=1; player.dir='right'; }
-      if(up()){ dy=-1; player.dir='up'; } else if(down()){ dy=1; player.dir='down'; }
-      player.x=Math.max(8,Math.min(W-player.w-8,player.x+dx*speed*dt));
-      player.y=Math.max(8,Math.min(H-player.h-8,player.y+dy*speed*dt));
-      if(touch.fire && fireCd<=0){ attack(); fireCd=.32; }
-      slashes.forEach(a=>a.t-=dt); slashes=slashes.filter(a=>a.t>0);
-      pickups.forEach(p=>p.t-=dt); pickups=pickups.filter(p=>p.t>0);
-      enemies.forEach(e=>{ const dx=player.x-e.x, dy=player.y-e.y; const len=Math.max(1,Math.hypot(dx,dy)); e.x+=dx/len*e.speed*dt; e.y+=dy/len*e.speed*dt; if(rectHit(player,e)) hurt(); });
-      for(let i=enemies.length-1;i>=0;i--){
-        const e=enemies[i]; let dead=false;
-        for(const a of slashes){ if(rectHit(e,a)){ e.hp--; if(e.hp<=0){ dead=true; break; } } }
-        if(dead){ enemies.splice(i,1); score+=120; sparks.push({x:e.x+e.w/2,y:e.y+e.h/2,t:.3,color:'#ffd33d'}); }
-      }
-      for(let i=pickups.length-1;i>=0;i--){ const it=pickups[i]; if(rectHit(player,it)){ if(it.kind==='med'){ player.lives=Math.min(6,player.lives+1); } else { score+=160; } pickups.splice(i,1); } }
-      sparks.forEach(v=>v.t-=dt); sparks=sparks.filter(v=>v.t>0);
-      if(time<=0){ const finalScore=score + player.lives*180; saveRetroBest('s40000',finalScore); show('Servisák 40000 hotovo ⚔️<br><small>Skóre: '+finalScore+'<br>Vydržel jsi grimdark invazi</small>'); running=false; return; }
-      ctx.clearRect(0,0,W,H);
-      const grd=ctx.createLinearGradient(0,0,0,H); grd.addColorStop(0,'#160b0f'); grd.addColorStop(1,'#2a1215'); ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
-      ctx.fillStyle='rgba(255,255,255,.04)'; for(let i=0;i<40;i++) ctx.fillRect((i*71)%W,(i*53)%H,26,3);
-      ctx.fillStyle='#47252b'; ctx.fillRect(10,10,W-20,H-20);
-      pickups.forEach(it=>{ if(it.kind==='med'){ ctx.fillStyle='#63ff92'; ctx.fillRect(it.x,it.y,it.w,it.h); ctx.fillStyle='#11331d'; ctx.fillRect(it.x+7,it.y+3,6,14); ctx.fillRect(it.x+3,it.y+7,14,6); } else { ctx.fillStyle='#ffd33d'; ctx.beginPath(); ctx.arc(it.x+10,it.y+10,9,0,7); ctx.fill(); ctx.fillStyle='#754e0d'; ctx.fillRect(it.x+9,it.y+3,2,14); } });
-      slashes.forEach(a=>{ ctx.fillStyle='rgba(255,215,100,.25)'; ctx.fillRect(a.x,a.y,a.w,a.h); ctx.strokeStyle='rgba(255,235,170,.75)'; ctx.strokeRect(a.x,a.y,a.w,a.h); });
-      enemies.forEach(e=>{ ctx.fillStyle='#971f28'; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.fillStyle='#fff'; ctx.fillRect(e.x+6,e.y+8,4,4); ctx.fillRect(e.x+18,e.y+8,4,4); });
-      sparks.forEach(v=>{ ctx.globalAlpha=Math.max(0,v.t/.3); ctx.fillStyle=v.color; ctx.beginPath(); ctx.arc(v.x,v.y,8+(1-v.t/.3)*13,0,7); ctx.fill(); ctx.globalAlpha=1; });
-      ctx.globalAlpha=player.inv>0 && Math.floor(performance.now()/100)%2 ? .45 : 1;
-      drawServiceTech(player.x,player.y,player.w,player.h,'platformer');
-      ctx.strokeStyle='#d4a017'; ctx.lineWidth=2; ctx.strokeRect(player.x-2,player.y-2,player.w+4,player.h+4);
-      ctx.globalAlpha=1;
-      setHud('BONUS: SERVISÁK 40000<br>Grimdark aréna: sekej heretiky a přežij vlny<br>Skóre: '+score+' &nbsp; Životy: '+player.lives+' &nbsp; TOP: '+getBestScore('s40000')+'<br><small>Čas do přežití: '+Math.ceil(time)+' s &nbsp; Útok: B / mezerník</small>');
-    }
-    loop(last);
-  }
-
-
-
-  function isSecretMachine(){ const input=document.getElementById('machine'); return input&&String(input.value).trim()===SECRET_MACHINE; }
+function isSecretMachine(){ const input=document.getElementById('machine'); return input&&String(input.value).trim()===SECRET_MACHINE; }
   window.addEventListener('DOMContentLoaded',function(){ const recalc=document.getElementById('recalc'); if(recalc) recalc.addEventListener('click',function(){ if(isSecretMachine()) setTimeout(openRetroEgg,80); }); });
 })();
 </script>
