@@ -4447,42 +4447,60 @@ document.addEventListener("DOMContentLoaded", ()=>{
   'use strict';
   const SECRET_MACHINE = '123';
   let ready=false, raf=0, mode='platformer', level=1, running=false, gameRunId=0;
-  let canvas, ctx, hud, msg, overlay;
+  let canvas, ctx, hud, msg, overlay, stage, picker;
   let levelTimeouts=[];
   const keys=Object.create(null);
   const touch={left:false,right:false,up:false,down:false,fire:false,last:null,queue:[]};
+  const GAME_LABELS={platformer:'Level 1: Servisák',tools:'Level 2: Chytej nářadí',snake:'Level 3: Had',invaders:'Bonus: Dlaždice',oil:'Bonus: Mazání vřetena',probe:'Bonus: Kalibrace sondy',bomber:'Bonus: Servis Bomber',shooter:'Bonus: Servis Shooter'};
   function clearLevelTimeouts(){ levelTimeouts.forEach(id=>clearTimeout(id)); levelTimeouts=[]; }
   function queueLevelTimeout(fn, ms){ const id=setTimeout(()=>{ levelTimeouts=levelTimeouts.filter(v=>v!==id); fn(); }, ms); levelTimeouts.push(id); return id; }
+  function loadRetroScores(){ try{ return JSON.parse(localStorage.getItem('krutotraktorRetroScores')||'{}')||{}; }catch(e){ return {}; } }
+  function getBestScore(game){ const scores=loadRetroScores(); return Number(scores[game]||0); }
+  function saveRetroBest(game, value){ const num=Number(value||0); const scores=loadRetroScores(); if(num>(Number(scores[game]||0))){ scores[game]=num; try{ localStorage.setItem('krutotraktorRetroScores', JSON.stringify(scores)); }catch(e){} } refreshPickerScores(); }
+  function refreshPickerScores(){ if(!overlay) return; const scores=loadRetroScores(); overlay.querySelectorAll('[data-score]').forEach(el=>{ const key=el.getAttribute('data-score'); el.textContent='TOP: '+Number(scores[key]||0); }); }
+  function setHud(html){ if(hud) hud.innerHTML=html; }
+  function openGamePicker(){ if(!picker) return; picker.classList.add('retro-show'); refreshPickerScores(); syncRetroLayout(); }
+  function closeGamePicker(){ if(!picker) return; picker.classList.remove('retro-show'); syncRetroLayout(); }
 
   function ensureRetroEgg(){
     if(ready) return; ready=true;
     const style=document.createElement('style');
     style.textContent=`
-      #retroEggOverlay{position:fixed;inset:0;z-index:999999;display:none;background:#101827;color:#fff;font-family:Arial,sans-serif;touch-action:none;overflow:hidden}
+      #retroEggOverlay{position:fixed;inset:0;z-index:999999;display:none;background:#101827;color:#fff;font-family:Arial,sans-serif;touch-action:none;overflow:hidden;--retro-top:84px;--retro-bottom:126px}
       #retroEggOverlay.retro-open{display:block}
-      #retroHud{position:absolute;left:10px;right:10px;top:8px;z-index:6;display:flex;flex-direction:column;gap:0;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.4);font-size:14px;pointer-events:none}
+      #retroHud{position:absolute;left:10px;right:10px;top:8px;z-index:6;display:flex;flex-direction:column;gap:8px;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.4);font-size:14px;pointer-events:none}
       #retroHudTop{display:flex;justify-content:space-between;gap:8px;align-items:center;pointer-events:auto}
-      #retroHudText{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;overflow:hidden!important;padding:0!important;margin:0!important;border:0!important}
+      #retroHudText{display:block;background:rgba(0,0,0,.48);backdrop-filter:blur(2px);border-radius:12px;padding:9px 12px;line-height:1.32;font-size:13px;max-width:min(94vw,520px);pointer-events:none}
       #retroHudBtns{display:flex;gap:8px;white-space:nowrap}
       #retroHudBtns button{border:0;border-radius:14px;background:rgba(0,0,0,.66);color:#fff;font-weight:900;padding:11px 13px;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
       #retroCloseBtn{background:#d92525!important;min-width:132px}
       #retroRestartBtn{min-width:108px}
-      #retroCanvas{position:absolute;left:0;right:0;top:76px;bottom:104px;width:100%;height:auto;display:block;background:#67c8ff}
-      @media(max-width:390px){#retroHudBtns button{font-size:14px;padding:10px 10px}#retroCloseBtn{min-width:120px}#retroRestartBtn{min-width:92px}}
-      #retroMsg{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:4;background:rgba(0,0,0,.78);padding:16px 20px;border-radius:16px;text-align:center;font-weight:900;line-height:1.35;display:none;min-width:240px}
-      #retroControls{position:absolute;left:0;right:0;bottom:0;min-height:104px;z-index:5;display:flex;align-items:flex-end;justify-content:space-between;padding:8px 22px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(180deg,rgba(16,24,39,0),rgba(16,24,39,.72) 36%,rgba(16,24,39,.92))}.retroPad{display:flex;justify-content:space-between;gap:18px;width:158px;pointer-events:auto}.retroBtn{width:68px;height:68px;border-radius:999px;border:0;background:rgba(0,0,0,.64);color:#fff;font-size:32px;font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.28);touch-action:manipulation}.retroBtn:active{transform:scale(.94);background:rgba(0,0,0,.78)}@media(max-width:390px){#retroCanvas{top:74px;bottom:98px}#retroControls{min-height:98px;padding-left:14px;padding-right:14px;padding-top:6px}.retroPad{gap:16px;width:146px}.retroBtn{width:64px;height:64px;font-size:30px}}
+      #retroMenuBtn{min-width:96px}
+      #retroStage{position:absolute;left:0;right:0;top:var(--retro-top);bottom:var(--retro-bottom);z-index:1;overflow:hidden;background:#67c8ff}
+      #retroCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent}
+      @media(max-width:390px){#retroHudBtns button{font-size:13px;padding:10px 9px}#retroCloseBtn{min-width:120px}#retroRestartBtn{min-width:92px}#retroMenuBtn{min-width:88px}#retroHudText{font-size:12px;padding:8px 10px}}
+      #retroMsg{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:7;background:rgba(0,0,0,.78);padding:16px 20px;border-radius:16px;text-align:center;font-weight:900;line-height:1.35;display:none;min-width:240px;max-width:min(92vw,380px)}
+#retroPicker{position:absolute;inset:0;z-index:8;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(6,10,18,.72);backdrop-filter:blur(2px)}#retroPicker.retro-show{display:flex}#retroPickerCard{width:min(94vw,420px);max-height:min(76vh,620px);overflow:auto;background:#101827;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;box-shadow:0 18px 40px rgba(0,0,0,.38)}#retroPickerHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}#retroPickerTitle{font-size:18px;font-weight:900}#retroPickerClose{border:0;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font-weight:900;padding:10px 12px}#retroGameList{display:grid;gap:10px}.retroGamePick{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:14px;background:rgba(255,255,255,.08);color:#fff;padding:12px 14px;font-weight:900}.retroGamePick small{display:block;font-size:12px;opacity:.78;font-weight:700;margin-top:3px}.retroGameScore{font-size:12px;opacity:.86;white-space:nowrap;text-align:right}
+      #retroControls{position:absolute;left:0;right:0;bottom:0;min-height:104px;z-index:5;display:flex;align-items:flex-end;justify-content:space-between;padding:8px 22px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(180deg,rgba(16,24,39,0),rgba(16,24,39,.72) 36%,rgba(16,24,39,.92))}.retroPad{display:flex;justify-content:space-between;gap:18px;width:158px;pointer-events:auto}.retroFirePad{position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);pointer-events:auto}.retroFireBtn{width:62px;height:62px;border-radius:999px;border:0;background:rgba(217,37,37,.82);color:#fff;font-size:22px;font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.28);touch-action:manipulation}.retroBtn{width:68px;height:68px;border-radius:999px;border:0;background:rgba(0,0,0,.64);color:#fff;font-size:32px;font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.28);touch-action:manipulation}.retroBtn:active{transform:scale(.94);background:rgba(0,0,0,.78)}@media(max-width:390px){#retroEggOverlay{--retro-top:82px;--retro-bottom:118px}#retroControls{min-height:98px;padding-left:14px;padding-right:14px;padding-top:6px}.retroPad{gap:16px;width:146px}.retroBtn{width:64px;height:64px;font-size:30px}.retroFirePad{bottom:calc(20px + env(safe-area-inset-bottom))}.retroFireBtn{width:58px;height:58px;font-size:20px}}
     `;
     document.head.appendChild(style);
     overlay=document.createElement('div'); overlay.id='retroEggOverlay';
-    overlay.innerHTML=`<canvas id="retroCanvas"></canvas><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button></div></div></div><div id="retroMsg"></div><div id="retroControls"><div class="retroPad"><button class="retroBtn" id="retroLeft" type="button">‹</button><button class="retroBtn" id="retroRight" type="button">›</button></div><div class="retroPad"><button class="retroBtn" id="retroDown" type="button">↓</button><button class="retroBtn" id="retroJump" type="button">↑</button></div></div>`;
+    overlay.innerHTML=`<div id="retroStage"><canvas id="retroCanvas"></canvas></div><div id="retroHud"><div id="retroHudTop"><div id="retroHudBtns"><button id="retroCloseBtn" type="button">← Zpět do aplikace</button><button id="retroRestartBtn" type="button">Restart hry</button><button id="retroMenuBtn" type="button">Výběr her</button></div></div><div id="retroHudText">Vyber stroj 123 a spusť přepočet.</div></div><div id="retroMsg"></div><div id="retroPicker"><div id="retroPickerCard"><div id="retroPickerHead"><div id="retroPickerTitle">Výběr minihry</div><button id="retroPickerClose" type="button">Zavřít</button></div><div id="retroGameList"><button class="retroGamePick" data-game="platformer" type="button"><span>Level 1: Servisák<small>Skákej přes překážky a sbírej coiny</small></span><span class="retroGameScore" data-score="platformer">TOP: 0</span></button><button class="retroGamePick" data-game="tools" type="button"><span>Level 2: Chytej nářadí<small>Chytej padající nářadí</small></span><span class="retroGameScore" data-score="tools">TOP: 0</span></button><button class="retroGamePick" data-game="snake" type="button"><span>Level 3: Had<small>Klasický had s dotykovým ovládáním</small></span><span class="retroGameScore" data-score="snake">TOP: 0</span></button><button class="retroGamePick" data-game="invaders" type="button"><span>Bonus: Dlaždice<small>Rozbij všechny bloky</small></span><span class="retroGameScore" data-score="invaders">TOP: 0</span></button><button class="retroGamePick" data-game="oil" type="button"><span>Bonus: Mazání vřetena<small>Sbírej kapky a vyhýbej se alarmům</small></span><span class="retroGameScore" data-score="oil">TOP: 0</span></button><button class="retroGamePick" data-game="probe" type="button"><span>Bonus: Kalibrace sondy<small>Dojeď k cíli a vyhni se alarmům</small></span><span class="retroGameScore" data-score="probe">TOP: 0</span></button></div></div></div><div id="retroControls"><div class="retroPad"><button class="retroBtn" id="retroLeft" type="button">‹</button><button class="retroBtn" id="retroRight" type="button">›</button></div><div class="retroPad"><button class="retroBtn" id="retroDown" type="button">↓</button><button class="retroBtn" id="retroJump" type="button">↑</button></div></div>`;
     document.body.appendChild(overlay);
-    canvas=document.getElementById('retroCanvas'); ctx=canvas.getContext('2d'); hud=document.getElementById('retroHudText') || document.createElement('div'); msg=document.getElementById('retroMsg');
+    stage=document.getElementById('retroStage');
+    picker=document.getElementById('retroPicker');
+    canvas=document.getElementById('retroCanvas'); ctx=canvas.getContext('2d'); hud=document.getElementById('retroHudText'); msg=document.getElementById('retroMsg');
     document.getElementById('retroCloseBtn').addEventListener('click',closeRetroEgg);
-    document.getElementById('retroRestartBtn').addEventListener('click',()=>startLevel(['platformer','tools','snake','invaders','oil'].includes(mode)?mode:'platformer'));
-    bindBtn('retroLeft','left'); bindBtn('retroRight','right'); bindBtn('retroJump','up'); bindBtn('retroDown','down'); bindSnakeSwipe();
-    window.addEventListener('resize',resizeCanvas);
-    document.addEventListener('keydown',e=>{ if(isOpen()){ if(e.key==='Escape'){ e.preventDefault(); closeRetroEgg(); return; } keys[e.key]=true; if(mode==='snake'){ const km={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'}; if(km[e.key]) queueSnakeDir(km[e.key]); } if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault(); }});
-    document.addEventListener('keyup',e=>{ keys[e.key]=false; });
+    document.getElementById('retroRestartBtn').addEventListener('click',()=>startLevel(['platformer','tools','snake','invaders','oil','bomber','shooter','probe'].includes(mode)?mode:'platformer'));
+    document.getElementById('retroMenuBtn').addEventListener('click',openGamePicker);
+    document.getElementById('retroPickerClose').addEventListener('click',closeGamePicker);
+    picker.addEventListener('click',e=>{ if(e.target===picker) closeGamePicker(); });
+    picker.querySelectorAll('[data-game]').forEach(btn=>btn.addEventListener('click',()=>startLevel(btn.dataset.game)));
+    bindBtn('retroLeft','left'); bindBtn('retroRight','right'); bindBtn('retroJump','up'); bindBtn('retroDown','down'); bindBtn('retroFire','fire'); bindSnakeSwipe();
+    refreshPickerScores();
+    window.addEventListener('resize',()=>{ syncRetroLayout(); resizeCanvas(); });
+    document.addEventListener('keydown',e=>{ if(isOpen()){ if(e.key==='Escape'){ e.preventDefault(); closeRetroEgg(); return; } keys[e.key]=true; if(mode==='snake'){ const km={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'}; if(km[e.key]) queueSnakeDir(km[e.key]); } if(e.key===' '||e.key==='Enter') touch.fire=true; if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault(); }});
+    document.addEventListener('keyup',e=>{ keys[e.key]=false; if(e.key===' '||e.key==='Enter') touch.fire=false; });
     resizeCanvas();
   }
   function queueSnakeDir(name){ if(mode==='snake' && ['left','right','up','down'].includes(name)){ touch.queue.push(name); if(touch.queue.length>3) touch.queue.shift(); touch.last=name; } }
@@ -4502,16 +4520,28 @@ document.addEventListener("DOMContentLoaded", ()=>{
       queueSnakeDir(Math.abs(dx)>Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up'));
     }, {passive:true});
   }
-  function resizeCanvas(){ if(!canvas)return; const d=Math.max(1,Math.min(2,window.devicePixelRatio||1)); const r=canvas.getBoundingClientRect(); const w=Math.max(1,r.width||innerWidth); const h=Math.max(1,r.height||(innerHeight-104)); canvas.width=Math.floor(w*d); canvas.height=Math.floor(h*d); ctx.setTransform(d,0,0,d,0,0); }
-  function gameSize(){ const r=canvas.getBoundingClientRect(); return {W:Math.max(1,r.width||innerWidth), H:Math.max(1,r.height||(innerHeight-104))}; }
+  function syncRetroLayout(){
+    if(!overlay) return;
+    const hudEl=document.getElementById('retroHud');
+    const controlsEl=document.getElementById('retroControls');
+    const overlayRect=overlay.getBoundingClientRect();
+    const hudRect=hudEl ? hudEl.getBoundingClientRect() : {bottom:overlayRect.top};
+    const controlsRect=controlsEl ? controlsEl.getBoundingClientRect() : {top:overlayRect.bottom};
+    const top=Math.max(72, Math.ceil(hudRect.bottom - overlayRect.top + 12));
+    const bottom=Math.max(108, Math.ceil(overlayRect.bottom - controlsRect.top + 12));
+    overlay.style.setProperty('--retro-top', top+'px');
+    overlay.style.setProperty('--retro-bottom', bottom+'px');
+  }
+  function resizeCanvas(){ if(!canvas)return; syncRetroLayout(); const d=Math.max(1,Math.min(2,window.devicePixelRatio||1)); const r=(stage||canvas).getBoundingClientRect(); const w=Math.max(1,r.width||innerWidth); const h=Math.max(1,r.height||Math.max(180,innerHeight-220)); canvas.width=Math.floor(w*d); canvas.height=Math.floor(h*d); ctx.setTransform(d,0,0,d,0,0); }
+  function gameSize(){ const r=(stage||canvas).getBoundingClientRect(); return {W:Math.max(1,r.width||innerWidth), H:Math.max(1,r.height||Math.max(180,innerHeight-220))}; }
   function isOpen(){ return overlay && overlay.classList.contains('retro-open'); }
-  function openRetroEgg(){ ensureRetroEgg(); overlay.classList.add('retro-open'); startLevel('platformer'); }
-  function closeRetroEgg(){ if(overlay) overlay.classList.remove('retro-open'); running=false; gameRunId++; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); if(ctx&&canvas){ ctx.clearRect(0,0,canvas.width,canvas.height); } Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; }
+  function openRetroEgg(){ ensureRetroEgg(); overlay.classList.add('retro-open'); closeGamePicker(); refreshPickerScores(); requestAnimationFrame(()=>{ resizeCanvas(); startLevel('platformer'); }); }
+  function closeRetroEgg(){ if(overlay) overlay.classList.remove('retro-open'); closeGamePicker(); running=false; gameRunId++; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); if(ctx&&canvas){ ctx.clearRect(0,0,canvas.width,canvas.height); } Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; }
   function show(html){ msg.innerHTML=html; msg.style.display='block'; }
   function hide(){ msg.style.display='none'; }
   function left(){ return keys.ArrowLeft||keys.a||touch.left; } function right(){ return keys.ArrowRight||keys.d||touch.right; } function up(){ return keys.ArrowUp||keys.w||keys[' ']||touch.up; } function down(){ return keys.ArrowDown||keys.s||touch.down; }
   function rect(a,b){ return !(a.x+a.w<b.x||a.x>b.x+b.w||a.y+a.h<b.y||a.y>b.y+b.h); }
-  function startLevel(which){ running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); if(which==='oil') oilRun(); }
+  function startLevel(which){ closeGamePicker(); running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } setHud((GAME_LABELS[which]||'Minihra')+'<br><small>Načítám…</small>'); running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); if(which==='oil') oilRun(); if(which==='bomber') bomberRun(); if(which==='shooter') shooterRun(); if(which==='probe') probeRun(); }
 
   function platformer(){
     const runId=gameRunId;
@@ -4526,10 +4556,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
       const oldX=p.x, oldY=p.y; p.vy+=0.62*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.onGround=false;
       platforms.forEach(pl=>{ if(!rect(p,pl))return; const wasAbove=oldY+p.h<=pl.y+6, wasBelow=oldY>=pl.y+pl.h-2, wasLeft=oldX+p.w<=pl.x+4, wasRight=oldX>=pl.x+pl.w-4; if(p.vy>=0&&wasAbove){p.y=pl.y-p.h;p.vy=0;p.onGround=true;} else if(p.vy<0&&wasBelow){p.y=pl.y+pl.h;p.vy=0;} else if(p.vx>0&&wasLeft){p.x=pl.x-p.w;} else if(p.vx<0&&wasRight){p.x=pl.x+pl.w;} });
       if(p.y>floor-p.h){p.y=floor-p.h;p.vy=0;p.onGround=true;} p.x=Math.max(0,Math.min(world-p.w,p.x)); cam=Math.max(0,Math.min(world-W,p.x-W*.35)); if(inv>0)inv-=dt;
-      enemies.forEach(e=>{ if(e.dead)return; e.x+=e.dir*1.35*dt; if(Math.abs(e.x-e.base)>120)e.dir*=-1; if(inv<=0&&rect(p,e)){ if(p.vy>0&&p.y+p.h<e.y+18){e.dead=true;p.vy=-8}else{lives--;inv=80;p.x=Math.max(20,p.x-180); if(lives<=0){done=true;show('Konec Levelu 1<br><small>Restart = nový pokus</small>');}} }});
+      enemies.forEach(e=>{ if(e.dead)return; e.x+=e.dir*1.35*dt; if(Math.abs(e.x-e.base)>120)e.dir*=-1; if(inv<=0&&rect(p,e)){ if(p.vy>0&&p.y+p.h<e.y+18){e.dead=true;p.vy=-8}else{lives--;inv=80;p.x=Math.max(20,p.x-180); if(lives<=0){done=true;saveRetroBest('platformer',score);show('Konec Levelu 1<br><small>Restart = nový pokus</small>');}} }});
       coins.forEach(c=>{ if(!c.got&&Math.hypot((p.x+p.w/2)-c.x,(p.y+p.h/2)-c.y)<30){c.got=true;score++;} });
-      if(p.x>world-80&&!done){ done=true; show('Level 1 hotový<br><small>Za 2 sekundy startuje Level 2: chytej nářadí</small>'); queueLevelTimeout(()=>{ if(isOpen() && runId===gameRunId) startLevel('tools');},2000); }
-      drawPlatformer(W,H,floor,world,cam,p,platforms,coins,enemies,score,lives,inv,done); hud.innerHTML='LEVEL 1 / 3<br>Coiny: '+score+'/28 &nbsp; Životy: '+lives+'<br><small>Cíl je na konci mapy</small>';
+      if(p.x>world-80&&!done){ done=true; saveRetroBest('platformer',score); show('Level 1 hotový<br><small>Za 2 sekundy startuje Level 2: chytej nářadí</small>'); queueLevelTimeout(()=>{ if(isOpen() && runId===gameRunId) startLevel('tools');},2000); }
+      drawPlatformer(W,H,floor,world,cam,p,platforms,coins,enemies,score,lives,inv,done); setHud('LEVEL 1 / 3<br>Coiny: '+score+'/28 &nbsp; Životy: '+lives+' &nbsp; TOP: '+getBestScore('platformer')+'<br><small>Cíl je na konci mapy</small>');
     } loop(0);
   }
   function drawServiceTech(x,y,w,h,variant='platformer'){ 
@@ -4613,12 +4643,12 @@ document.addEventListener("DOMContentLoaded", ()=>{
     }
     function loop(now){ if(runId!==gameRunId||!running||mode!=='tools'||!isOpen())return; raf=requestAnimationFrame(loop); const dt=Math.min(.05,(now-last)/1000||0.016); last=now; if(left())man.x-=360*dt; if(right())man.x+=360*dt; man.x=Math.max(0,Math.min(W-man.w,man.x)); spawn-=dt; if(spawn<=0 && items.length<maxActive){spawn=Math.max(.22,.50-(score/100)*.007);items.push({x:24+Math.random()*(W-48),y:-20,vy:145+Math.random()*100,txt:names[Math.floor(Math.random()*names.length)]});}
       for(let i=items.length-1;i>=0;i--){let it=items[i];it.y+=it.vy*dt; if(rect({x:man.x-8,y:man.y-8,w:man.w+16,h:man.h+16},{x:it.x-20,y:it.y-20,w:40,h:40})){ score+=100; items.splice(i,1); } else if(it.y>H+30){ missed++; items.splice(i,1); } }
-      if(score>=targetScore){const rank=toolRank(missed); show('Level 2 hotový<br><small>Dosažené skóre: '+score+' / '+targetScore+' bodů<br>Postrácel jsi nářadí: '+missed+' ks<br>Hodnocení: '+rank+'<br>Za 3 sekundy startuje Level 3: Had</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('snake')},3000); running=false; return;}
+      if(score>=targetScore){const rank=toolRank(missed); saveRetroBest('tools',score); show('Level 2 hotový<br><small>Dosažené skóre: '+score+' / '+targetScore+' bodů<br>Postrácel jsi nářadí: '+missed+' ks<br>Hodnocení: '+rank+'<br>Za 3 sekundy startuje Level 3: Had</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('snake')},3000); running=false; return;}
       ctx.clearRect(0,0,W,H); ctx.fillStyle='#172033';ctx.fillRect(0,0,W,H); ctx.fillStyle='#24324d';ctx.fillRect(0,H-82,W,82); ctx.font='32px Arial'; items.forEach(it=>{ctx.fillText(it.txt,it.x-16,it.y+12)}); 
       ctx.fillStyle='#6d7887'; ctx.fillRect(man.x-6,man.y+30,man.w+12,10); ctx.fillStyle='#3f4652'; ctx.fillRect(man.x-10,man.y+20,8,28); ctx.fillRect(man.x+man.w+2,man.y+20,8,28);
       drawServiceTech(man.x-2,man.y-14,man.w+8,man.h+22,'tools');
       ctx.fillStyle='#d8dde5'; ctx.fillRect(man.x+man.w-6,man.y+4,12,16); ctx.fillStyle='#77d6ff'; ctx.fillRect(man.x+man.w-3,man.y+8,6,8);
-      hud.innerHTML='LEVEL 2 / 3<br>Chytej nářadí do skóre '+targetScore+'<br>Skóre: '+score+' / '+targetScore+'<br><small>Spadlé nářadí: '+missed+' ks</small>';
+      setHud('LEVEL 2 / 3<br>Chytej nářadí do skóre '+targetScore+'<br>Skóre: '+score+' / '+targetScore+' &nbsp; TOP: '+getBestScore('tools')+'<br><small>Spadlé nářadí: '+missed+' ks</small>');
     } loop(last);
   }
 
@@ -4633,8 +4663,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(!k) k = (keys.ArrowUp||keys.w?'up':keys.ArrowDown||keys.s?'down':keys.ArrowLeft||keys.a?'left':keys.ArrowRight||keys.d?'right':null);
       touch.last=null; touch.left=false; touch.right=false; touch.up=false; touch.down=false;
       if(k==='up'&&dir.y!==1)next={x:0,y:-1}; else if(k==='down'&&dir.y!==-1)next={x:0,y:1}; else if(k==='left'&&dir.x!==1)next={x:-1,y:0}; else if(k==='right'&&dir.x!==-1)next={x:1,y:0};
-      dir=next; const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y}; const crash=head.x<0||head.y<0||head.x>=cols||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y); if(crash){lives--; if(lives<=0){show('Had přišel o 5 životů<br><small>Spouštím bonus: Dlaždice...</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},1800); running=false; return;} reset(); return;} snake.unshift(head); if(head.x===food.x&&head.y===food.y){score++; if(score>=winScore){show('Had hotový 🐍<br><small>Za 2 sekundy startuje bonus: Dlaždice</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},2000); running=false; return;} placeFood();} else snake.pop(); }
-    function loop(t){ if(runId!==gameRunId||!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); hud.innerHTML='LEVEL 3 / 3<br>Had: šipky, swipe nebo krátké ťuknutí<br>Skóre: '+score+' / '+winScore+' &nbsp; Životy: '+lives+' / 5<br><small>Hrací pole začíná pod horním menu</small>'; }
+      dir=next; const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y}; const crash=head.x<0||head.y<0||head.x>=cols||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y); if(crash){lives--; if(lives<=0){saveRetroBest('snake',score);show('Had přišel o 5 životů<br><small>Spouštím bonus: Dlaždice...</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},1800); running=false; return;} reset(); return;} snake.unshift(head); if(head.x===food.x&&head.y===food.y){score++; if(score>=winScore){saveRetroBest('snake',score);show('Had hotový 🐍<br><small>Za 2 sekundy startuje bonus: Dlaždice</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},2000); running=false; return;} placeFood();} else snake.pop(); }
+    function loop(t){ if(runId!==gameRunId||!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); setHud('LEVEL 3 / 3<br>Had: šipky, swipe nebo krátké ťuknutí<br>Skóre: '+score+' / '+winScore+' &nbsp; Životy: '+lives+' / 5 &nbsp; TOP: '+getBestScore('snake')+'<br><small>Hrací pole začíná pod horním menu</small>'); }
     loop(0);
   }
 
@@ -4684,10 +4714,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
             break;
           }
         }
-        if(ball.y-ball.r>H){ lives--; if(lives<=0){ show('Dlaždice konec<br><small>Restart = nový pokus</small>'); running=false; } else resetBall(); }
+        if(ball.y-ball.r>H){ lives--; if(lives<=0){ saveRetroBest('invaders',score); show('Dlaždice konec<br><small>Restart = nový pokus</small>'); running=false; } else resetBall(); }
       }
       hits.forEach(h=>h.t-=dt); hits=hits.filter(h=>h.t>0);
-      if(bricks.every(b=>!b.alive)){ show('Dlaždice hotovo 🧱<br><small>Za 2 sekundy startuje bonus: Mazání vřetena</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('oil')},2000); running=false; }
+      if(bricks.every(b=>!b.alive)){ saveRetroBest('invaders',score); show('Dlaždice hotovo 🧱<br><small>Za 2 sekundy startuje bonus: Mazání vřetena</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('oil')},2000); running=false; }
       ctx.clearRect(0,0,W,H);
       ctx.fillStyle='#09111d'; ctx.fillRect(0,0,W,H);
       ctx.fillStyle='#132238'; ctx.fillRect(0,0,W,H);
@@ -4697,7 +4727,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       ctx.fillStyle='#d3ffd9'; ctx.fillRect(paddle.x+8,paddle.y+2,paddle.w-16,3);
       ctx.fillStyle='#ffd33d'; ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,7); ctx.fill();
       hits.forEach(h=>{ ctx.globalAlpha=Math.max(0,h.t/.28); ctx.fillStyle=h.color; ctx.beginPath(); ctx.arc(h.x,h.y,8+(1-h.t/.28)*12,0,7); ctx.fill(); ctx.globalAlpha=1; });
-      hud.innerHTML='BONUS: DLAŽDICE<br>Pohybuj plošinkou doleva a doprava<br>Skóre: '+score+' &nbsp; Životy: '+lives+'<br><small>Rozbij všechny bloky nahoře</small>';
+      setHud('BONUS: DLAŽDICE<br>Pohybuj plošinkou doleva a doprava<br>Skóre: '+score+' &nbsp; Životy: '+lives+' &nbsp; TOP: '+getBestScore('invaders')+'<br><small>Rozbij všechny bloky nahoře</small>');
     }
     loop(last);
   }
@@ -4720,8 +4750,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(alarmSpawn<=0){ alarmSpawn=1.2+Math.random()*.9; alarms.push({x:22+Math.random()*(W-44),y:-24,w:28,h:28,vy:150+Math.random()*90}); }
       for(let i=drops.length-1;i>=0;i--){ const d=drops[i]; d.y+=d.vy*dt; if(rect(tech,{x:d.x-d.r,y:d.y-d.r,w:d.r*2,h:d.r*2})){score++; drops.splice(i,1);} else if(d.y>H+30)drops.splice(i,1); }
       for(let i=alarms.length-1;i>=0;i--){ const a=alarms[i]; a.y+=a.vy*dt; if(rect(tech,a)){hits++; alarms.splice(i,1);} else if(a.y>H+40)alarms.splice(i,1); }
-      if(score>=target){ show('Mazání vřetena hotovo ✅<br><small>Nasbíráno: '+score+' kapek<br>Zásahy alarmem: '+hits+'</small>'); running=false; return; }
-      if(time<=0 || hits>=5){ show('Mazání vřetena konec<br><small>Skóre: '+score+' / '+target+' &nbsp; Alarmy: '+hits+' / 5</small>'); running=false; return; }
+      if(score>=target){ saveRetroBest('oil',score); show('Mazání vřetena hotovo ✅<br><small>Nasbíráno: '+score+' kapek<br>Zásahy alarmem: '+hits+'<br>Za 2 sekundy startuje bonus: Servis Bomber</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('bomber')},2000); running=false; return; }
+      if(time<=0 || hits>=5){ saveRetroBest('oil',score); show('Mazání vřetena konec<br><small>Skóre: '+score+' / '+target+' &nbsp; Alarmy: '+hits+' / 5</small>'); running=false; return; }
       ctx.clearRect(0,0,W,H);
       ctx.fillStyle='#0b1422'; ctx.fillRect(0,0,W,H);
       ctx.fillStyle='#14233a'; ctx.fillRect(0,H-52,W,52);
@@ -4729,7 +4759,289 @@ document.addEventListener("DOMContentLoaded", ()=>{
       drops.forEach(d=>{ ctx.fillStyle='#65d6ff'; ctx.beginPath(); ctx.ellipse(d.x,d.y,d.r*.72,d.r,0,0,7); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.45)'; ctx.beginPath(); ctx.arc(d.x-3,d.y-4,3,0,7); ctx.fill(); });
       alarms.forEach(a=>{ ctx.fillStyle='#ff4b4b'; ctx.fillRect(a.x,a.y,a.w,a.h); ctx.fillStyle='#fff'; ctx.font='20px Arial'; ctx.fillText('!',a.x+10,a.y+22); });
       drawServiceTech(tech.x,tech.y,tech.w,tech.h,'oil');
-      hud.innerHTML='BONUS: MAZÁNÍ VŘETENA<br>Sbírej modré kapky, vyhýbej se červeným alarmům<br>Kapky: '+score+' / '+target+' &nbsp; Alarmy: '+hits+' / 5<br><small>Čas: '+Math.ceil(time)+' s</small>';
+      setHud('BONUS: MAZÁNÍ VŘETENA<br>Sbírej modré kapky, vyhýbej se červeným alarmům<br>Kapky: '+score+' / '+target+' &nbsp; Alarmy: '+hits+' / 5 &nbsp; TOP: '+getBestScore('oil')+'<br><small>Čas: '+Math.ceil(time)+' s</small>');
+    }
+    loop(last);
+  }
+
+
+  function bomberRun(){
+    const runId=gameRunId;
+    const s=gameSize(), W=s.W, H=s.H;
+    const cols=13, rows=11;
+    const cell=Math.floor(Math.min(W/cols, H/rows));
+    const ox=Math.floor((W-cols*cell)/2), oy=Math.floor((H-rows*cell)/2);
+    let score=0, lives=3, time=75, last=performance.now(), fireLatch=false, moveCd=0;
+    const grid=[];
+    for(let y=0;y<rows;y++){
+      grid[y]=[];
+      for(let x=0;x<cols;x++){
+        const solid = x===0||y===0||x===cols-1||y===rows-1||(x%2===0&&y%2===0);
+        const safe = (x<=2&&y<=2);
+        grid[y][x]= solid ? 1 : (!safe && Math.random()<.43 ? 2 : 0);
+      }
+    }
+    let player={x:1,y:1,hit:0};
+    let bombs=[], blasts=[];
+    const enemies=[
+      {x:cols-2,y:rows-2,dx:-1,dy:0,step:.45},
+      {x:cols-2,y:1,dx:0,dy:1,step:.55},
+      {x:1,y:rows-2,dx:1,dy:0,step:.6}
+    ];
+    function free(x,y){
+      if(x<0||y<0||x>=cols||y>=rows) return false;
+      if(grid[y][x]!==0) return false;
+      if(bombs.some(b=>b.x===x&&b.y===y)) return false;
+      return true;
+    }
+    function tryMove(o,dx,dy){ const nx=o.x+dx, ny=o.y+dy; if(free(nx,ny)){ o.x=nx; o.y=ny; return true; } return false; }
+    function placeBomb(){ if(bombs.some(b=>b.x===player.x&&b.y===player.y)) return; bombs.push({x:player.x,y:player.y,t:1.7,r:2}); }
+    function addBlast(x,y){ blasts.push({x,y,t:.34}); }
+    function explode(b){
+      addBlast(b.x,b.y);
+      const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+      for(const [dx,dy] of dirs){
+        for(let i=1;i<=b.r;i++){
+          const x=b.x+dx*i, y=b.y+dy*i;
+          if(x<0||y<0||x>=cols||y>=rows) break;
+          if(grid[y][x]===1) break;
+          addBlast(x,y);
+          if(grid[y][x]===2){ grid[y][x]=0; score+=50; break; }
+        }
+      }
+    }
+    function blastAt(x,y){ return blasts.some(b=>b.x===x&&b.y===y); }
+    function hurt(){
+      if(player.hit>0) return;
+      lives--; player.hit=1.2;
+      if(lives<=0){ saveRetroBest('bomber',score); show('Servis Bomber konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
+      else { player.x=1; player.y=1; }
+    }
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#0b1422'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#132238'; ctx.fillRect(ox-4,oy-4,cols*cell+8,rows*cell+8);
+      for(let y=0;y<rows;y++) for(let x=0;x<cols;x++){
+        const px=ox+x*cell, py=oy+y*cell;
+        ctx.fillStyle=((x+y)%2?'#22344f':'#1b2b43'); ctx.fillRect(px,py,cell-1,cell-1);
+        if(grid[y][x]===1){ ctx.fillStyle='#667083'; ctx.fillRect(px+2,py+2,cell-5,cell-5); ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fillRect(px+5,py+5,cell-10,4); }
+        if(grid[y][x]===2){ ctx.fillStyle='#a96c35'; ctx.fillRect(px+4,py+4,cell-8,cell-8); ctx.strokeStyle='#70451f'; ctx.lineWidth=2; ctx.strokeRect(px+5,py+5,cell-10,cell-10); }
+      }
+      blasts.forEach(b=>{ const px=ox+b.x*cell, py=oy+b.y*cell; ctx.fillStyle='rgba(255,211,61,.85)'; ctx.fillRect(px+3,py+3,cell-7,cell-7); ctx.fillStyle='rgba(255,90,60,.75)'; ctx.fillRect(px+cell*.28,py+cell*.28,cell*.44,cell*.44); });
+      bombs.forEach(b=>{ const px=ox+b.x*cell+cell/2, py=oy+b.y*cell+cell/2; ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(px,py,cell*.28,0,7); ctx.fill(); ctx.fillStyle='#ff4b4b'; ctx.fillRect(px+cell*.12,py-cell*.26,cell*.1,cell*.1); });
+      enemies.forEach(e=>{ const px=ox+e.x*cell, py=oy+e.y*cell; ctx.fillStyle='#ff4e4e'; ctx.fillRect(px+cell*.22,py+cell*.22,cell*.56,cell*.56); ctx.fillStyle='#fff'; ctx.font=Math.max(12,cell*.42)+'px Arial'; ctx.fillText('!',px+cell*.42,py+cell*.65); });
+      ctx.globalAlpha=player.hit>0 && Math.floor(performance.now()/120)%2 ? .45 : 1;
+      drawServiceTech(ox+player.x*cell+cell*.13, oy+player.y*cell+cell*.05, cell*.74, cell*.86, 'oil');
+      ctx.globalAlpha=1;
+      setHud('BONUS: SERVIS BOMBER<br>Pohyb šipkami, B / mezerník = bomba<br>Skóre: '+score+' &nbsp; Životy: '+lives+' &nbsp; TOP: '+getBestScore('bomber')+'<br><small>Čas: '+Math.ceil(time)+' s</small>');
+    }
+    function loop(now){
+      if(runId!==gameRunId||!running||mode!=='bomber'||!isOpen())return;
+      raf=requestAnimationFrame(loop);
+      const dt=Math.min(.05,(now-last)/1000||.016); last=now; time-=dt; moveCd-=dt; if(player.hit>0)player.hit-=dt;
+      if(time<=0){ saveRetroBest('bomber',score); show('Servis Bomber konec<br><small>Skóre: '+score+' &nbsp; Čas vypršel</small>'); running=false; return; }
+
+      if(moveCd<=0){
+        let dx=0,dy=0; if(left())dx=-1; else if(right())dx=1; else if(up())dy=-1; else if(down())dy=1;
+        if(dx||dy){ tryMove(player,dx,dy); moveCd=.12; }
+      }
+      if(touch.fire && !fireLatch){ placeBomb(); fireLatch=true; }
+      if(!touch.fire && !keys[' '] && !keys.Enter) fireLatch=false;
+
+      bombs.forEach(b=>b.t-=dt);
+      const exp=bombs.filter(b=>b.t<=0); bombs=bombs.filter(b=>b.t>0); exp.forEach(explode);
+      blasts.forEach(b=>b.t-=dt); blasts=blasts.filter(b=>b.t>0);
+
+      enemies.forEach(e=>{
+        e.step-=dt;
+        if(e.step<=0){
+          e.step=.32+Math.random()*.28;
+          if(!tryMove(e,e.dx,e.dy) || Math.random()<.24){
+            const dirs=[[1,0],[-1,0],[0,1],[0,-1]].sort(()=>Math.random()-.5);
+            for(const d of dirs){ if(free(e.x+d[0],e.y+d[1])){ e.dx=d[0]; e.dy=d[1]; break; } }
+          }
+        }
+      });
+      for(let i=enemies.length-1;i>=0;i--){ if(blastAt(enemies[i].x,enemies[i].y)){ enemies.splice(i,1); score+=200; } }
+      if(blastAt(player.x,player.y)) hurt();
+      if(enemies.some(e=>e.x===player.x&&e.y===player.y)) hurt();
+
+      if(enemies.length===0 && !grid.some(row=>row.includes(2))){
+        const finalScore=score+Math.ceil(time)*10;
+        saveRetroBest('bomber',finalScore);
+        show('Servis Bomber hotovo 💣<br><small>Skóre: '+finalScore+'<br>Za 2 sekundy startuje bonus: Servis Shooter</small>');
+        queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('shooter')},2000); running=false; return;
+      }
+      draw();
+    }
+    draw(); loop(last);
+  }
+
+
+  function shooterRun(){
+    const runId=gameRunId;
+    const s=gameSize(), W=s.W, H=s.H;
+    const floor=H-44, world=2400;
+    let cam=0, score=0, lives=3, ammo=28, last=performance.now(), fireLatch=false, inv=0, done=false;
+    let p={x:42,y:floor-46,w:34,h:42,vx:0,vy:0,onGround:false,dir:1};
+    const platforms=[
+      {x:260,y:floor-88,w:120,h:16},{x:520,y:floor-136,w:110,h:16},{x:820,y:floor-92,w:140,h:16},
+      {x:1120,y:floor-150,w:140,h:16},{x:1500,y:floor-110,w:160,h:16},{x:1880,y:floor-150,w:130,h:16}
+    ];
+    const crates=[360,680,1020,1320,1680,2060].map(x=>({x,y:floor-30,w:30,h:30,alive:true}));
+    const drones=[500,780,1180,1460,1760,2140].map((x,i)=>({x,y:floor-82-(i%2)*55,w:30,h:24,base:x,dir:i%2?1:-1,alive:true,shoot:1+i*.18}));
+    const pickups=[300,920,1550,1980].map(x=>({x,y:floor-118,w:16,h:16,got:false,type:'ammo'}));
+    let bullets=[], enemyBullets=[], fx=[];
+
+    function clearJump(){ touch.up=false; keys.ArrowUp=false; keys.w=false; keys[' ']=false; }
+    function solidCollide(obj, oldX, oldY){
+      platforms.concat([{x:-999,y:floor,w:world+1999,h:80}]).forEach(pl=>{
+        if(!rect(obj,pl))return;
+        const wasAbove=oldY+obj.h<=pl.y+5, wasBelow=oldY>=pl.y+pl.h-2, wasLeft=oldX+obj.w<=pl.x+4, wasRight=oldX>=pl.x+pl.w-4;
+        if(obj.vy>=0&&wasAbove){obj.y=pl.y-obj.h;obj.vy=0;obj.onGround=true;}
+        else if(obj.vy<0&&wasBelow){obj.y=pl.y+pl.h;obj.vy=0;}
+        else if(obj.vx>0&&wasLeft){obj.x=pl.x-obj.w;}
+        else if(obj.vx<0&&wasRight){obj.x=pl.x+pl.w;}
+      });
+    }
+    function shoot(){
+      if(ammo<=0)return;
+      ammo--;
+      bullets.push({x:p.x+(p.dir>0?p.w+2:-8),y:p.y+17,w:12,h:5,vx:p.dir*520});
+    }
+    function hurt(){
+      if(inv>0)return;
+      lives--; inv=1.2; p.x=Math.max(30,p.x-90); p.vy=-7;
+      if(lives<=0){ saveRetroBest('shooter',score); show('Servis Shooter konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
+    }
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      const grd=ctx.createLinearGradient(0,0,0,H); grd.addColorStop(0,'#101827'); grd.addColorStop(.55,'#182744'); grd.addColorStop(1,'#0b1422'); ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='rgba(255,255,255,.06)'; for(let i=0;i<45;i++) ctx.fillRect((i*127-cam*.18)%W,(i*53)%Math.max(1,H-80),2,2);
+      ctx.fillStyle='#263a5a'; for(let x=-((cam*.35)%180);x<W+180;x+=180){ ctx.fillRect(x,H-170,90,126); ctx.fillStyle='rgba(119,214,255,.12)'; ctx.fillRect(x+18,H-146,18,18); ctx.fillRect(x+54,H-110,18,18); ctx.fillStyle='#263a5a'; }
+      ctx.fillStyle='#26334d'; ctx.fillRect(0,floor,W,H-floor);
+      ctx.fillStyle='#50627e'; ctx.fillRect(0,floor,W,5);
+      platforms.forEach(pl=>{ctx.fillStyle='#50627e';ctx.fillRect(pl.x-cam,pl.y,pl.w,pl.h);ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(pl.x-cam+6,pl.y+3,pl.w-12,3);});
+      crates.forEach(c=>{ if(!c.alive)return; ctx.fillStyle='#9c6630';ctx.fillRect(c.x-cam,c.y,c.w,c.h);ctx.strokeStyle='#5f3d1d';ctx.strokeRect(c.x-cam+2,c.y+2,c.w-4,c.h-4);});
+      pickups.forEach(a=>{ if(a.got)return; ctx.fillStyle='#65d6ff';ctx.fillRect(a.x-cam,a.y,a.w,a.h);ctx.fillStyle='#fff';ctx.font='12px Arial';ctx.fillText('+',a.x-cam+4,a.y+13);});
+      drones.forEach(d=>{ if(!d.alive)return; ctx.fillStyle='#ff4e4e';ctx.fillRect(d.x-cam,d.y,d.w,d.h);ctx.fillStyle='#fff';ctx.fillRect(d.x-cam+6,d.y+7,6,6);ctx.fillRect(d.x-cam+18,d.y+7,6,6);});
+      bullets.forEach(b=>{ctx.fillStyle='#ffd33d';ctx.fillRect(b.x-cam,b.y,b.w,b.h);});
+      enemyBullets.forEach(b=>{ctx.fillStyle='#ff7a7a';ctx.fillRect(b.x-cam,b.y,b.w,b.h);});
+      fx.forEach(v=>{ctx.globalAlpha=Math.max(0,v.t/.35);ctx.fillStyle=v.color;ctx.beginPath();ctx.arc(v.x-cam,v.y,8+(1-v.t/.35)*14,0,7);ctx.fill();ctx.globalAlpha=1;});
+      ctx.globalAlpha=inv>0 && Math.floor(performance.now()/110)%2 ? .45 : 1;
+      drawServiceTech(p.x-cam-3,p.y-8,p.w+10,p.h+13,'platformer');
+      ctx.globalAlpha=1;
+      ctx.fillStyle='#8cff9a'; ctx.fillRect(world-52-cam,floor-82,16,38); ctx.fillStyle='#fff'; ctx.fillRect(world-48-cam,floor-78,8,8);
+      setHud('BONUS: SERVIS SHOOTER<br>Retro DOS střílečka: šipky, skok, B / mezerník = střelba<br>Skóre: '+score+' &nbsp; Životy: '+lives+' &nbsp; Munice: '+ammo+' &nbsp; TOP: '+getBestScore('shooter')+'<br><small>Dojdi k zelenému výtahu vpravo</small>');
+    }
+    function loop(now){
+      if(runId!==gameRunId||!running||mode!=='shooter'||!isOpen())return;
+      raf=requestAnimationFrame(loop);
+      const dt=Math.min(.05,(now-last)/1000||.016); last=now; if(inv>0)inv-=dt;
+      p.vx=(left()?-220:right()?220:0); if(p.vx<0)p.dir=-1; if(p.vx>0)p.dir=1;
+      if(up()&&p.onGround){p.vy=-520; p.onGround=false; clearJump();}
+      if(touch.fire&&!fireLatch){shoot();fireLatch=true;} if(!touch.fire&&!keys[' ']&&!keys.Enter)fireLatch=false;
+      const ox=p.x, oy=p.y; p.vy+=1200*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.onGround=false; solidCollide(p,ox,oy);
+      p.x=Math.max(0,Math.min(world-p.w,p.x)); if(p.y>H+80) hurt();
+      cam=Math.max(0,Math.min(world-W,p.x-W*.35));
+      drones.forEach(d=>{ if(!d.alive)return; d.x+=d.dir*70*dt; if(Math.abs(d.x-d.base)>90)d.dir*=-1; d.shoot-=dt; if(d.shoot<=0){d.shoot=.9+Math.random()*.8; const dir=(p.x>d.x)?1:-1; enemyBullets.push({x:d.x+15,y:d.y+13,w:10,h:5,vx:dir*250});} if(rect(p,d))hurt();});
+      bullets.forEach(b=>b.x+=b.vx*dt); bullets=bullets.filter(b=>b.x>-40&&b.x<world+40);
+      enemyBullets.forEach(b=>b.x+=b.vx*dt); enemyBullets=enemyBullets.filter(b=>b.x>-40&&b.x<world+40);
+      for(let i=bullets.length-1;i>=0;i--){
+        const b=bullets[i];
+        let hit=false;
+        drones.forEach(d=>{if(!hit&&d.alive&&rect(b,d)){d.alive=false;score+=200;fx.push({x:d.x+d.w/2,y:d.y+d.h/2,t:.35,color:'#ff6464'});hit=true;}});
+        crates.forEach(c=>{if(!hit&&c.alive&&rect(b,c)){c.alive=false;score+=80;fx.push({x:c.x+c.w/2,y:c.y+c.h/2,t:.3,color:'#ffd33d'});hit=true;}});
+        if(hit)bullets.splice(i,1);
+      }
+      enemyBullets.forEach(b=>{if(rect(p,b))hurt();});
+      pickups.forEach(a=>{ if(!a.got&&rect(p,a)){a.got=true;ammo+=12;score+=50;} });
+      fx.forEach(v=>v.t-=dt); fx=fx.filter(v=>v.t>0);
+      if(p.x>world-85&&!done){ done=true; const finalScore=score+lives*200+ammo*5; saveRetroBest('shooter',finalScore); show('Servis Shooter hotovo 🔫<br><small>Skóre: '+finalScore+'<br>Za 2 sekundy startuje Kalibrace sondy</small>'); queueLevelTimeout(()=>{if(isOpen()&&runId===gameRunId)startLevel('probe')},2000); running=false; return; }
+      draw();
+    }
+    draw(); loop(last);
+  }
+
+
+  function probeRun(){
+    const runId=gameRunId;
+    const s=gameSize(), W=s.W, H=s.H;
+    let tech={x:W/2-24,y:H-72,w:48,h:54};
+    let score=0, hits=0, time=26, last=performance.now(), hazardSpawn=.7, pulse=0;
+    const targetScore=10;
+    let target=spawnTarget();
+    let hazards=[];
+    let fx=[];
+
+    function spawnTarget(){
+      const pad=34;
+      return {x: pad + Math.random()*(W-pad*2), y: pad + Math.random()*(H-pad*2-16), r: 16};
+    }
+    function overlapCircleRect(c, r){
+      const nx=Math.max(r.x, Math.min(c.x, r.x+r.w));
+      const ny=Math.max(r.y, Math.min(c.y, r.y+r.h));
+      const dx=c.x-nx, dy=c.y-ny;
+      return dx*dx + dy*dy <= c.r*c.r;
+    }
+    function resetTech(){ tech.x=W/2-tech.w/2; tech.y=H-72; }
+
+    function loop(now){
+      if(runId!==gameRunId||!running||mode!=='probe'||!isOpen())return;
+      raf=requestAnimationFrame(loop);
+      const dt=Math.min(.05,(now-last)/1000||.016); last=now; time-=dt; pulse+=dt;
+
+      if(left()) tech.x-=340*dt; if(right()) tech.x+=340*dt; if(up()) tech.y-=280*dt; if(down()) tech.y+=280*dt;
+      tech.x=Math.max(4,Math.min(W-tech.w-4,tech.x)); tech.y=Math.max(8,Math.min(H-tech.h-8,tech.y));
+
+      hazardSpawn-=dt;
+      if(hazardSpawn<=0){
+        hazardSpawn=Math.max(.45,.95-score*.04)+(Math.random()*.2);
+        const side=Math.floor(Math.random()*4);
+        if(side===0) hazards.push({x:-24,y:20+Math.random()*(H-40),w:26,h:26,vx:140+Math.random()*70,vy:(Math.random()-.5)*70});
+        else if(side===1) hazards.push({x:W+24,y:20+Math.random()*(H-40),w:26,h:26,vx:-(140+Math.random()*70),vy:(Math.random()-.5)*70});
+        else if(side===2) hazards.push({x:20+Math.random()*(W-40),y:-24,w:26,h:26,vx:(Math.random()-.5)*70,vy:140+Math.random()*70});
+        else hazards.push({x:20+Math.random()*(W-40),y:H+24,w:26,h:26,vx:(Math.random()-.5)*70,vy:-(140+Math.random()*70)});
+      }
+
+      for(let i=hazards.length-1;i>=0;i--){
+        const h=hazards[i]; h.x+=h.vx*dt; h.y+=h.vy*dt;
+        if(h.x<-60||h.x>W+60||h.y<-60||h.y>H+60){ hazards.splice(i,1); continue; }
+        if(rect(tech,h)){
+          hits++; fx.push({x:tech.x+tech.w/2,y:tech.y+tech.h/2,t:.35,color:'#ff6464'}); hazards.splice(i,1); resetTech();
+          if(hits>=5){ saveRetroBest('probe',score); show('Kalibrace sondy konec<br><small>Body: '+score+' / '+targetScore+' &nbsp; Kolize: '+hits+' / 5</small>'); running=false; return; }
+        }
+      }
+
+      if(overlapCircleRect(target, tech)){
+        score++; fx.push({x:target.x,y:target.y,t:.35,color:'#68ff92'}); target=spawnTarget();
+        if(score>=targetScore){ saveRetroBest('probe',score); show('Kalibrace sondy hotová 🎯<br><small>Body: '+score+' / '+targetScore+'<br>Kolize: '+hits+' / 5</small>'); running=false; return; }
+      }
+      if(time<=0){ saveRetroBest('probe',score); show('Kalibrace sondy konec<br><small>Body: '+score+' / '+targetScore+' &nbsp; Kolize: '+hits+' / 5</small>'); running=false; return; }
+
+      fx.forEach(v=>v.t-=dt); fx=fx.filter(v=>v.t>0);
+
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#08111d'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#112137'; ctx.fillRect(0,0,W,H);
+      ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
+      for(let x=24;x<W;x+=32){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for(let y=24;y<H;y+=32){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      const pr=target.r + Math.sin(pulse*4)*2;
+      ctx.strokeStyle='#72ff89'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(target.x,target.y,pr,0,7); ctx.stroke();
+      ctx.strokeStyle='rgba(114,255,137,.55)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(target.x-pr-8,target.y); ctx.lineTo(target.x+pr+8,target.y); ctx.moveTo(target.x,target.y-pr-8); ctx.lineTo(target.x,target.y+pr+8); ctx.stroke();
+      ctx.fillStyle='rgba(114,255,137,.18)'; ctx.beginPath(); ctx.arc(target.x,target.y,pr-6,0,7); ctx.fill();
+
+      hazards.forEach(h=>{
+        ctx.fillStyle='#ff4e4e'; ctx.fillRect(h.x,h.y,h.w,h.h);
+        ctx.fillStyle='#fff'; ctx.font='18px Arial'; ctx.fillText('!',h.x+9,h.y+19);
+      });
+      fx.forEach(v=>{ ctx.globalAlpha=Math.max(0,v.t/.35); ctx.fillStyle=v.color; ctx.beginPath(); ctx.arc(v.x,v.y,10+(1-v.t/.35)*16,0,7); ctx.fill(); ctx.globalAlpha=1; });
+
+      drawServiceTech(tech.x,tech.y,tech.w,tech.h,'oil');
+      ctx.strokeStyle='#77d6ff'; ctx.lineWidth=2; ctx.strokeRect(tech.x-3, tech.y-3, tech.w+6, tech.h+6);
+      setHud('BONUS: KALIBRACE SONDY<br>Dojeď k zelenému cíli a vyhýbej se alarmům<br>Body: '+score+' / '+targetScore+' &nbsp; Kolize: '+hits+' / 5 &nbsp; TOP: '+getBestScore('probe')+'<br><small>Čas: '+Math.ceil(time)+' s</small>');
     }
     loop(last);
   }
