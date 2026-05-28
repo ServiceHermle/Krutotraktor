@@ -2002,6 +2002,7 @@ function setLang(lang){
   try{ if(typeof renderCustomers==='function'){ const el=document.getElementById('c-search'); renderCustomers(el?el.value:''); } }catch(e){}
   try{ if(typeof renderFixed==='function'){ const el=document.getElementById('f-search'); renderFixed(el?el.value:''); } }catch(e){}
   try{ if(typeof refreshServiceCalculatorLang==='function') refreshServiceCalculatorLang(); }catch(e){}
+  try{ if(typeof refreshRetroTexts==='function') refreshRetroTexts(); }catch(e){}
   try{
     updateAppInfoLabels();
     const helpOverlay=document.getElementById('appHelpOverlay');
@@ -4571,12 +4572,79 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const keys=Object.create(null);
   const touch={left:false,right:false,up:false,down:false,fire:false,last:null,queue:[]};
   const GAME_LABELS={platformer:'Level 1: Servisák',tools:'Level 2: Chytej nářadí',snake:'Level 3: Had',invaders:'Bonus: Dlaždice',bomber:'Bonus: Servis Bomber',wolf:'Bonus: Disgruntled Customers'};
+  const RETRO_I18N={
+    cs:{
+      back:'← Zpět do aplikace', restart:'Restart hry', menu:'Výběr her', close:'Zavřít', picker:'Výběr minihry', loading:'Načítám…', top:'TOP',
+      score:'Skóre', best:'Nejlepší skóre', item:'Položka', value:'Hodnota', result:'Výsledek hry', thisScore:'Skóre této hry', newTry:'Restart = nový pokus',
+      lives:'Životy', time:'Čas', range:'Dosah', bombs:'Bomby', key:'Klíč', enemies:'Nepřátelé', yes:'ANO', no:'NE', ammo:'Munice',
+      game_platformer_title:'Level 1: Servisák', game_platformer_desc:'Skákej přes překážky a sbírej coiny',
+      game_tools_title:'Level 2: Chytej nářadí', game_tools_desc:'Chytej padající nářadí',
+      game_snake_title:'Level 3: Had', game_snake_desc:'Klasický had s dotykovým ovládáním',
+      game_invaders_title:'Bonus: Dlaždice', game_invaders_desc:'Rozbij všechny bloky',
+      game_bomber_title:'Bonus: Servis Bomber', game_bomber_desc:'Tři levely a power-upy: range, bomby, speed, shield',
+      game_wolf_title:'Bonus: Disgruntled Customers', game_wolf_desc:'Tři levely a různé druhy útoků zákazníků',
+      bomber_intro:'Tři levely a nové power-upy: range, extra bomba, speed a shield.',
+      bomber_done:'Servis Bomber hotovo 💣', bomber_over:'Servis Bomber konec', bomber_level_done:'hotov. Připrav se na',
+      invaders_over:'Dlaždice konec', invaders_done:'Dlaždice hotovo', invaders_help:'Rozbij všechny bloky nahoře',
+      customers_intro:'Tři levely. Teď mají zákazníci různé druhy útoků.',
+      customers_over:'Disgruntled Customers konec', customers_done:'Disgruntled Customers hotovo', customers_level_done:'hotov. Přichází',
+      attackTypes:'Typy útoků: guard = complaint bubble, elite = email shot, boss = triple rant'
+    },
+    de:{
+      back:'← Zurück zur App', restart:'Spiel neu starten', menu:'Spiele auswählen', close:'Schließen', picker:'Minispiel auswählen', loading:'Laden…', top:'TOP',
+      score:'Punkte', best:'Bestes Ergebnis', item:'Eintrag', value:'Wert', result:'Spielergebnis', thisScore:'Punkte dieses Spiels', newTry:'Neustart = neuer Versuch',
+      lives:'Leben', time:'Zeit', range:'Reichweite', bombs:'Bomben', key:'Schlüssel', enemies:'Gegner', yes:'JA', no:'NEIN', ammo:'Munition',
+      game_platformer_title:'Level 1: Servicetechniker', game_platformer_desc:'Springe über Hindernisse und sammle Coins',
+      game_tools_title:'Level 2: Werkzeug fangen', game_tools_desc:'Fange fallendes Werkzeug',
+      game_snake_title:'Level 3: Snake', game_snake_desc:'Klassisches Snake mit Touch-Steuerung',
+      game_invaders_title:'Bonus: Kacheln', game_invaders_desc:'Zerstöre alle Blöcke',
+      game_bomber_title:'Bonus: Service Bomber', game_bomber_desc:'Drei Level und Power-ups: Range, Bomben, Speed, Shield',
+      game_wolf_title:'Bonus: Disgruntled Customers', game_wolf_desc:'Drei Level und verschiedene Kundenangriffe',
+      bomber_intro:'Drei Level und neue Power-ups: Range, extra Bombe, Speed und Shield.',
+      bomber_done:'Service Bomber geschafft 💣', bomber_over:'Service Bomber Ende', bomber_level_done:'geschafft. Bereite dich vor auf',
+      invaders_over:'Kacheln Ende', invaders_done:'Kacheln geschafft', invaders_help:'Zerstöre alle Blöcke oben',
+      customers_intro:'Drei Level. Kunden haben jetzt verschiedene Angriffe.',
+      customers_over:'Disgruntled Customers Ende', customers_done:'Disgruntled Customers geschafft', customers_level_done:'geschafft. Es kommt',
+      attackTypes:'Angriffe: guard = Beschwerde-Blase, elite = E-Mail-Schuss, boss = Triple-Rant'
+    },
+    en:{
+      back:'← Back to app', restart:'Restart game', menu:'Game selection', close:'Close', picker:'Choose minigame', loading:'Loading…', top:'TOP',
+      score:'Score', best:'Best score', item:'Item', value:'Value', result:'Game result', thisScore:'This game score', newTry:'Restart = new try',
+      lives:'Lives', time:'Time', range:'Range', bombs:'Bombs', key:'Key', enemies:'Enemies', yes:'YES', no:'NO', ammo:'Ammo',
+      game_platformer_title:'Level 1: Service Tech', game_platformer_desc:'Jump over obstacles and collect coins',
+      game_tools_title:'Level 2: Catch tools', game_tools_desc:'Catch falling tools',
+      game_snake_title:'Level 3: Snake', game_snake_desc:'Classic snake with touch controls',
+      game_invaders_title:'Bonus: Tiles', game_invaders_desc:'Break all blocks',
+      game_bomber_title:'Bonus: Service Bomber', game_bomber_desc:'Three levels and power-ups: range, bombs, speed, shield',
+      game_wolf_title:'Bonus: Disgruntled Customers', game_wolf_desc:'Three levels and different customer attacks',
+      bomber_intro:'Three levels and new power-ups: range, extra bomb, speed and shield.',
+      bomber_done:'Service Bomber complete 💣', bomber_over:'Service Bomber game over', bomber_level_done:'complete. Get ready for',
+      invaders_over:'Tiles game over', invaders_done:'Tiles complete', invaders_help:'Break all blocks above',
+      customers_intro:'Three levels. Customers now have different attack types.',
+      customers_over:'Disgruntled Customers game over', customers_done:'Disgruntled Customers complete', customers_level_done:'complete. Next:',
+      attackTypes:'Attack types: guard = complaint bubble, elite = email shot, boss = triple rant'
+    }
+  };
+  function rlang(){ return (typeof CURRENT_LANG!=='undefined' && RETRO_I18N[CURRENT_LANG]) ? CURRENT_LANG : 'cs'; }
+  function rt(key){ const lang=rlang(); return (RETRO_I18N[lang]&&RETRO_I18N[lang][key]) || (RETRO_I18N.cs&&RETRO_I18N.cs[key]) || key; }
+  function rgameTitle(game){ return rt('game_'+game+'_title') || GAME_LABELS[game] || 'Minihra'; }
+  function rgameDesc(game){ return rt('game_'+game+'_desc') || ''; }
+  function refreshRetroTexts(){
+    if(!overlay) return;
+    const set=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
+    set('retroCloseBtn',rt('back')); set('retroRestartBtn',rt('restart')); set('retroMenuBtn',rt('menu')); set('retroPickerTitle',rt('picker')); set('retroPickerClose',rt('close'));
+    overlay.querySelectorAll('.retroGamePick[data-game]').forEach(btn=>{
+      const g=btn.dataset.game; const main=btn.querySelector('span:first-child'); const small=main?main.querySelector('small'):null;
+      if(main){ const title=rgameTitle(g); if(small){ main.firstChild.nodeValue=title; small.textContent=rgameDesc(g); } else main.textContent=title; }
+    });
+    refreshPickerScores();
+  }
   function clearLevelTimeouts(){ levelTimeouts.forEach(id=>clearTimeout(id)); levelTimeouts=[]; }
   function queueLevelTimeout(fn, ms){ const id=setTimeout(()=>{ levelTimeouts=levelTimeouts.filter(v=>v!==id); fn(); }, ms); levelTimeouts.push(id); return id; }
   function loadRetroScores(){ try{ return JSON.parse(localStorage.getItem('krutotraktorRetroScores')||'{}')||{}; }catch(e){ return {}; } }
   function getBestScore(game){ const scores=loadRetroScores(); return Number(scores[game]||0); }
   function saveRetroBest(game, value){ const num=Number(value||0); const scores=loadRetroScores(); if(num>(Number(scores[game]||0))){ scores[game]=num; try{ localStorage.setItem('krutotraktorRetroScores', JSON.stringify(scores)); }catch(e){} } refreshPickerScores(); }
-  function refreshPickerScores(){ if(!overlay) return; const scores=loadRetroScores(); overlay.querySelectorAll('[data-score]').forEach(el=>{ const key=el.getAttribute('data-score'); el.textContent='TOP: '+Number(scores[key]||0); }); }
+  function refreshPickerScores(){ if(!overlay) return; const scores=loadRetroScores(); overlay.querySelectorAll('[data-score]').forEach(el=>{ const key=el.getAttribute('data-score'); el.textContent=rt('top')+': '+Number(scores[key]||0); }); }
   function setHud(html){ if(hud) hud.innerHTML=html; }
   function parseScoreFromHtml(html){
     const text=String(html||'').replace(/&nbsp;/g,' ');
@@ -4586,11 +4654,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
   function scoreTableHtml(title, score, best, note){
     const rows=[];
-    if(score!==null&&Number.isFinite(score))rows.push('<tr><td>Skóre této hry</td><td>'+score+'</td></tr>');
-    if(best!==null&&Number.isFinite(best))rows.push('<tr><td>Nejlepší skóre</td><td>'+best+'</td></tr>');
-    return '<div class="retroScoreTitle">'+String(title||'Výsledek hry')+'</div><table><thead><tr><th>Položka</th><th>Hodnota</th></tr></thead><tbody>'+rows.join('')+'</tbody></table>'+(note?'<div class="retroScoreNote">'+note+'</div>':'');
+    if(score!==null&&Number.isFinite(score))rows.push('<tr><td>'+rt('thisScore')+'</td><td>'+score+'</td></tr>');
+    if(best!==null&&Number.isFinite(best))rows.push('<tr><td>'+rt('best')+'</td><td>'+best+'</td></tr>');
+    return '<div class="retroScoreTitle">'+String(title||rt('result'))+'</div><table><thead><tr><th>'+rt('item')+'</th><th>'+rt('value')+'</th></tr></thead><tbody>'+rows.join('')+'</tbody></table>'+(note?'<div class="retroScoreNote">'+note+'</div>':'');
   }
-  function gameTitleFromMode(){ return GAME_LABELS[mode]||'Minihra'; }
+  function gameTitleFromMode(){ return rgameTitle(mode)||'Minihra'; }
   function openGamePicker(){ if(!picker) return; picker.classList.add('retro-show'); refreshPickerScores(); syncRetroLayout(); }
   function closeGamePicker(){ if(!picker) return; picker.classList.remove('retro-show'); syncRetroLayout(); }
 
@@ -4634,7 +4702,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     overlay.addEventListener('touchmove', e=>{ try{ const sel=window.getSelection&&window.getSelection(); if(sel) sel.removeAllRanges(); }catch(_){} }, {passive:true});
     picker.querySelectorAll('[data-game]').forEach(btn=>btn.addEventListener('click',()=>startLevel(btn.dataset.game)));
     bindBtn('retroLeft','left'); bindBtn('retroRight','right'); bindBtn('retroJump','up'); bindBtn('retroDown','down'); bindBtn('retroFire','fire'); bindSnakeSwipe();
-    refreshPickerScores();
+    refreshRetroTexts();
     window.addEventListener('resize',()=>{ syncRetroLayout(); resizeCanvas(); });
     document.addEventListener('keydown',e=>{ if(isOpen()){ if(e.key==='Escape'){ e.preventDefault(); closeRetroEgg(); return; } keys[e.key]=true; if(mode==='snake'){ const km={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'}; if(km[e.key]) queueSnakeDir(km[e.key]); } if(e.key===' '||e.key==='Enter') touch.fire=true; if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault(); }});
     document.addEventListener('keyup',e=>{ keys[e.key]=false; if(e.key===' '||e.key==='Enter') touch.fire=false; });
@@ -4700,7 +4768,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   function hide(){ msg.style.display='none'; }
   function left(){ return keys.ArrowLeft||keys.a||touch.left; } function right(){ return keys.ArrowRight||keys.d||touch.right; } function up(){ return keys.ArrowUp||keys.w||keys[' ']||touch.up; } function down(){ return keys.ArrowDown||keys.s||touch.down; }
   function rect(a,b){ return !(a.x+a.w<b.x||a.x>b.x+b.w||a.y+a.h<b.y||a.y>b.y+b.h); }
-  function startLevel(which){ closeGamePicker(); running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } setHud((GAME_LABELS[which]||'Minihra')+'<br><small>Načítám…</small>'); running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); if(which==='bomber') bomberRun(); if(which==='wolf') wolfRun(); }
+  function startLevel(which){ closeGamePicker(); running=false; if(raf) cancelAnimationFrame(raf); clearLevelTimeouts(); gameRunId++; hide(); Object.keys(keys).forEach(k=>keys[k]=false); touch.left=false; touch.right=false; touch.up=false; touch.down=false; touch.fire=false; touch.last=null; touch.queue=[]; if(canvas&&ctx){ resizeCanvas(); ctx.clearRect(0,0,canvas.width,canvas.height); } setHud(rgameTitle(which)+'<br><small>'+rt('loading')+'</small>'); running=true; mode=which; if(which==='platformer') platformer(); if(which==='tools') tools(); if(which==='snake') snake(); if(which==='invaders') invaders(); if(which==='bomber') bomberRun(); if(which==='wolf') wolfRun(); }
 
   function platformer(){
     const runId=gameRunId;
@@ -4873,7 +4941,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
             break;
           }
         }
-        if(ball.y-ball.r>H){ lives--; if(lives<=0){ saveRetroBest('invaders',score); show('Dlaždice konec<br><small>Restart = nový pokus</small>'); running=false; } else resetBall(); }
+        if(ball.y-ball.r>H){ lives--; if(lives<=0){ saveRetroBest('invaders',score); show(rt('invaders_over')+'<br><small>'+rt('newTry')+'</small>'); running=false; } else resetBall(); }
       }
       hits.forEach(h=>h.t-=dt); hits=hits.filter(h=>h.t>0);
       if(bricks.every(b=>!b.alive)){ saveRetroBest('invaders',score); show('Dlaždice hotovo 🧱<br><small>Za 2 sekundy startuje bonus: Servis Bomber</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('bomber')},2000); running=false; }
@@ -4886,7 +4954,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       ctx.fillStyle='#d3ffd9'; ctx.fillRect(paddle.x+8,paddle.y+2,paddle.w-16,3);
       ctx.fillStyle='#ffd33d'; ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,7); ctx.fill();
       hits.forEach(h=>{ ctx.globalAlpha=Math.max(0,h.t/.28); ctx.fillStyle=h.color; ctx.beginPath(); ctx.arc(h.x,h.y,8+(1-h.t/.28)*12,0,7); ctx.fill(); ctx.globalAlpha=1; });
-      setHud('BONUS: DLAŽDICE<br>Pohybuj plošinkou doleva a doprava<br>Skóre: '+score+' &nbsp; Životy: '+lives+' &nbsp; TOP: '+getBestScore('invaders')+'<br><small>Rozbij všechny bloky nahoře</small>');
+      setHud(rgameTitle('invaders')+'<br>'+rt('score')+': '+score+' &nbsp; '+rt('lives')+': '+lives+' &nbsp; '+rt('top')+': '+getBestScore('invaders')+'<br><small>'+rt('invaders_help')+'</small>');
     }
     loop(last);
   }
@@ -5006,7 +5074,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(msg) speak(msg);
       if(armor<=0){
         saveRetroBest('wolf', score);
-        show('Disgruntled Customers konec<br><small>Skóre: '+score+' &nbsp; TOP: '+getBestScore('wolf')+' &nbsp; Restart = nový pokus</small>');
+        show(rt('customers_over')+'<br><small>'+rt('score')+': '+score+' &nbsp; '+rt('top')+': '+getBestScore('wolf')+' &nbsp; '+rt('newTry')+'</small>');
         running=false;
       }
     }
@@ -5045,13 +5113,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
         const alive=enemies.filter(e=>e.hp>0).length;
         const finalScore=score + armor*4 + ammo*6 + (alive===0?180:0);
         saveRetroBest('wolf', finalScore);
-        show('Disgruntled Customers hotovo<br><small>Skóre: '+finalScore+' &nbsp; TOP: '+getBestScore('wolf')+' &nbsp; Restart = nový pokus</small>');
+        show(rt('customers_done')+'<br><small>'+rt('score')+': '+finalScore+' &nbsp; '+rt('top')+': '+getBestScore('wolf')+' &nbsp; '+rt('newTry')+'</small>');
         running=false;
         return;
       }
       transitioning=true;
       score += 150 + armor;
-      show('Disgruntled Customers<br><small>'+levelDefs[level].name+' hotov. Přichází '+levelDefs[level+1].name+'.</small>');
+      show(rgameTitle('wolf')+'<br><small>'+levelDefs[level].name+' '+rt('customers_level_done')+' '+levelDefs[level+1].name+'.</small>');
       queueLevelTimeout(()=>{
         if(runId===gameRunId && running && mode==='wolf' && isOpen()){
           level++;
@@ -5219,7 +5287,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(hurtFlash>0){ ctx.fillStyle='rgba(255,64,64,'+(0.28*Math.min(1,hurtFlash/.45))+')'; ctx.fillRect(0,0,W,H); }
 
       const alive=enemies.filter(e=>e.hp>0).length;
-      setHud('BONUS: DISGRUNTLED CUSTOMERS<br>'+levelDefs[level].name+' / '+levelDefs.length+' &nbsp; Armor: '+armor+' &nbsp; Munice: '+ammo+' &nbsp; Klíč: '+(hasKey?'ANO':'NE')+' &nbsp; Nepřátelé: '+alive+' &nbsp; TOP: '+getBestScore('wolf')+'<br><small>Typy útoků: guard = complaint bubble, elite = email shot, boss = triple rant &nbsp; | &nbsp; '+bark+'</small>');
+      setHud(rgameTitle('wolf')+'<br>'+levelDefs[level].name+' / '+levelDefs.length+' &nbsp; Armor: '+armor+' &nbsp; '+rt('ammo')+': '+ammo+' &nbsp; '+rt('key')+': '+(hasKey?rt('yes'):rt('no'))+' &nbsp; '+rt('enemies')+': '+alive+' &nbsp; '+rt('top')+': '+getBestScore('wolf')+'<br><small>'+rt('attackTypes')+' &nbsp; | &nbsp; '+bark+'</small>');
     }
     function updateProjectiles(dt){
       for(let i=projectiles.length-1;i>=0;i--){
@@ -5279,7 +5347,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       draw();
     }
     initLevel(level);
-    show('Disgruntled Customers<br><small>Tři levely. Teď mají zákazníci různé druhy útoků.</small>');
+    show(rgameTitle('wolf')+'<br><small>'+rt('customers_intro')+'</small>');
     queueLevelTimeout(()=>{ if(runId===gameRunId&&mode==='wolf') hide(); }, 1800);
     draw();
     raf=requestAnimationFrame(loop);
@@ -5362,20 +5430,20 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(player.hit>0 || transitioning) return;
       if(shield>0){ shield--; player.hit=.8; return; }
       lives--; player.hit=1.2;
-      if(lives<=0){ saveRetroBest('bomber',score); show('Servis Bomber konec<br><small>Skóre: '+score+' &nbsp; Restart = nový pokus</small>'); running=false; }
+      if(lives<=0){ saveRetroBest('bomber',score); show(rt('bomber_over')+'<br><small>'+rt('score')+': '+score+' &nbsp; '+rt('newTry')+'</small>'); running=false; }
       else { player.x=1; player.y=1; }
     }
     function advanceLevel(){
       if(level>=levelDefs.length-1){
         const finalScore=score+Math.ceil(time)*10 + lives*120 + rangeBonus*35 + bombLimit*30 + speedBonus*25 + shield*20;
         saveRetroBest('bomber', finalScore);
-        show('Servis Bomber hotovo 💣<br><small>3 levely dokončeny &nbsp; Skóre: '+finalScore+' &nbsp; Restart = nový pokus</small>');
+        show(rt('bomber_done')+'<br><small>3 levely dokončeny &nbsp; '+rt('score')+': '+finalScore+' &nbsp; '+rt('newTry')+'</small>');
         running=false;
         return;
       }
       transitioning=true;
       score += Math.ceil(time)*10;
-      show('Servis Bomber<br><small>'+levelDefs[level].name+' hotov. Připrav se na '+levelDefs[level+1].name+'.</small>');
+      show(rgameTitle('bomber')+'<br><small>'+levelDefs[level].name+' '+rt('bomber_level_done')+' '+levelDefs[level+1].name+'.</small>');
       queueLevelTimeout(()=>{
         if(runId===gameRunId && running && mode==='bomber' && isOpen()){
           level++;
@@ -5414,7 +5482,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       ctx.globalAlpha=player.hit>0 && Math.floor(performance.now()/120)%2 ? .45 : 1;
       drawServiceTech(ox+player.x*cell+cell*.13, oy+player.y*cell+cell*.05, cell*.74, cell*.86, 'oil');
       ctx.globalAlpha=1;
-      setHud('BONUS: SERVIS BOMBER<br>'+levelDefs[level].name+' / '+levelDefs.length+' &nbsp; Skóre: '+score+' &nbsp; Životy: '+lives+' &nbsp; TOP: '+getBestScore('bomber')+'<br><small>Čas: '+Math.ceil(time)+' s &nbsp; Dosah: '+currentRange()+' &nbsp; Bomby: '+bombs.length+'/'+bombLimit+' &nbsp; Speed: '+(speedBonus+1)+' &nbsp; Shield: '+shield+'</small>');
+      setHud(rgameTitle('bomber')+'<br>'+levelDefs[level].name+' / '+levelDefs.length+' &nbsp; '+rt('score')+': '+score+' &nbsp; '+rt('lives')+': '+lives+' &nbsp; '+rt('top')+': '+getBestScore('bomber')+'<br><small>'+rt('time')+': '+Math.ceil(time)+' s &nbsp; '+rt('range')+': '+currentRange()+' &nbsp; '+rt('bombs')+': '+bombs.length+'/'+bombLimit+' &nbsp; Speed: '+(speedBonus+1)+' &nbsp; Shield: '+shield+'</small>');
     }
     function loop(now){
       if(runId!==gameRunId||!running||mode!=='bomber'||!isOpen())return;
@@ -5422,7 +5490,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       const dt=Math.min(.05,(now-last)/1000||.016); last=now;
       if(transitioning){ draw(); return; }
       time-=dt; moveCd-=dt; if(player.hit>0)player.hit-=dt;
-      if(time<=0){ saveRetroBest('bomber',score); show('Servis Bomber konec<br><small>Skóre: '+score+' &nbsp; Čas vypršel</small>'); running=false; return; }
+      if(time<=0){ saveRetroBest('bomber',score); show(rt('bomber_over')+'<br><small>'+rt('score')+': '+score+' &nbsp; '+rt('time')+' vypršel</small>'); running=false; return; }
       if(moveCd<=0){ let dx=0,dy=0; if(left())dx=-1; else if(right())dx=1; else if(up())dy=-1; else if(down())dy=1; if(dx||dy){ tryMove(player,dx,dy); moveCd=currentMoveDelay(); } }
       if(touch.fire && !fireLatch){ placeBomb(); fireLatch=true; }
       if(!touch.fire && !keys[' '] && !keys.Enter) fireLatch=false;
@@ -5446,7 +5514,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       draw();
     }
     initLevel(level);
-    show('Servis Bomber<br><small>Tři levely a nové power-upy: range, extra bomba, speed a shield.</small>');
+    show(rgameTitle('bomber')+'<br><small>'+rt('bomber_intro')+'</small>');
     queueLevelTimeout(()=>{ if(runId===gameRunId&&mode==='bomber') hide(); }, 1600);
     draw(); loop(last);
   }

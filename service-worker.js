@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_51-json-network-first';
+const CACHE_VER = 'hdh-code-v3_1_52-retro-language-switch';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
