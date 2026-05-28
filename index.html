@@ -2002,6 +2002,13 @@ function setLang(lang){
   try{ if(typeof renderCustomers==='function'){ const el=document.getElementById('c-search'); renderCustomers(el?el.value:''); } }catch(e){}
   try{ if(typeof renderFixed==='function'){ const el=document.getElementById('f-search'); renderFixed(el?el.value:''); } }catch(e){}
   try{ if(typeof refreshServiceCalculatorLang==='function') refreshServiceCalculatorLang(); }catch(e){}
+  try{
+    updateAppInfoLabels();
+    const helpOverlay=document.getElementById('appHelpOverlay');
+    if(helpOverlay && helpOverlay.classList.contains('show')) renderAppHelpContent();
+    const newsOverlay=document.getElementById('whatsNewOverlay');
+    if(newsOverlay && newsOverlay.classList.contains('show')) showWhatsNew(true);
+  }catch(e){}
 }
 
 function refreshServiceCalculatorLang(){
@@ -2099,6 +2106,7 @@ const APP_NEWS_KEY = "app_news_seen_version";
 const APP_NEWS_FILE = "./whats-new.json";
 const APP_NEWS_FALLBACK = {
   version: "2026-04-21-2",
+  title: "Co je nového",
   items: [
     "Změny aplikace se nyní načítají z externího JSON souboru whats-new.json.",
     "Po další úpravě stačí přepsat verzi a seznam změn v textovém souboru.",
@@ -2121,6 +2129,39 @@ const APP_HELP_FALLBACK = {
 };
 let appHelpData = JSON.parse(JSON.stringify(APP_HELP_FALLBACK));
 
+const APP_INFO_UI = {
+  cs: { helpMenu:"ℹ️ Funkce aplikace", newsMenu:"🆕 Co je nového", close:"Zavřít", understand:"Rozumím", newsTitle:"Co je nového", version:"Verze", helpTitle:"Funkce aplikace", helpIntro:"Rychlý přehled toho, co v aplikaci najdeš a k čemu jednotlivé části slouží." },
+  de: { helpMenu:"ℹ️ App-Funktionen", newsMenu:"🆕 Was ist neu", close:"Schließen", understand:"Verstanden", newsTitle:"Was ist neu", version:"Version", helpTitle:"App-Funktionen", helpIntro:"Kurze Übersicht, was du in der App findest und wofür die einzelnen Bereiche dienen." },
+  en: { helpMenu:"ℹ️ App functions", newsMenu:"🆕 What's new", close:"Close", understand:"Got it", newsTitle:"What's new", version:"Version", helpTitle:"App functions", helpIntro:"Quick overview of what you can find in the app and what each section is used for." }
+};
+function appInfoText(key){
+  const lang = (typeof CURRENT_LANG !== "undefined" && APP_INFO_UI[CURRENT_LANG]) ? CURRENT_LANG : "cs";
+  return (APP_INFO_UI[lang] && APP_INFO_UI[lang][key]) || (APP_INFO_UI.cs && APP_INFO_UI.cs[key]) || key;
+}
+function pickLocalizedJsonBlock(data){
+  if(!data || typeof data !== "object") return data;
+  const lang = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG) ? CURRENT_LANG : "cs";
+  if(data[lang] && typeof data[lang] === "object") return data[lang];
+  if(data.languages && data.languages[lang] && typeof data.languages[lang] === "object") return data.languages[lang];
+  if(data.cs && typeof data.cs === "object") return data.cs;
+  if(data.en && typeof data.en === "object") return data.en;
+  if(data.de && typeof data.de === "object") return data.de;
+  return data;
+}
+function updateAppInfoLabels(){
+  const pairs = [
+    ["appMenuHelpBtn","helpMenu"],
+    ["appMenuNewsBtn","newsMenu"],
+    ["appMenuCloseBtn","close"],
+    ["appHelpOpenNewsBtn","newsMenu"],
+    ["appHelpCloseBtn","understand"],
+    ["whatsNewConfirm","understand"],
+    ["whatsNewTitle","newsTitle"]
+  ];
+  pairs.forEach(([id,key])=>{ const el=document.getElementById(id); if(el) el.textContent = appInfoText(key); });
+}
+
+
 function escapeHtml(str){
   return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch] || ch));
 }
@@ -2131,19 +2172,23 @@ function buildNewsList(items){
 
 function normalizeWhatsNewJson(data){
   if(!data || typeof data !== "object") return { ...APP_NEWS_FALLBACK, items:[...APP_NEWS_FALLBACK.items] };
-  const version = String(data.version || APP_NEWS_FALLBACK.version).trim() || APP_NEWS_FALLBACK.version;
-  const items = Array.isArray(data.items)
-    ? data.items.map(item => String(item || '').trim()).filter(Boolean)
-    : [];
-  return { version, items: items.length ? items : [...APP_NEWS_FALLBACK.items] };
+  const block = pickLocalizedJsonBlock(data) || {};
+  const version = String(data.version || block.version || APP_NEWS_FALLBACK.version).trim() || APP_NEWS_FALLBACK.version;
+  const title = String(block.title || data.title || appInfoText("newsTitle") || APP_NEWS_FALLBACK.title).trim() || appInfoText("newsTitle");
+  const items = Array.isArray(block.items)
+    ? block.items.map(item => String(item || '').trim()).filter(Boolean)
+    : (Array.isArray(data.items) ? data.items.map(item => String(item || '').trim()).filter(Boolean) : []);
+  return { version, title, items: items.length ? items : [...APP_NEWS_FALLBACK.items] };
 }
 
 function normalizeHelpJson(data){
   if(!data || typeof data !== "object") return JSON.parse(JSON.stringify(APP_HELP_FALLBACK));
-  const title = String(data.title || APP_HELP_FALLBACK.title).trim() || APP_HELP_FALLBACK.title;
-  const intro = String(data.intro || APP_HELP_FALLBACK.intro).trim() || APP_HELP_FALLBACK.intro;
-  const sections = Array.isArray(data.sections)
-    ? data.sections.map(sec => ({
+  const block = pickLocalizedJsonBlock(data) || {};
+  const title = String(block.title || data.title || APP_HELP_FALLBACK.title).trim() || APP_HELP_FALLBACK.title;
+  const intro = String(block.intro || data.intro || APP_HELP_FALLBACK.intro).trim() || APP_HELP_FALLBACK.intro;
+  const rawSections = Array.isArray(block.sections) ? block.sections : (Array.isArray(data.sections) ? data.sections : []);
+  const sections = rawSections
+    ? rawSections.map(sec => ({
         title: String((sec && sec.title) || '').trim(),
         text: String((sec && sec.text) || '').trim()
       })).filter(sec => sec.title || sec.text)
@@ -2194,13 +2239,16 @@ async function showWhatsNew(force=false){
   const overlay = document.getElementById("whatsNewOverlay");
   const list = document.getElementById("whatsNewList");
   const ver = document.getElementById("whatsNewVersion");
+  const titleEl = document.getElementById("whatsNewTitle");
   if(!overlay || !list || !ver) return;
   const data = await loadWhatsNewData();
   let seen = null;
   try{ seen = canUseLocal() ? localStorage.getItem(APP_NEWS_KEY) : null; }catch(e){}
   if(!force && seen === data.version) return;
-  ver.textContent = `Verze ${data.version}`;
+  if(titleEl) titleEl.textContent = data.title || appInfoText("newsTitle");
+  ver.textContent = `${appInfoText("version")} ${data.version}`;
   list.innerHTML = buildNewsList(data.items);
+  updateAppInfoLabels();
   overlay.classList.add("show");
   overlay.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
@@ -2218,12 +2266,12 @@ function ensureWhatsNewUI(){
     overlay.innerHTML = `
       <div class="news-card">
         <div class="news-content">
-          <h2>Co je nového</h2>
+          <h2 id="whatsNewTitle">${appInfoText("newsTitle")}</h2>
           <div class="news-ver" id="whatsNewVersion"></div>
           <ul class="news-list" id="whatsNewList"></ul>
         </div>
         <div class="news-actions">
-          <button class="btn primary" id="whatsNewConfirm" type="button">Rozumím</button>
+          <button class="btn primary" id="whatsNewConfirm" type="button">${appInfoText("understand")}</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -2286,9 +2334,9 @@ function ensureAppHelpUI(){
     menu.setAttribute('aria-hidden','true');
     menu.innerHTML=`
       <div class="appmenu-card">
-        <button class="btn" id="appMenuHelpBtn" type="button">ℹ️ Funkce aplikace</button>
-        <button class="btn" id="appMenuNewsBtn" type="button">🆕 Co je nového</button>
-        <button class="btn" id="appMenuCloseBtn" type="button">Zavřít</button>
+        <button class="btn" id="appMenuHelpBtn" type="button">${appInfoText("helpMenu")}</button>
+        <button class="btn" id="appMenuNewsBtn" type="button">${appInfoText("newsMenu")}</button>
+        <button class="btn" id="appMenuCloseBtn" type="button">${appInfoText("close")}</button>
       </div>`;
     document.body.appendChild(menu);
   }
@@ -2302,17 +2350,19 @@ function ensureAppHelpUI(){
     overlay.innerHTML=`
       <div class="apphelp-card">
         <div class="apphelp-content">
-          <h2 id="appHelpTitle">Funkce aplikace</h2>
-          <div class="apphelp-intro" id="appHelpIntro">Rychlý přehled toho, co v aplikaci najdeš a k čemu jednotlivé části slouží.</div>
+          <h2 id="appHelpTitle">${appInfoText("helpTitle")}</h2>
+          <div class="apphelp-intro" id="appHelpIntro">${appInfoText("helpIntro")}</div>
           <div id="appHelpSections"></div>
         </div>
         <div class="apphelp-actions">
-          <button class="btn" id="appHelpOpenNewsBtn" type="button">🆕 Co je nového</button>
-          <button class="btn primary" id="appHelpCloseBtn" type="button">Rozumím</button>
+          <button class="btn" id="appHelpOpenNewsBtn" type="button">${appInfoText("newsMenu")}</button>
+          <button class="btn primary" id="appHelpCloseBtn" type="button">${appInfoText("understand")}</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
   }
+
+  updateAppInfoLabels();
 
   const moreBtn=document.getElementById('appMoreBtn');
   if(moreBtn && !moreBtn.dataset.bound){ moreBtn.addEventListener('click', openAppMenu); moreBtn.dataset.bound='1'; }

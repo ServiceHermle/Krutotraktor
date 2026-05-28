@@ -1,30 +1,92 @@
 {
-  "title": "Funkce aplikace",
-  "intro": "Přehled hlavních částí aplikace a k čemu slouží.",
-  "sections": [
-    {
-      "title": "🧮 Výpočet",
-      "text": "Hlavní výpočet přístupových hodnot podle data a čísla stroje. Výsledky můžeš kopírovat jednotlivě, zkopírovat vše najednou nebo sdílet."
-    },
-    {
-      "title": "📅 Období",
-      "text": "Výpočet nebo přehled hodnot pro vybrané období. Hodí se, když potřebuješ pracovat s více dny najednou."
-    },
-    {
-      "title": "🔐 Pevné kódy",
-      "text": "Přehled uložených pevných kódů, které není potřeba znovu počítat."
-    },
-    {
-      "title": "🏭 Zákazníci",
-      "text": "Evidence zákazníků a jejich strojů. Slouží pro rychlejší orientaci a práci se servisními informacemi."
-    },
-    {
-      "title": "🧰 Kalkulačky",
-      "text": "Servisní kalkulačky pro pomocné výpočty, například orientace vřetene, kinematika, měření vibrací a utahovací moment pro hákové klíče."
-    },
-    {
-      "title": "🛌 Hotely",
-      "text": "Seznam hotelů pro servisní výjezdy. U hotelů můžeš ukládat informace, volat, otevřít navigaci a data exportovat nebo importovat."
-    }
-  ]
+  "cs": {
+    "title": "Funkce aplikace",
+    "intro": "Přehled hlavních částí aplikace a k čemu slouží.",
+    "sections": [
+      {
+        "title": "🧮 Výpočet",
+        "text": "Hlavní výpočet přístupových hodnot podle data a čísla stroje. Výsledky můžeš kopírovat jednotlivě, zkopírovat vše najednou nebo sdílet."
+      },
+      {
+        "title": "📅 Období",
+        "text": "Výpočet nebo přehled hodnot pro vybrané období. Hodí se, když potřebuješ pracovat s více dny najednou."
+      },
+      {
+        "title": "🔐 Pevné kódy",
+        "text": "Přehled uložených pevných kódů, které není potřeba znovu počítat."
+      },
+      {
+        "title": "🏭 Zákazníci",
+        "text": "Evidence zákazníků a jejich strojů. Slouží pro rychlejší orientaci a práci se servisními informacemi."
+      },
+      {
+        "title": "🧰 Kalkulačky",
+        "text": "Servisní kalkulačky pro pomocné výpočty, například orientace vřetene, kinematika, měření vibrací a utahovací moment pro hákové klíče."
+      },
+      {
+        "title": "🛌 Hotely",
+        "text": "Seznam hotelů pro servisní výjezdy. U hotelů můžeš ukládat informace, volat, otevřít navigaci a data exportovat nebo importovat."
+      }
+    ]
+  },
+  "de": {
+    "title": "App-Funktionen",
+    "intro": "Übersicht der wichtigsten Bereiche der App und wofür sie verwendet werden.",
+    "sections": [
+      {
+        "title": "🧮 Berechnung",
+        "text": "Hauptberechnung der Zugriffswerte anhand von Datum und Maschinennummer. Die Ergebnisse können einzeln kopiert, komplett kopiert oder geteilt werden."
+      },
+      {
+        "title": "📅 Zeitraum",
+        "text": "Berechnung oder Übersicht der Werte für einen ausgewählten Zeitraum. Praktisch, wenn du mit mehreren Tagen arbeiten musst."
+      },
+      {
+        "title": "🔐 Feste Codes",
+        "text": "Übersicht der gespeicherten festen Codes, die nicht erneut berechnet werden müssen."
+      },
+      {
+        "title": "🏭 Kunden",
+        "text": "Verwaltung von Kunden und deren Maschinen. Hilft bei schneller Orientierung und bei der Arbeit mit Serviceinformationen."
+      },
+      {
+        "title": "🧰 Rechner",
+        "text": "Service-Rechner für Hilfsberechnungen, zum Beispiel Spindelorientierung, Kinematik, Vibrationsmessung und Drehmomentberechnung für Hakenschlüssel."
+      },
+      {
+        "title": "🛌 Hotels",
+        "text": "Hotelliste für Serviceeinsätze. Bei Hotels können Informationen gespeichert, Anrufe gestartet, Navigation geöffnet sowie Daten exportiert oder importiert werden."
+      }
+    ]
+  },
+  "en": {
+    "title": "App functions",
+    "intro": "Overview of the main parts of the app and what they are used for.",
+    "sections": [
+      {
+        "title": "🧮 Calculation",
+        "text": "Main calculation of access values based on the date and machine number. Results can be copied individually, copied all at once, or shared."
+      },
+      {
+        "title": "📅 Period",
+        "text": "Calculation or overview of values for a selected period. Useful when you need to work with several days at once."
+      },
+      {
+        "title": "🔐 Fixed codes",
+        "text": "Overview of saved fixed codes that do not need to be calculated again."
+      },
+      {
+        "title": "🏭 Customers",
+        "text": "Customer and machine database. It helps with faster orientation and service information handling."
+      },
+      {
+        "title": "🧰 Calculators",
+        "text": "Service calculators for auxiliary calculations, such as spindle orientation, kinematics, vibration measurement, and hook wrench torque calculation."
+      },
+      {
+        "title": "🛌 Hotels",
+        "text": "Hotel list for service trips. You can save hotel information, call, open navigation, and export or import data."
+      }
+    ]
+  }
 }

@@ -1,14 +1,33 @@
 {
-  "version": "5.9.49",
-  "title": "Co je nového",
-  "items": [
-    "Na stránku Výpočet jsem přidal tlačítko Kalkulačky.",
-    "Zatím jsou zde tyto kalkulačky:",
-    "Orientace vřetene – po výměně vřetene už není potřeba složitě přemýšlet nad výpočtem. Stačí zadat ideální pozici a aplikace rovnou vypočítá hodnotu, kterou je potřeba zapsat do parametru 3430.",
-    "Měření kinematiky – mělo by fungovat stejně jako původní Excel pro starší stroje.",
-    "Měření vibrací – slouží hlavně jako pomocný zápis pro měření vřeten a zadávání závaží.",
-    "Výpočet utahovacího momentu pro hákové klíče – je to jednoduchý výpočet, ale často se musí dohledávat. Dole je navíc možnost uložit si vlastní nářadí, takže ho není potřeba pokaždé měřit znovu. Stačí vybrat, s čím právě chcete pracovat.",
-    "Kdyby cokoliv nefungovalo, stačí mi napsat. Budu rád i za jakýkoliv nápad na další funkce.",
-    "Až se budeš nudit, zadej číslo stroje 123 a zmáčkni přepočítat."
-  ]
+  "version": "5.9.50",
+  "cs": {
+    "title": "Co je nového",
+    "items": [
+      "Nápověda a Co je nového se nyní správně přepínají podle zvoleného jazyka.",
+      "Překlady jsou dostupné pro CZ, DE a EN.",
+      "Servis Bomber má nově 3 levely a power-upy: range, extra bomba, speed a shield.",
+      "Disgruntled Customers má 3 levely a různé druhy útoků zákazníků.",
+      "Až se budeš nudit, zadej číslo stroje 123 a zmáčkni přepočítat."
+    ]
+  },
+  "de": {
+    "title": "Was ist neu",
+    "items": [
+      "Hilfe und Was ist neu werden jetzt korrekt entsprechend der ausgewählten Sprache umgeschaltet.",
+      "Übersetzungen sind für CZ, DE und EN verfügbar.",
+      "Servis Bomber hat jetzt 3 Level und Power-ups: Reichweite, zusätzliche Bombe, Speed und Shield.",
+      "Disgruntled Customers hat 3 Level und verschiedene Kundenangriffe.",
+      "Wenn dir langweilig ist, gib die Maschinennummer 123 ein und drücke Neuberechnen."
+    ]
+  },
+  "en": {
+    "title": "What's new",
+    "items": [
+      "Help and What's new now switch correctly according to the selected language.",
+      "Translations are available for CZ, DE and EN.",
+      "Servis Bomber now has 3 levels and power-ups: range, extra bomb, speed and shield.",
+      "Disgruntled Customers has 3 levels and different customer attack types.",
+      "When you get bored, enter machine number 123 and press recalculate."
+    ]
+  }
 }
