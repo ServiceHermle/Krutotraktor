@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_56-platformer-prettier-graphics';
+const CACHE_VER = 'hdh-code-v3_1_60-platformer-bg-only-snake-pretty';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
