@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_54-more-levels-platformer-invaders';
+const CACHE_VER = 'hdh-code-v3_1_56-platformer-prettier-graphics';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

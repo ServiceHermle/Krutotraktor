@@ -4887,71 +4887,183 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
   function drawServiceTech(x,y,w,h,variant='platformer'){ 
-    const helmet = variant==='tools' ? '#ffbf1f' : '#d62b2b';
-    const vest = variant==='tools' ? '#f3cc27' : '#f0d13f';
-    const jacket = variant==='tools' ? '#4c5668' : '#596273';
-    const pants = '#233d8f';
-    const skin = '#ffce9e';
-    const boot = '#1a1a1a';
-    const outline = '#111';
+    const helmet = variant==='tools' ? '#ffbd22' : '#e13232';
+    const helmetDark = variant==='tools' ? '#d38d05' : '#b61d1d';
+    const vest = variant==='tools' ? '#f8cf36' : '#f0d34c';
+    const vestShadow = variant==='tools' ? '#d9ab18' : '#caa826';
+    const jacket = variant==='tools' ? '#5a6472' : '#4b5563';
+    const jacketDark = variant==='tools' ? '#424b57' : '#363f4c';
+    const pants = '#3352b8';
+    const pantsDark = '#22398a';
+    const skin = '#ffd4b0';
+    const skinShadow = '#edb98d';
+    const boot = '#16191f';
+    const outline = '#0c1017';
+    const pad = Math.max(2, Math.round(w*0.06));
+    const hx = x+w*0.22, hy = y+4, hw = w*0.56, hh = h*0.23;
     ctx.save();
-    ctx.strokeStyle=outline; ctx.lineWidth=2;
-    ctx.fillStyle='rgba(0,0,0,.22)'; ctx.beginPath(); ctx.ellipse(x+w*0.5,y+h-2,w*0.42,6,0,0,7); ctx.fill();
-    ctx.fillStyle=boot; ctx.fillRect(x+4,y+h-8,w*0.28,8); ctx.fillRect(x+w*0.58,y+h-8,w*0.24,8);
-    ctx.fillStyle=pants; ctx.fillRect(x+6,y+h*0.57,w*0.26,h*0.26); ctx.fillRect(x+w*0.56,y+h*0.57,w*0.2,h*0.26);
-    ctx.fillStyle=jacket; ctx.fillRect(x+4,y+h*0.28,w-8,h*0.34);
-    ctx.fillStyle=vest; ctx.fillRect(x+w*0.26,y+h*0.3,w*0.48,h*0.28);
-    ctx.fillStyle='#8b96a4'; ctx.fillRect(x+w*0.33,y+h*0.35,w*0.08,h*0.18); ctx.fillRect(x+w*0.59,y+h*0.35,w*0.08,h*0.18);
-    ctx.fillStyle=skin; ctx.fillRect(x+w*0.08,y+h*0.34,7,11); ctx.fillRect(x+w-12,y+h*0.34,7,11);
-    ctx.fillStyle=helmet; ctx.fillRect(x+w*0.18,y+3,w*0.64,10); ctx.fillRect(x+w*0.23,y+11,w*0.54,4);
-    ctx.fillStyle=skin; ctx.fillRect(x+w*0.24,y+15,w*0.52,h*0.18);
-    ctx.fillStyle='#222'; ctx.fillRect(x+w*0.35,y+21,3,3); ctx.fillRect(x+w*0.59,y+21,3,3); ctx.fillRect(x+w*0.42,y+27,w*0.18,2);
-    ctx.fillStyle='#3b3b3b'; ctx.fillRect(x+w*0.68,y+h*0.46,9,12); ctx.fillStyle='#8ad8ff'; ctx.fillRect(x+w*0.7,y+h*0.49,5,7);
-    ctx.strokeRect(x+4,y+h*0.28,w-8,h*0.34); ctx.strokeRect(x+w*0.24,y+15,w*0.52,h*0.18);
+    ctx.strokeStyle = outline; ctx.lineWidth = 2;
+    ctx.fillStyle='rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x+w*0.5,y+h-2,w*0.37,6,0,0,7); ctx.fill();
+    // boots
+    ctx.fillStyle=boot; ctx.fillRect(x+w*0.12,y+h*0.82,w*0.2,h*0.12); ctx.fillRect(x+w*0.58,y+h*0.82,w*0.2,h*0.12);
+    ctx.fillStyle='#2b3140'; ctx.fillRect(x+w*0.12,y+h*0.82,w*0.15,3); ctx.fillRect(x+w*0.58,y+h*0.82,w*0.15,3);
+    // legs
+    ctx.fillStyle=pants; ctx.fillRect(x+w*0.18,y+h*0.58,w*0.16,h*0.25); ctx.fillRect(x+w*0.51,y+h*0.58,w*0.16,h*0.25);
+    ctx.fillStyle=pantsDark; ctx.fillRect(x+w*0.26,y+h*0.58,w*0.08,h*0.25); ctx.fillRect(x+w*0.59,y+h*0.58,w*0.08,h*0.25);
+    // torso jacket / arms
+    ctx.fillStyle=jacket; ctx.fillRect(x+w*0.14,y+h*0.31,w*0.72,h*0.3);
+    ctx.fillStyle=jacketDark; ctx.fillRect(x+w*0.14,y+h*0.49,w*0.72,h*0.12);
+    ctx.fillStyle=vest; ctx.fillRect(x+w*0.3,y+h*0.34,w*0.4,h*0.25);
+    ctx.fillStyle=vestShadow; ctx.fillRect(x+w*0.3,y+h*0.47,w*0.4,h*0.12);
+    ctx.fillStyle='#8d98a6'; ctx.fillRect(x+w*0.47,y+h*0.35,w*0.06,h*0.24);
+    // arms and gloves
+    ctx.fillStyle=jacket; ctx.fillRect(x+w*0.04,y+h*0.37,w*0.12,h*0.18); ctx.fillRect(x+w*0.84,y+h*0.37,w*0.12,h*0.18);
+    ctx.fillStyle=skin; ctx.fillRect(x+w*0.05,y+h*0.49,w*0.1,h*0.08); ctx.fillRect(x+w*0.85,y+h*0.49,w*0.1,h*0.08);
+    // handheld service tablet / wrench
+    if(variant==='platformer'){
+      ctx.fillStyle='#3d4653'; ctx.fillRect(x+w*0.71,y+h*0.43,w*0.12,h*0.16);
+      ctx.fillStyle='#8de1ff'; ctx.fillRect(x+w*0.735,y+h*0.455,w*0.07,h*0.08);
+    } else {
+      ctx.fillStyle='#d4d9df'; ctx.fillRect(x+w*0.69,y+h*0.46,w*0.13,4);
+      ctx.fillRect(x+w*0.72,y+h*0.42,4,h*0.14);
+    }
+    // helmet
+    ctx.fillStyle=helmet; ctx.fillRect(hx,hy,hw,hh*0.58);
+    ctx.fillStyle=helmetDark; ctx.fillRect(hx,hy+hh*0.4,hw,hh*0.18);
+    ctx.fillStyle='#ffefef'; ctx.fillRect(hx+3,hy+2,hw-6,3);
+    // face
+    ctx.fillStyle=skin; ctx.fillRect(x+w*0.25,y+h*0.12,w*0.5,h*0.19);
+    ctx.fillStyle=skinShadow; ctx.fillRect(x+w*0.25,y+h*0.24,w*0.5,h*0.07);
+    ctx.fillStyle='#1f2430'; ctx.fillRect(x+w*0.35,y+h*0.18,4,4); ctx.fillRect(x+w*0.58,y+h*0.18,4,4);
+    ctx.fillStyle='#7d4d22'; ctx.fillRect(x+w*0.38,y+h*0.23,w*0.22,3);
+    ctx.fillStyle='#f1f5f9'; ctx.fillRect(x+w*0.37,y+h*0.205,3,2); ctx.fillRect(x+w*0.60,y+h*0.205,3,2);
+    // outline accents
+    ctx.strokeRect(x+w*0.14,y+h*0.31,w*0.72,h*0.3);
+    ctx.strokeRect(x+w*0.25,y+h*0.12,w*0.5,h*0.19);
+    ctx.strokeRect(hx,hy,hw,hh*0.58);
     ctx.restore();
   }
   function drawMachineEnemy(x,y,w,h,phase=0){
     ctx.save();
-    const body='#d8dde2', frame='#525962', dark='#2e3339', glass='#8fdcff', accent='#e43a3a', warn='#f2c230';
-    // base and machine body
-    ctx.fillStyle=dark; ctx.fillRect(x+2,y+h-6,w-4,6);
-    ctx.fillStyle=body; ctx.fillRect(x,y+2,w,h-8);
-    ctx.strokeStyle=frame; ctx.lineWidth=2; ctx.strokeRect(x+1,y+3,w-2,h-9);
-    // work area / door
-    ctx.fillStyle=frame; ctx.fillRect(x+4,y+6,w*0.48,h*0.58);
-    ctx.fillStyle=glass; ctx.fillRect(x+7,y+9,w*0.42,h*0.5);
-    ctx.fillStyle='rgba(255,255,255,.25)'; ctx.fillRect(x+10,y+11,w*0.12,h*0.42);
-    // spindle head
-    ctx.fillStyle=dark; ctx.fillRect(x+w*0.2,y+10,w*0.1,h*0.18);
-    ctx.fillStyle='#b7bec8'; ctx.fillRect(x+w*0.225,y+10,w*0.05,h*0.26);
-    ctx.fillStyle='#7a828c'; ctx.fillRect(x+w*0.24,y+18,w*0.02,h*0.18);
-    // control panel right side
-    ctx.fillStyle=frame; ctx.fillRect(x+w*0.58,y+7,w*0.24,h*0.42);
-    ctx.fillStyle='#1d2227'; ctx.fillRect(x+w*0.61,y+10,w*0.18,h*0.16);
-    ctx.fillStyle=glass; ctx.fillRect(x+w*0.625,y+12,w*0.09,h*0.08);
-    ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(x+w*0.75,y+14,3,0,7); ctx.fill();
-    ctx.fillStyle=warn; ctx.fillRect(x+w*0.63,y+22,4,4); ctx.fillRect(x+w*0.69,y+22,4,4); ctx.fillRect(x+w*0.75,y+22,4,4);
-    // service door lines and feet
-    ctx.strokeStyle='#8e97a1'; ctx.lineWidth=1.5; ctx.strokeRect(x+5,y+6,w*0.48,h*0.58);
-    ctx.beginPath(); ctx.moveTo(x+w*0.5,y+6); ctx.lineTo(x+w*0.5,y+h-10); ctx.stroke();
+    const body='#d7dde5', bodyDark='#b5bec8', frame='#49515b', dark='#232a33', glass='#9ee7ff', accent='#ef4444', warn='#f4c430';
+    const bob = Math.sin(phase*0.6)*1.5;
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x+w*0.5,y+h+2,w*0.42,5,0,0,7); ctx.fill();
+    // machine body
+    ctx.fillStyle=dark; ctx.fillRect(x+2,y+h-5,w-4,5);
+    ctx.fillStyle=body; ctx.fillRect(x,y+4+bob,w,h-9);
+    ctx.fillStyle=bodyDark; ctx.fillRect(x,y+4+bob,w,h*0.12);
+    ctx.strokeStyle=frame; ctx.lineWidth=2; ctx.strokeRect(x+1,y+5+bob,w-2,h-10);
+    // door / window
+    ctx.fillStyle=frame; ctx.fillRect(x+5,y+9+bob,w*0.42,h*0.56);
+    ctx.fillStyle=glass; ctx.fillRect(x+8,y+12+bob,w*0.36,h*0.46);
+    ctx.fillStyle='rgba(255,255,255,.3)'; ctx.fillRect(x+11,y+14+bob,w*0.08,h*0.38);
+    ctx.strokeStyle='#8c96a0'; ctx.lineWidth=1.2; ctx.strokeRect(x+6,y+10+bob,w*0.4,h*0.54);
+    // spindle + interior
+    ctx.fillStyle=dark; ctx.fillRect(x+w*0.18,y+14+bob,w*0.08,h*0.12);
+    ctx.fillStyle='#c4cbd4'; ctx.fillRect(x+w*0.205,y+14+bob,w*0.03,h*0.22);
+    ctx.fillStyle='#8b95a0'; ctx.fillRect(x+w*0.21,y+21+bob,w*0.02,h*0.1);
+    // control panel
+    ctx.fillStyle=frame; ctx.fillRect(x+w*0.57,y+10+bob,w*0.23,h*0.34);
+    ctx.fillStyle='#161c23'; ctx.fillRect(x+w*0.60,y+13+bob,w*0.16,h*0.13);
+    ctx.fillStyle='#82d7ff'; ctx.fillRect(x+w*0.62,y+15+bob,w*0.1,h*0.07);
+    ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(x+w*0.75,y+16+bob,3.4,0,7); ctx.fill();
+    ctx.fillStyle=warn; ctx.fillRect(x+w*0.61,y+24+bob,4,4); ctx.fillRect(x+w*0.67,y+24+bob,4,4); ctx.fillRect(x+w*0.73,y+24+bob,4,4);
+    // side service arm gives character
+    const armY = y+h*0.47 + bob;
+    ctx.fillStyle='#c6ccd4'; ctx.fillRect(x-5,armY,9,3); ctx.fillRect(x+w-4,armY+4,9,3);
+    ctx.fillStyle='#8e97a1'; ctx.fillRect(x-1,armY-3,3,10); ctx.fillRect(x+w-2,armY+1,3,10);
+    // angry status lights / face vibe
+    ctx.fillStyle='#111827'; ctx.fillRect(x+w*0.59,y+h*0.5+bob,4,2); ctx.fillRect(x+w*0.72,y+h*0.5+bob,4,2);
+    ctx.fillStyle='#7a2323'; ctx.fillRect(x+w*0.61,y+h*0.57+bob,w*0.12,2.5);
+    // feet
     ctx.fillStyle='#aeb5be'; ctx.fillRect(x+4,y+h-5,6,3); ctx.fillRect(x+w-10,y+h-5,6,3);
-    // little moving arm detail to make it lively
-    const armY = y+h*0.48 + Math.sin(phase*0.6)*2;
-    ctx.fillStyle='#c6ccd4'; ctx.fillRect(x-4,armY,8,3);
-    ctx.fillRect(x+w-4,armY+3,8,3);
     ctx.restore();
   }
   function drawPlatformer(W,H,floor,world,cam,p,platforms,coins,enemies,score,lives,inv,done){ 
-    ctx.clearRect(0,0,W,H); ctx.fillStyle='#67c8ff'; ctx.fillRect(0,0,W,H); 
-    ctx.fillStyle='rgba(255,255,255,.85)'; 
-    for(let i=0;i<10;i++){let x=(i*330-cam*.25)% (W+180); if(x< -100)x+=W+180; ctx.beginPath();ctx.ellipse(x,90+(i%3)*45,55,18,0,0,7);ctx.fill();}
-    ctx.fillStyle='#74cf55';ctx.fillRect(0,floor,W,H-floor);ctx.fillStyle='#8b5429';ctx.fillRect(0,floor,W,H-floor);
-    ctx.fillStyle='#12a23d'; 
-    platforms.forEach(pl=>{ctx.fillRect(pl.x+8-cam,floor-80,54,80);ctx.fillRect(pl.x-cam,pl.y,pl.w,pl.h); ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fillRect(pl.x-cam+8,pl.y+3,pl.w-16,3); ctx.fillStyle='#12a23d';});
-    coins.forEach(c=>{if(c.got)return;ctx.fillStyle='#ffd33d';ctx.beginPath();ctx.arc(c.x-cam,c.y,12,0,7);ctx.fill();ctx.strokeStyle='#a06a00';ctx.lineWidth=3;ctx.stroke();});
-    enemies.forEach((e,i)=>{if(e.dead)return;drawMachineEnemy(e.x-cam,e.y,e.w,e.h,i);});
-    ctx.fillStyle='#eee';ctx.fillRect(world-45-cam,floor-150,10,150);ctx.fillStyle='#e62929';ctx.fillRect(world-35-cam,floor-145,78,34);
-    ctx.globalAlpha=inv>0?.45:1; drawServiceTech(p.x-cam-4,p.y-8,p.w+12,p.h+14,'platformer'); ctx.globalAlpha=1; 
+    ctx.clearRect(0,0,W,H);
+    // sky gradient
+    const sky = ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,'#76cfff'); sky.addColorStop(0.55,'#8dd7ff'); sky.addColorStop(1,'#c9efff');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    // far skyline / mountains
+    ctx.fillStyle='rgba(255,255,255,.12)';
+    for(let i=0;i<4;i++){
+      const bx=((i*260)-cam*0.12)%(W+320); const x=bx<-180?bx+W+320:bx;
+      ctx.beginPath(); ctx.moveTo(x,H*0.6); ctx.lineTo(x+90,H*0.42); ctx.lineTo(x+180,H*0.6); ctx.closePath(); ctx.fill();
+    }
+    ctx.fillStyle='rgba(56,86,120,.18)';
+    for(let i=0;i<6;i++){
+      let x=((i*170)-cam*0.18)%(W+90); if(x<-60) x+=W+90;
+      const h=50+(i%3)*18;
+      ctx.fillRect(x,H*0.62-h,40,h); ctx.fillRect(x+10,H*0.62-h-18,20,18);
+    }
+    // clouds
+    ctx.fillStyle='rgba(255,255,255,.78)';
+    for(let i=0;i<9;i++){
+      let x=(i*235-cam*.22)%(W+170); if(x<-120)x+=W+170;
+      const y=78+(i%3)*42; const sc=.9+(i%2)*.15;
+      ctx.beginPath();
+      ctx.ellipse(x,y,42*sc,15*sc,0,0,7);
+      ctx.ellipse(x+32*sc,y-4,34*sc,13*sc,0,0,7);
+      ctx.ellipse(x+62*sc,y,40*sc,16*sc,0,0,7);
+      ctx.fill();
+    }
+    // distant workshop stripes
+    ctx.fillStyle='#6dbd53'; ctx.fillRect(0,floor-6,W,6);
+    const groundGrad = ctx.createLinearGradient(0,floor,0,H);
+    groundGrad.addColorStop(0,'#99602f'); groundGrad.addColorStop(1,'#6f441f');
+    ctx.fillStyle=groundGrad; ctx.fillRect(0,floor,W,H-floor);
+    ctx.fillStyle='rgba(255,255,255,.12)';
+    for(let i=0;i<W;i+=34) ctx.fillRect(i,floor+8,20,3);
+    ctx.fillStyle='rgba(0,0,0,.1)';
+    for(let i=0;i<W;i+=28) ctx.fillRect(i,floor+22,16,2);
+
+    // decorative pipes / support columns under platforms
+    platforms.forEach((pl,idx)=>{
+      const sx = pl.x-cam;
+      // support column
+      ctx.fillStyle='#1aa542';
+      ctx.fillRect(sx+Math.max(8,pl.w*0.18), pl.y+pl.h, Math.max(18,pl.w*0.46), floor-(pl.y+pl.h));
+      ctx.fillStyle='rgba(255,255,255,.18)';
+      ctx.fillRect(sx+Math.max(10,pl.w*0.2), pl.y+pl.h+4, Math.max(8,pl.w*0.16), floor-(pl.y+pl.h)-8);
+      // platform top body
+      const topGrad = ctx.createLinearGradient(0,pl.y,0,pl.y+pl.h);
+      topGrad.addColorStop(0,'#2dd45d'); topGrad.addColorStop(1,'#15963e');
+      ctx.fillStyle=topGrad; ctx.fillRect(sx,pl.y,pl.w,pl.h);
+      ctx.fillStyle='#83f2a2'; ctx.fillRect(sx+6,pl.y+3,Math.max(10,pl.w-12),3);
+      ctx.fillStyle='rgba(0,0,0,.16)'; ctx.fillRect(sx,pl.y+pl.h-3,pl.w,3);
+      if(pl.w>60){
+        ctx.fillStyle='#46515d'; ctx.fillRect(sx+pl.w*0.7, pl.y+pl.h-2, 18, 12);
+        ctx.fillStyle='#9ee7ff'; ctx.fillRect(sx+pl.w*0.735, pl.y+pl.h+1, 8, 5);
+      }
+    });
+
+    // coins
+    coins.forEach((c,i)=>{
+      if(c.got) return;
+      const cx=c.x-cam, cy=c.y;
+      ctx.fillStyle='#f6b90b'; ctx.beginPath(); ctx.arc(cx,cy,12,0,7); ctx.fill();
+      ctx.fillStyle='#ffd94b'; ctx.beginPath(); ctx.arc(cx-2,cy-2,8.5,0,7); ctx.fill();
+      ctx.strokeStyle='#9a6500'; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,.35)'; ctx.fillRect(cx-4,cy-6,3,5);
+    });
+
+    // enemies and little floor details
+    enemies.forEach((e,i)=>{ if(e.dead) return; drawMachineEnemy(e.x-cam,e.y,e.w,e.h,i+score*0.03); });
+
+    // goal flag / portal
+    const gx=world-58-cam;
+    ctx.fillStyle='#dce3ea'; ctx.fillRect(gx,floor-160,8,160);
+    ctx.fillStyle='#f43f5e'; ctx.fillRect(gx+8,floor-154,74,28);
+    ctx.fillStyle='#ffffff'; ctx.fillRect(gx+18,floor-147,34,4);
+    ctx.fillStyle='#0b1220'; ctx.fillRect(gx+58,floor-149,12,12);
+    ctx.fillStyle='rgba(255,255,255,.22)'; ctx.fillRect(gx+8,floor-122,26,4);
+
+    // player
+    ctx.globalAlpha=inv>0?.45:1; 
+    drawServiceTech(p.x-cam-4,p.y-8,p.w+12,p.h+14,'platformer'); 
+    ctx.globalAlpha=1; 
   }
 
   function tools(){
@@ -4987,8 +5099,37 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if(!k) k = (keys.ArrowUp||keys.w?'up':keys.ArrowDown||keys.s?'down':keys.ArrowLeft||keys.a?'left':keys.ArrowRight||keys.d?'right':null);
       touch.last=null; touch.left=false; touch.right=false; touch.up=false; touch.down=false;
       if(k==='up'&&dir.y!==1)next={x:0,y:-1}; else if(k==='down'&&dir.y!==-1)next={x:0,y:1}; else if(k==='left'&&dir.x!==1)next={x:-1,y:0}; else if(k==='right'&&dir.x!==-1)next={x:1,y:0};
-      dir=next; const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y}; const crash=head.x<0||head.y<0||head.x>=cols||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y); if(crash){lives--; if(lives<=0){saveRetroBest('snake',score);show('Had přišel o 5 životů<br><small>Spouštím bonus: Dlaždice...</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},1800); running=false; return;} reset(); return;} snake.unshift(head); if(head.x===food.x&&head.y===food.y){score++; if(score>=winScore){saveRetroBest('snake',score);show('Had hotový 🐍<br><small>Za 2 sekundy startuje bonus: Dlaždice</small>'); queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},2000); running=false; return;} placeFood();} else snake.pop(); }
-    function loop(t){ if(runId!==gameRunId||!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); setHud('LEVEL 3 / 3<br>Had: šipky, swipe nebo krátké ťuknutí<br>Skóre: '+score+' / '+winScore+' &nbsp; Životy: '+lives+' / 5 &nbsp; TOP: '+getBestScore('snake')+'<br><small>Hrací pole začíná pod horním menu</small>'); }
+      dir=next;
+      const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+      if(head.x<0) head.x=cols-1; else if(head.x>=cols) head.x=0;
+      if(head.y<0) head.y=rows-1; else if(head.y>=rows) head.y=0;
+      const selfBite=snake.some(s=>s.x===head.x&&s.y===head.y);
+      if(selfBite){
+        lives--;
+        if(lives<=0){
+          saveRetroBest('snake',score);
+          show('Had se kousl 5× sám do sebe<br><small>Spouštím bonus: Dlaždice...</small>');
+          queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},1800);
+          running=false;
+          return;
+        }
+        reset();
+        return;
+      }
+      snake.unshift(head);
+      if(head.x===food.x&&head.y===food.y){
+        score++;
+        if(score>=winScore){
+          saveRetroBest('snake',score);
+          show('Had hotový 🐍<br><small>Za 2 sekundy startuje bonus: Dlaždice</small>');
+          queueLevelTimeout(()=>{if(isOpen() && runId===gameRunId)startLevel('invaders')},2000);
+          running=false;
+          return;
+        }
+        placeFood();
+      } else snake.pop();
+    }
+    function loop(t){ if(runId!==gameRunId||!running||mode!=='snake'||!isOpen())return; raf=requestAnimationFrame(loop); acc+=(t-last)||0; last=t; if(acc>130){acc=0;step();} ctx.clearRect(0,0,W,H);ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1d2a43';ctx.fillRect(0,0,cols*cell,rows*cell); ctx.fillStyle='#ffd33d';ctx.fillRect(food.x*cell+3,food.y*cell+3,cell-6,cell-6); ctx.fillStyle='#6ee16c';snake.forEach((s,i)=>{ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);}); setHud('LEVEL 3 / 3<br>Had: šipky, swipe nebo krátké ťuknutí<br>Skóre: '+score+' / '+winScore+' &nbsp; Životy: '+lives+' / 5 &nbsp; TOP: '+getBestScore('snake')+'<br><small>Projdeš zdí jako na 3310. Umřeš jen při kousnutí do sebe.</small>'); }
     loop(0);
   }
 
