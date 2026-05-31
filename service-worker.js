@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_60-platformer-bg-only-snake-pretty';
+const CACHE_VER = 'hdh-code-v3_1_61-spindle-empty-labels';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

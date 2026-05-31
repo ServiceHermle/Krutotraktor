@@ -1166,17 +1166,17 @@ input[type="search"] {
       <div class="calc-title" id="activeCalcTitle" style="padding:0;text-align:left;font-size:1.2rem;">Orientace vřetene</div>
       <label id="calcLabel1">Hodnota parametru</label>
       <div class="calc-input-select" id="calcInputWrap1">
-        <input id="calcInput1" inputmode="decimal" type="text" placeholder="0.000"/>
+        <input id="calcInput1" inputmode="decimal" type="text" placeholder=""/>
         <select id="torqueWrenchSelect" class="tool-inline-select hidden" aria-label="Momentový klíč"></select>
       </div>
       <label id="calcLabel2">Pozice M19</label>
       <div class="calc-input-select" id="calcInputWrap2">
-        <input id="calcInput2" inputmode="decimal" type="text" placeholder="0.000"/>
+        <input id="calcInput2" inputmode="decimal" type="text" placeholder=""/>
         <select id="torqueAdapterSelect" class="tool-inline-select hidden" aria-label="Adaptér / hák"></select>
       </div>
       <label id="calcLabel3">Skutečná pozice M19</label>
       <div class="calc-input-select" id="calcInputWrap3">
-        <input id="calcInput3" inputmode="decimal" type="text" placeholder="0.000"/>
+        <input id="calcInput3" inputmode="decimal" type="text" placeholder=""/>
       </div>
       <div class="calc-result">
         <div class="calc-result-label" id="calcResultLabel">Nová hodnota parametru</div>
@@ -1559,8 +1559,8 @@ const I18N = {
     calc_vibrations: "Měření vibrací",
     calc_back_to_menu: "Zpět na kalkulačky",
     calc_current_param: "Hodnota parametru",
-    calc_current_position: "Pozice M19",
-    calc_ideal_position: "Skutečná pozice M19",
+    calc_current_position: "Pozice M19 (z ref. hodnot)",
+    calc_ideal_position: "Skutečná pozice M19 (seřízeno pomocí hodinek)",
     calc_new_param: "Nová hodnota parametru",
     calc_wrench_length_l: "Délka momentového klíče (od středu ráčny po střed rukojeti) [mm]",
     calc_adapter_length_a: "Efektivní délka adaptéru (napsána na adaptéru) [mm]",
@@ -1677,8 +1677,8 @@ const I18N = {
     calc_vibrations: "Vibrationsmessung",
     calc_back_to_menu: "Zurück zu Rechnern",
     calc_current_param: "Aktueller Parameterwert",
-    calc_current_position: "Aktuelle Spindelposition",
-    calc_ideal_position: "Ideale Spindelposition",
+    calc_current_position: "M19-Position (aus Referenzwerten)",
+    calc_ideal_position: "Tatsächliche M19-Position (mit Messuhr eingestellt)",
     calc_new_param: "Neuer Parameterwert",
     calc_wrench_length_l: "Länge des Drehmomentschlüssels L [mm]",
     calc_adapter_length_a: "Wirksame Adapterlänge A [mm]",
@@ -1794,8 +1794,8 @@ const I18N = {
     calc_vibrations: "Vibration measurement",
     calc_back_to_menu: "Back to calculators",
     calc_current_param: "Current parameter value",
-    calc_current_position: "Current spindle position",
-    calc_ideal_position: "Ideal spindle position",
+    calc_current_position: "M19 position (from reference values)",
+    calc_ideal_position: "Actual M19 position (set with dial indicator)",
     calc_new_param: "New parameter value",
     calc_wrench_length_l: "Torque wrench length L [mm]",
     calc_adapter_length_a: "Effective adapter length A [mm]",
@@ -2608,7 +2608,7 @@ const serviceCalcs = {
   spindle: {
     title: 'calc_spindle', resultLabel: 'calc_new_param',
     labels: ['calc_current_param','calc_current_position','calc_ideal_position'],
-    placeholders: ['74.781','15.190','313.914'],
+    placeholders: ['','',''],
     help: 'calc_help_spindle',
     calc: (a,b,c)=> norm360(a - (c - b))
   },
@@ -2657,7 +2657,7 @@ function openCalc(type){
   ['1','2','3'].forEach((n,i)=>{
     const lab=document.getElementById('calcLabel'+n), inp=document.getElementById('calcInput'+n);
     if(lab) lab.textContent = t(c.labels[i]);
-    if(inp){ inp.placeholder = c.placeholders[i] || '0.000'; inp.value=''; }
+    if(inp){ inp.placeholder = (c.placeholders && c.placeholders[i] !== undefined) ? c.placeholders[i] : '0.000'; inp.value=''; }
   });
   const i3=document.getElementById('calcInput3'); const l3=document.getElementById('calcLabel3');
   const hideThird = !!c.hideThird;
