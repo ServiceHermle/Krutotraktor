@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_62-spindle-param3430';
+const CACHE_VER = 'hdh-code-v3_1_64-contact-fullname';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

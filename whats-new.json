@@ -1,5 +1,5 @@
 {
-  "version": "5.9.49",
+  "version": "5.9.50",
   "cs": {
     "title": "Co je nového",
     "items": [
@@ -10,7 +10,9 @@
       "Měření vibrací – slouží hlavně jako pomocný zápis pro měření vřeten a zadávání závaží.",
       "Výpočet utahovacího momentu pro hákové klíče – je to jednoduchý výpočet, ale často se musí dohledávat. Dole je navíc možnost uložit si vlastní nářadí, takže ho není potřeba pokaždé měřit znovu. Stačí vybrat, s čím právě chcete pracovat.",
       "Kdyby cokoliv nefungovalo, stačí mi napsat. Budu rád i za jakýkoliv nápad na další funkce.",
-      "Až se budeš nudit, zadej číslo stroje 123 a zmáčkni přepočítat."
+      "Až se budeš nudit, zadej číslo stroje 123 a zmáčkni přepočítat.",
+      "Ať se Vám daří, Tomáš Pospíšil",
+      "Kontakt / autor aplikace: {{WHATSAPP}}"
     ]
   },
   "de": {
@@ -23,7 +25,9 @@
       "Vibrationsmessung – dient hauptsächlich als Hilfsnotiz für Spindelmessungen und das Eintragen von Gewichten.",
       "Berechnung des Anzugsdrehmoments für Hakenschlüssel – es ist eine einfache Berechnung, die man aber oft nachschlagen muss. Unten gibt es zusätzlich die Möglichkeit, eigenes Werkzeug zu speichern, damit es nicht jedes Mal neu gemessen werden muss. Einfach auswählen, womit du gerade arbeiten möchtest.",
       "Falls irgendetwas nicht funktioniert, schreib mir einfach. Ich freue mich auch über jede Idee für weitere Funktionen.",
-      "Wenn dir langweilig ist, gib die Maschinennummer 123 ein und drücke Neuberechnen."
+      "Wenn dir langweilig ist, gib die Maschinennummer 123 ein und drücke Neuberechnen.",
+      "Viel Erfolg, Tomáš Pospíšil",
+      "Kontakt / App-Autor: {{WHATSAPP}}"
     ]
   },
   "en": {
@@ -36,7 +40,9 @@
       "Vibration measurement – mainly intended as a helper note for spindle measurements and entering balancing weights.",
       "Hook wrench tightening torque calculation – it is a simple calculation, but it often has to be looked up. At the bottom there is also an option to save your own tools, so you do not have to measure them again every time. Just select what you are currently working with.",
       "If anything does not work, just write to me. I will also be happy for any idea for more functions.",
-      "When you get bored, enter machine number 123 and press recalculate."
+      "When you get bored, enter machine number 123 and press recalculate.",
+      "Best wishes, Tomáš Pospíšil",
+      "Contact / app author: {{WHATSAPP}}"
     ]
   }
 }
