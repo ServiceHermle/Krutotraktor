@@ -28,8 +28,8 @@
         "text": "Seznam hotelů pro servisní výjezdy. U hotelů můžeš ukládat informace, volat, otevřít navigaci a data exportovat nebo importovat."
       },
       {
-        "title": "👤 Autor / kontakt",
-        "text": "Aplikaci vytvořil Tomáš Pospíšil. V případě nápadu nebo problému můžete napsat přes {{WHATSAPP}}."
+        "title": "👤 Kontakt",
+        "text": "Kontakt: {{WHATSAPP}}"
       }
     ]
   },
@@ -62,8 +62,8 @@
         "text": "Hotelliste für Serviceeinsätze. Bei Hotels können Informationen gespeichert, Anrufe gestartet, Navigation geöffnet sowie Daten exportiert oder importiert werden."
       },
       {
-        "title": "👤 Autor / Kontakt",
-        "text": "Die App wurde von Tomáš Pospíšil erstellt. Bei Ideen oder Problemen kannst du über {{WHATSAPP}} schreiben."
+        "title": "👤 Kontakt",
+        "text": "Kontakt: {{WHATSAPP}}"
       }
     ]
   },
@@ -96,8 +96,8 @@
         "text": "Hotel list for service trips. You can save hotel information, call, open navigation, and export or import data."
       },
       {
-        "title": "👤 Author / contact",
-        "text": "The app was created by Tomáš Pospíšil. For ideas or issues, you can write via {{WHATSAPP}}."
+        "title": "👤 Contact",
+        "text": "Contact: {{WHATSAPP}}"
       }
     ]
   }

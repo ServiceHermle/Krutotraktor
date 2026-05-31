@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_64-contact-fullname';
+const CACHE_VER = 'hdh-code-v3_1_65-contact-clean';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

@@ -2106,14 +2106,13 @@ function uiShowApp(){ const lockEl=document.getElementById('lock'); const appEl=
 const APP_NEWS_KEY = "app_news_seen_version";
 const APP_NEWS_FILE = "./whats-new.json";
 const APP_NEWS_FALLBACK = {
-  version: "5.9.50",
+  version: "5.9.51",
   title: "Co je nového",
   items: [
     "Změny aplikace se nyní načítají z externího JSON souboru whats-new.json.",
     "Po další úpravě stačí přepsat verzi a seznam změn v textovém souboru.",
     "Po potvrzení se okno znovu neukáže až do změny verze v souboru.",
-    "Ať se Vám daří, Tomáš Pospíšil",
-    "Kontakt / autor aplikace: {{WHATSAPP}}"
+    "Ať se Vám daří, {{WHATSAPP}}"
   ]
 };
 let appNewsData = { ...APP_NEWS_FALLBACK };
@@ -2130,8 +2129,7 @@ const APP_NEWS_ORIGINAL_TRANSLATIONS = {
       "Výpočet utahovacího momentu pro hákové klíče – je to jednoduchý výpočet, ale často se musí dohledávat. Dole je navíc možnost uložit si vlastní nářadí, takže ho není potřeba pokaždé měřit znovu. Stačí vybrat, s čím právě chcete pracovat.",
       "Kdyby cokoliv nefungovalo, stačí mi napsat. Budu rád i za jakýkoliv nápad na další funkce.",
       "Až se budeš nudit, zadej číslo stroje 123 a zmáčkni přepočítat.",
-      "Ať se Vám daří, Tomáš Pospíšil",
-      "Kontakt / autor aplikace: {{WHATSAPP}}"
+      "Ať se Vám daří, {{WHATSAPP}}"
     ]
   },
   de: {
@@ -2145,8 +2143,7 @@ const APP_NEWS_ORIGINAL_TRANSLATIONS = {
       "Berechnung des Anzugsdrehmoments für Hakenschlüssel – es ist eine einfache Berechnung, die man aber oft nachschlagen muss. Unten gibt es zusätzlich die Möglichkeit, eigenes Werkzeug zu speichern, damit es nicht jedes Mal neu gemessen werden muss. Einfach auswählen, womit du gerade arbeiten möchtest.",
       "Falls irgendetwas nicht funktioniert, schreib mir einfach. Ich freue mich auch über jede Idee für weitere Funktionen.",
       "Wenn dir langweilig ist, gib die Maschinennummer 123 ein und drücke Neuberechnen.",
-      "Viel Erfolg, Tomáš Pospíšil",
-      "Kontakt / App-Autor: {{WHATSAPP}}"
+      "Viel Erfolg, {{WHATSAPP}}"
     ]
   },
   en: {
@@ -2160,8 +2157,7 @@ const APP_NEWS_ORIGINAL_TRANSLATIONS = {
       "Hook wrench tightening torque calculation – it is a simple calculation, but it often has to be looked up. At the bottom there is also an option to save your own tools, so you do not have to measure them again every time. Just select what you are currently working with.",
       "If anything does not work, just write to me. I will also be happy for any idea for more functions.",
       "When you get bored, enter machine number 123 and press recalculate.",
-      "Best wishes, Tomáš Pospíšil",
-      "Contact / app author: {{WHATSAPP}}"
+      "Best wishes, {{WHATSAPP}}"
     ]
   }
 };
@@ -2181,7 +2177,7 @@ const APP_HELP_FALLBACK = {
     { title: "🏭 Zákazníci", text: "Evidence zákazníků a jejich strojů. Slouží pro rychlejší orientaci a práci se servisními informacemi." },
     { title: "🧰 Kalkulačky", text: "Servisní kalkulačky pro pomocné výpočty, například orientace vřetene, kinematika, měření vibrací a utahovací moment pro hákové klíče." },
     { title: "🛌 Hotely", text: "Seznam hotelů pro servisní výjezdy. U hotelů můžeš ukládat informace, volat, otevřít navigaci a data exportovat nebo importovat." },
-    { title: "👤 Autor / kontakt", text: "Aplikaci vytvořil Tomáš Pospíšil. V případě nápadu nebo problému můžete napsat přes {{WHATSAPP}}." }
+    { title: "👤 Kontakt", text: "Kontakt: {{WHATSAPP}}" }
   ]
 };
 let appHelpData = JSON.parse(JSON.stringify(APP_HELP_FALLBACK));
@@ -2221,10 +2217,7 @@ function updateAppInfoLabels(){
 
 const APP_CONTACT_WHATSAPP_URL = "https://wa.me/420731860884?text=Ahoj%20Tom%C3%A1%C5%A1i%2C%20p%C3%AD%C5%A1u%20z%20aplikace.";
 function appContactWhatsAppLabel(){
-  const lang = (typeof CURRENT_LANG !== "undefined" && CURRENT_LANG) ? CURRENT_LANG : "cs";
-  if(lang === "de") return "WhatsApp an Tomáš Pospíšil";
-  if(lang === "en") return "WhatsApp to Tomáš Pospíšil";
-  return "WhatsApp Tomáš Pospíšil";
+  return "Tomáš Pospíšil";
 }
 function escapeHtml(str){
   return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch] || ch));
