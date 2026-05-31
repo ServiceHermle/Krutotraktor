@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_61-spindle-empty-labels';
+const CACHE_VER = 'hdh-code-v3_1_62-spindle-param3430';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
