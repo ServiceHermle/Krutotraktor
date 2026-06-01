@@ -559,17 +559,27 @@ function toast(msg){
     el.id='toast';
     el.className='toast';
   }
-  // Keep the toast as the last element in <body> so it is above modal overlays and blur layers on iOS/PWA.
-  if(el.parentElement!==document.body || el !== document.body.lastElementChild){
-    document.body.appendChild(el);
+
+  // Native <dialog> is rendered in the browser top layer. A normal fixed toast
+  // appended to <body> can still appear behind the dialog backdrop on iOS/PWA.
+  // When a dialog is open, place the toast inside the top-most open dialog so it
+  // is painted in the same top layer as the modal, above its content.
+  const openDialogs = Array.from(document.querySelectorAll('dialog[open]'));
+  const host = openDialogs.length ? openDialogs[openDialogs.length - 1] : document.body;
+  if(el.parentElement !== host){
+    host.appendChild(el);
   }
+
   el.textContent=msg||'Hotovo';
+  el.style.position='fixed';
+  el.style.left='50%';
+  el.style.bottom='calc(18px + env(safe-area-inset-bottom))';
   el.style.zIndex='2147483647';
   el.classList.remove('show');
   void el.offsetWidth;
   el.classList.add('show');
   clearTimeout(window.__toastTimer);
-  window.__toastTimer=setTimeout(()=>el.classList.remove('show'), 2200);
+  window.__toastTimer=setTimeout(()=>el.classList.remove('show'), 2600);
 }
 
 // Calc core

@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_70-toast-front-fix';
+const CACHE_VER = 'hdh-code-v3_1_71-toast-dialog-toplayer';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
