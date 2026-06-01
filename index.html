@@ -46,7 +46,7 @@
     .tab.active { background:#ffecec; border-color:#f3b1b1; }
     /* Hidden panels must always win over per-panel display rules (e.g., #panel-clients {display:flex}) */
     .hidden { display:none !important; }
-    .toast { position: fixed; left:50%; bottom: calc(18px + env(safe-area-inset-bottom)); transform: translateX(-50%); background:#d32525; color:#fff; padding:10px 12px; border-radius:12px; font-weight:900; opacity:0; pointer-events:none; transition: opacity .2s ease, transform .2s ease; }
+    .toast { position: fixed; left:50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index:1000000; transform: translateX(-50%); background:#d32525; color:#fff; padding:10px 12px; border-radius:12px; font-weight:900; opacity:0; pointer-events:none; transition: opacity .2s ease, transform .2s ease; }
     .toast.show { opacity:1; transform: translateX(-50%) translateY(-6px); }
 
     /* --- Clients: keep Import/Export always visible, scroll list between --- */
@@ -1596,7 +1596,7 @@ const I18N = {
     btn_back: "Zpět",
     btn_logout: "Odhlásit",
     label_search: "Vyhledávání",
-    placeholder_search: "Hledat…",
+    placeholder_search: "Hledat kód, parametr nebo popis…",
     placeholder_client_search: "Hledat zákazníka nebo N…",
     label_from: "Od",
     label_to: "Do",
@@ -1630,8 +1630,8 @@ const I18N = {
     btn_add_machine_small: "+ Stroj",
     label_note: "Poznámka",
     hotels_search: "Vyhledávání",
-    hotels_search_ph: "Město nebo hotel…",
-    hotels_hint: "Třídění podle měst, vyhledávání podle města nebo názvu hotelu.",
+    hotels_search_ph: "Město, hotel, kontakt nebo telefon…",
+    hotels_hint: "Třídění podle měst, vyhledávání podle města, hotelu, kontaktu, telefonu nebo poznámky.",
     dlg_hotel_title: "Hotel",
     label_city: "Město",
     label_hotel: "Hotel",
@@ -1647,6 +1647,18 @@ const I18N = {
     dlg_edit_machine_title: "Upravit stroj",
     toast_saved: "Uloženo",
     toast_deleted: "Smazáno",
+    err_duplicate_customer_name: "Zákazník „{name}“ už v seznamu existuje.",
+    err_duplicate_customer_phone: "Telefonní číslo už je uložené u zákazníka „{name}“.",
+    err_duplicate_hotel_name: "Hotel „{name}“ už v seznamu existuje.",
+    err_duplicate_hotel_phone: "Telefonní číslo už je uložené u hotelu „{name}“.",
+    err_duplicate_fixed_code: "Pevný kód „{value}“ už v seznamu existuje.",
+    err_duplicate_fixed_param: "Parametr „{value}“ už v seznamu existuje.",
+    err_fixed_desc_required: "Vyplňte popis.",
+    err_fixed_code_or_param_required: "Vyplňte buď kód, nebo parametr.",
+    popup_customer_not_found: "Nenalezen žádný zákazník.",
+    popup_customer_empty: "Nejsou uložení žádní zákazníci.",
+    popup_machine_added: "Stroj přidán k zákazníkovi: {name}",
+    err_enter_customer_name: "Zadejte jméno zákazníka",
     err_enter_name: "Zadejte název",
     confirm_delete_customer: "Opravdu smazat zákazníka?",
     confirm_delete_machine: "Opravdu smazat stroj?",
@@ -1655,6 +1667,7 @@ const I18N = {
     btn_call: "Volat",
     btn_machines: "Stroje",
     confirm_delete_hotel: "Opravdu smazat hotel?",
+    confirm_delete_fixed: "Opravdu smazat pevný kód / parametr?",
     hotels_title: "Hotely",
     hotels_open_title: "Hotely",
     btn_export: "Export",
@@ -1714,7 +1727,7 @@ const I18N = {
     btn_back: "Zurück",
     btn_logout: "Abmelden",
     label_search: "Suche",
-    placeholder_search: "Suchen…",
+    placeholder_search: "Code, Parameter oder Beschreibung suchen…",
     placeholder_client_search: "Kunde oder Nr. suchen…",
     label_from: "Von",
     label_to: "Bis",
@@ -1747,8 +1760,8 @@ const I18N = {
     btn_add_machine_small: "+ Maschine",
     label_note: "Notiz",
     hotels_search: "Suche",
-    hotels_search_ph: "Stadt oder Hotel…",
-    hotels_hint: "Sortierung nach Städten, Suche nach Stadt oder Hotelname.",
+    hotels_search_ph: "Stadt, Hotel, Kontakt oder Telefon…",
+    hotels_hint: "Sortierung nach Städten, Suche nach Stadt, Hotel, Kontakt, Telefon oder Notiz.",
     dlg_hotel_title: "Hotel",
     label_city: "Stadt",
     label_hotel: "Hotel",
@@ -1764,6 +1777,18 @@ const I18N = {
     dlg_edit_machine_title: "Maschine bearbeiten",
     toast_saved: "Gespeichert",
     toast_deleted: "Gelöscht",
+    err_duplicate_customer_name: "Kunde „{name}“ ist bereits in der Liste vorhanden.",
+    err_duplicate_customer_phone: "Die Telefonnummer ist bereits beim Kunden „{name}“ gespeichert.",
+    err_duplicate_hotel_name: "Hotel „{name}“ ist bereits in der Liste vorhanden.",
+    err_duplicate_hotel_phone: "Die Telefonnummer ist bereits beim Hotel „{name}“ gespeichert.",
+    err_duplicate_fixed_code: "Fester Code „{value}“ ist bereits in der Liste vorhanden.",
+    err_duplicate_fixed_param: "Parameter „{value}“ ist bereits in der Liste vorhanden.",
+    err_fixed_desc_required: "Bitte Beschreibung ausfüllen.",
+    err_fixed_code_or_param_required: "Bitte entweder Code oder Parameter ausfüllen.",
+    popup_customer_not_found: "Kein Kunde gefunden.",
+    popup_customer_empty: "Keine Kunden gespeichert.",
+    popup_machine_added: "Maschine zum Kunden hinzugefügt: {name}",
+    err_enter_customer_name: "Bitte Kundennamen eingeben",
     err_enter_name: "Bitte Name eingeben",
     confirm_delete_customer: "Kunden wirklich löschen?",
     confirm_delete_machine: "Maschine wirklich löschen?",
@@ -1772,6 +1797,7 @@ const I18N = {
     btn_call: "Anrufen",
     btn_machines: "Maschinen",
     confirm_delete_hotel: "Hotel wirklich löschen?",
+    confirm_delete_fixed: "Festen Code / Parameter wirklich löschen?",
     hotels_title: "Hotels",
     hotels_open_title: "Hotels",
     btn_export: "Export",
@@ -1831,7 +1857,7 @@ const I18N = {
     btn_back: "Back",
     btn_logout: "Log out",
     label_search: "Search",
-    placeholder_search: "Search…",
+    placeholder_search: "Search code, parameter or description…",
     placeholder_client_search: "Search customer or No…",
     label_from: "From",
     label_to: "To",
@@ -1864,8 +1890,8 @@ const I18N = {
     btn_add_machine_small: "+ Machine",
     label_note: "Note",
     hotels_search: "Search",
-    hotels_search_ph: "City or hotel…",
-    hotels_hint: "Sorted by cities, search by city or hotel name.",
+    hotels_search_ph: "City, hotel, contact or phone…",
+    hotels_hint: "Sorted by cities; search by city, hotel, contact, phone or note.",
     dlg_hotel_title: "Hotel",
     label_city: "City",
     label_hotel: "Hotel",
@@ -1881,6 +1907,18 @@ const I18N = {
     dlg_edit_machine_title: "Edit machine",
     toast_saved: "Saved",
     toast_deleted: "Deleted",
+    err_duplicate_customer_name: "Customer „{name}“ already exists in the list.",
+    err_duplicate_customer_phone: "The phone number is already saved for customer „{name}“.",
+    err_duplicate_hotel_name: "Hotel „{name}“ already exists in the list.",
+    err_duplicate_hotel_phone: "The phone number is already saved for hotel „{name}“.",
+    err_duplicate_fixed_code: "Fixed code „{value}“ already exists in the list.",
+    err_duplicate_fixed_param: "Parameter „{value}“ already exists in the list.",
+    err_fixed_desc_required: "Enter a description.",
+    err_fixed_code_or_param_required: "Enter either a code or a parameter.",
+    popup_customer_not_found: "No customer found.",
+    popup_customer_empty: "No customers saved.",
+    popup_machine_added: "Machine added to customer: {name}",
+    err_enter_customer_name: "Enter customer name",
     err_enter_name: "Enter a name",
     confirm_delete_customer: "Delete customer?",
     confirm_delete_machine: "Delete machine?",
@@ -1889,6 +1927,7 @@ const I18N = {
     btn_call: "Call",
     btn_machines: "Machines",
     confirm_delete_hotel: "Delete hotel?",
+    confirm_delete_fixed: "Delete fixed code / parameter?",
     hotels_title: "Hotels",
     hotels_open_title: "Hotels",
     btn_export: "Export",
@@ -1977,6 +2016,9 @@ function t(key){
          (I18N.cs[key]) ||
          (typeof CALC_I18N !== 'undefined' && CALC_I18N.cs && CALC_I18N.cs[key]) ||
          key;
+}
+function tfmt(key, vars={}){
+  return String(t(key)).replace(/\{(\w+)\}/g, (_, k)=> String(vars[k] ?? ''));
 }
 
 function applyI18n(){
@@ -3402,15 +3444,19 @@ function normKeyDup(value){
     .replace(/\s+/g,'')
     .toUpperCase();
 }
+function duplicateLabel(value, fallback){
+  const v = String(value||'').trim();
+  return v || fallback || 'bez názvu';
+}
 function findDuplicateCustomer(list, data){
   const name = normTextDup(data?.name);
   const phone = normalizePhone(data?.phone);
   const id = data?.id || null;
   if(!name && !phone) return '';
   const dupName = name ? list.find(x=>x.id!==id && normTextDup(x.name)===name) : null;
-  if(dupName) return `Zákazník „${dupName.name}“ už v seznamu existuje.`;
+  if(dupName) return tfmt('err_duplicate_customer_name', {name: duplicateLabel(dupName.name)});
   const dupPhone = phone ? list.find(x=>x.id!==id && normalizePhone(x.contactPhone)===phone) : null;
-  if(dupPhone) return `Telefonní číslo už je uložené u zákazníka „${dupPhone.name||'bez názvu'}“.`;
+  if(dupPhone) return tfmt('err_duplicate_customer_phone', {name: duplicateLabel(dupPhone.name)});
   return '';
 }
 function findDuplicateHotel(list, data){
@@ -3419,9 +3465,9 @@ function findDuplicateHotel(list, data){
   const id = data?.id || null;
   if(!hotel && !phone) return '';
   const dupHotel = hotel ? list.find(x=>x.id!==id && normTextDup(x.hotel)===hotel) : null;
-  if(dupHotel) return `Hotel „${dupHotel.hotel}“ už v seznamu existuje.`;
+  if(dupHotel) return tfmt('err_duplicate_hotel_name', {name: duplicateLabel(dupHotel.hotel)});
   const dupPhone = phone ? list.find(x=>x.id!==id && normalizePhone(x.phone)===phone) : null;
-  if(dupPhone) return `Telefonní číslo už je uložené u hotelu „${dupPhone.hotel||'bez názvu'}“.`;
+  if(dupPhone) return tfmt('err_duplicate_hotel_phone', {name: duplicateLabel(dupPhone.hotel)});
   return '';
 }
 function findDuplicateFixed(list, data){
@@ -3430,11 +3476,11 @@ function findDuplicateFixed(list, data){
   const id = data?.id || null;
   if(code){
     const dupCode = list.find(x=>x.id!==id && normKeyDup(x.code)===code);
-    if(dupCode) return `Pevný kód „${dupCode.code}“ už v seznamu existuje.`;
+    if(dupCode) return tfmt('err_duplicate_fixed_code', {value: duplicateLabel(dupCode.code)});
   }
   if(param){
     const dupParam = list.find(x=>x.id!==id && normKeyDup(x.param)===param);
-    if(dupParam) return `Parametr „${dupParam.param}“ už v seznamu existuje.`;
+    if(dupParam) return tfmt('err_duplicate_fixed_param', {value: duplicateLabel(dupParam.param)});
   }
   return '';
 }
@@ -3504,8 +3550,9 @@ function buildMapHref(address, name=''){
 function renderCustomers(filter=""){
   const raw=(filter||"").trim();
   const q=raw.toLowerCase();
-  const norm = (str)=>String(str||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  const norm = (str)=>String(str||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   const qn = norm(q);
+  const qPhone = normalizePhone(raw);
   const list=loadCustomers();
 
   list.sort((a,b)=>String(a?.name||'').localeCompare(String(b?.name||''),'cs',{sensitivity:'base'}));
@@ -3519,11 +3566,12 @@ function renderCustomers(filter=""){
     const contactN = norm(c.contactName||"");
     const addressN = norm(c.address||"");
     const phoneS = String(c.contactPhone||"");
+    const phoneN = normalizePhone(phoneS);
     const matchCustomer = (!q)
       ? true
       : (qn.length===1 && /[a-z]/i.test(qn)
           ? nameN.startsWith(qn)
-          : (nameN.includes(qn) || noteN.includes(qn) || contactN.includes(qn) || addressN.includes(qn) || phoneS.includes(q)));
+          : (nameN.includes(qn) || noteN.includes(qn) || contactN.includes(qn) || addressN.includes(qn) || phoneS.toLowerCase().includes(q) || (qPhone && phoneN.includes(qPhone))));
 
     const machines=[...(c.machines||[])].sort((a,b)=>(Number(b.number)||0)-(Number(a.number)||0));
     const matchedMachines=machines.filter(m=>{
@@ -3604,7 +3652,7 @@ function openDialog(title, innerHTML, onSave, onDelete=null){
   const del=document.getElementById('dlg-delete');
   if(dlgSaveHandler) save.removeEventListener('click', dlgSaveHandler);
   dlgSaveHandler=(ev)=>{ ev.preventDefault(); onSave(()=>clientsDlg.close()); };
-  save.addEventListener('click', dlgSaveHandler, { once:true });
+  save.addEventListener('click', dlgSaveHandler);
 
   // delete button is optional
   if(dlgDeleteHandler && del) del.removeEventListener('click', dlgDeleteHandler);
@@ -3612,7 +3660,7 @@ function openDialog(title, innerHTML, onSave, onDelete=null){
     if(typeof onDelete === 'function'){
       del.classList.remove('hidden');
       dlgDeleteHandler=(ev)=>{ ev.preventDefault(); onDelete(()=>clientsDlg.close()); };
-      del.addEventListener('click', dlgDeleteHandler, { once:true });
+      del.addEventListener('click', dlgDeleteHandler);
     } else {
       del.classList.add('hidden');
       dlgDeleteHandler=null;
@@ -4064,7 +4112,7 @@ if(hDlgDelete){
   hDlgDelete.addEventListener('click', (ev)=>{
     ev.preventDefault();
     if(!hDlgId) return;
-    if(!confirm('Opravdu smazat?')) return;
+    if(!confirm(t('confirm_delete_hotel'))) return;
     const list = loadHotels().filter(x=>x.id!==hDlgId);
     if(saveHotels(list)){
       hotelsDlg.close();
@@ -4101,7 +4149,10 @@ function saveFixed(list){
 }
 
 function renderFixed(filter=""){
-  const q = (filter||"").trim().toLowerCase();
+  const raw = (filter||"").trim();
+  const q = raw.toLowerCase();
+  const qn = normTextDup(raw);
+  const qKey = normKeyDup(raw);
   const list = loadFixed();
 
   const rootFixed = document.getElementById('f-list-fixed');
@@ -4111,11 +4162,20 @@ function renderFixed(filter=""){
   rootParam.innerHTML = "";
 
   const matchItem = (k)=>{
-    if(!q) return true;
-    return (k.label||"").toLowerCase().includes(q)
-      || (k.code||"").toLowerCase().includes(q)
-      || (k.description||"").toLowerCase().includes(q)
-      || (k.param||"").toLowerCase().includes(q);
+    if(!raw) return true;
+    const labelN = normTextDup(k.label);
+    const descN = normTextDup(k.description);
+    const codeKey = normKeyDup(k.code);
+    const paramKey = normKeyDup(k.param);
+    if(qn.length===1){
+      return codeKey.startsWith(qKey) || paramKey.startsWith(qKey) || labelN.startsWith(qn) || descN.startsWith(qn);
+    }
+    return labelN.includes(qn)
+      || descN.includes(qn)
+      || codeKey.includes(qKey)
+      || paramKey.includes(qKey)
+      || String(k.code||"").toLowerCase().includes(q)
+      || String(k.param||"").toLowerCase().includes(q);
   };
 
   const isParam = (k)=>{
@@ -4183,7 +4243,7 @@ const fAddBtn = document.getElementById('f-add');
 if(fAddBtn){
   fAddBtn.addEventListener('click', ()=>{
     const dlg = document.getElementById('fDlg');
-    document.getElementById('fDlg-title').textContent = "Přidat kód";
+    document.getElementById('fDlg-title').textContent = t("btn_add_code");
     dlg.dataset.id = "";
     document.getElementById('fk-label').value = "";
     document.getElementById('fk-code').value = "";
@@ -4204,8 +4264,8 @@ if(fAddBtn){
       const param = (document.getElementById('fk-param').value||'').trim();
       const hasCode = !!code;
       const hasParam = !!param;
-      if(!desc){ toast('Vyplňte popis'); return; }
-      if((hasCode && hasParam) || (!hasCode && !hasParam)) { toast('Vyplňte buď kód nebo parametr'); return; }
+      if(!desc){ toast(t('err_fixed_desc_required')); return; }
+      if((hasCode && hasParam) || (!hasCode && !hasParam)) { toast(t('err_fixed_code_or_param_required')); return; }
       const list = loadFixed();
       const dup = findDuplicateFixed(list, { code: hasCode ? code : '', param: hasParam ? param : '' });
       if(dup){ toast(dup); return; }
@@ -4213,7 +4273,7 @@ if(fAddBtn){
       if(saveFixed(list)){
         dlg.close();
         renderFixed(document.getElementById('f-search').value);
-        toast('Uloženo');
+        toast(t('toast_saved'));
       }
     };
   });
@@ -4234,7 +4294,7 @@ if(fListRoot){
     if(act === 'edit-fixed-btn'){
       const dlg = document.getElementById('fDlg');
       dlg.dataset.id = id;
-      document.getElementById('fDlg-title').textContent = "Upravit kód";
+      document.getElementById('fDlg-title').textContent = t("dlg_edit_code_title");
       document.getElementById('fk-label').value = item.label||"";
       document.getElementById('fk-code').value = item.code||"";
       document.getElementById('fk-desc').value = item.description||"";
@@ -4259,7 +4319,7 @@ if(fListRoot){
       if(delBtn){
         delBtn.onclick = (ev)=>{
           ev.preventDefault();
-          if(!confirm('Opravdu smazat kód?')) return;
+          if(!confirm(t('confirm_delete_fixed'))) return;
           const nl = loadFixed().filter(x=>x.id!==id);
           if(saveFixed(nl)){
             dlg.close();
@@ -4281,8 +4341,8 @@ if(fListRoot){
         const desc = (document.getElementById('fk-desc').value||'').trim();
         const hasCode = !!code;
         const hasParam = !!param;
-        if(!desc){ toast('Vyplňte popis'); return; }
-        if((hasCode && hasParam) || (!hasCode && !hasParam)) { toast('Vyplňte buď kód nebo parametr'); return; }
+        if(!desc){ toast(t('err_fixed_desc_required')); return; }
+        if((hasCode && hasParam) || (!hasCode && !hasParam)) { toast(t('err_fixed_code_or_param_required')); return; }
         const dup = findDuplicateFixed(cur, { id, code: hasCode ? code : '', param: hasParam ? param : '' });
         if(dup){ toast(dup); return; }
         it.label = '';
@@ -4293,7 +4353,7 @@ if(fListRoot){
         if(saveFixed(cur)){
           dlg.close();
           renderFixed(document.getElementById('f-search').value);
-          toast('Uloženo');
+          toast(t('toast_saved'));
         }
       };
 
@@ -4517,22 +4577,33 @@ function renderPopupCustomerList(){
     if(!list) return;
     list.innerHTML = "";
 
-    const q = (document.getElementById('popupCustomerSearch')?.value || "")
-      .trim()
-      .toLowerCase();
+    const raw = (document.getElementById('popupCustomerSearch')?.value || "").trim();
+    const q = raw.toLowerCase();
+    const norm = (str)=>String(str||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    const qn = norm(raw);
+    const qPhone = normalizePhone(raw);
 
     let customers = loadCustomersLS();
     customers = customers
       .slice()
       .sort((a,b)=> String(a.name||"").localeCompare(String(b.name||""), 'cs'))
-      .filter(c => !q || String(c.name||"").toLowerCase().includes(q));
+      .filter(c => {
+        if(!q) return true;
+        const nameN = norm(c.name);
+        const contactN = norm(c.contactName);
+        const noteN = norm(c.note);
+        const addressN = norm(c.address);
+        const phoneRaw = String(c.contactPhone||"").toLowerCase();
+        const phoneN = normalizePhone(c.contactPhone);
+        return nameN.includes(qn) || contactN.includes(qn) || noteN.includes(qn) || addressN.includes(qn) || phoneRaw.includes(q) || (qPhone && phoneN.includes(qPhone));
+      });
 
     if(customers.length===0){
         const empty=document.createElement('div');
         empty.style.opacity='0.7';
         empty.style.fontSize='14px';
         empty.style.padding='8px 2px';
-        empty.innerText = q ? 'Nenalezen žádný zákazník.' : 'Nejsou uložen žádní zákazníci.';
+        empty.innerText = q ? t('popup_customer_not_found') : t('popup_customer_empty');
         list.appendChild(empty);
         return;
     }
@@ -4559,21 +4630,21 @@ function addMachineToExisting(custId){
         note:""
     });
     saveCustomersLS(customers);
-    alert("Stroj přidán k zákazníkovi: " + c.name);
+    toast(tfmt("popup_machine_added", {name: c.name}));
     closeAddMachinePopup();
 }
 
 document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("popupCreateCustomer")?.addEventListener("click", ()=>{
         let name=document.getElementById("popupNewCustName")?.value.trim();
-        if(!name){ alert("Zadej jméno zákazníka"); return; }
+        if(!name){ toast(t("err_enter_customer_name")); return; }
         let contactName=(document.getElementById("popupNewCustContact")?.value||"").trim();
         let phone=(document.getElementById("popupNewCustPhone")?.value||"").trim();
         let N=document.getElementById("machine")?.value||"";
 
         let customers=loadCustomersLS();
         const dup=findDuplicateCustomer(customers,{name, phone});
-        if(dup){ alert(dup); return; }
+        if(dup){ toast(dup); return; }
         let newCust={
             id:"c"+Date.now(),
             name,

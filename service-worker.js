@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_67-import-duplicate-check';
+const CACHE_VER = 'hdh-code-v3_1_69-hotel-fixed-search-toast';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
