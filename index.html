@@ -46,8 +46,8 @@
     .tab.active { background:#ffecec; border-color:#f3b1b1; }
     /* Hidden panels must always win over per-panel display rules (e.g., #panel-clients {display:flex}) */
     .hidden { display:none !important; }
-    .toast { position: fixed; left:50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index:1000000; transform: translateX(-50%); background:#d32525; color:#fff; padding:10px 12px; border-radius:12px; font-weight:900; opacity:0; pointer-events:none; transition: opacity .2s ease, transform .2s ease; }
-    .toast.show { opacity:1; transform: translateX(-50%) translateY(-6px); }
+    .toast { position: fixed !important; left:50% !important; bottom: calc(18px + env(safe-area-inset-bottom)) !important; z-index:2147483647 !important; transform: translate3d(-50%,0,0) !important; background:#d32525; color:#fff; padding:12px 16px; border-radius:14px; font-weight:900; opacity:0; pointer-events:none; transition: opacity .2s ease, transform .2s ease; box-shadow:0 14px 36px rgba(0,0,0,.35); isolation:isolate; max-width:min(92vw,520px); text-align:center; }
+    .toast.show { opacity:1 !important; transform: translate3d(-50%,-6px,0) !important; }
 
     /* --- Clients: keep Import/Export always visible, scroll list between --- */
     #panel-clients{
@@ -3216,7 +3216,25 @@ kinRenderAll();
   try{ updateLastMachineUI(); }catch(e){}
 })();
 
-function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg||'Hotovo'; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 1400); }
+function toast(msg){
+  let el=document.getElementById('toast');
+  if(!el){
+    el=document.createElement('div');
+    el.id='toast';
+    el.className='toast';
+  }
+  // Keep the toast as the last element in <body> so it is above modal overlays and blur layers on iOS/PWA.
+  if(el.parentElement!==document.body || el !== document.body.lastElementChild){
+    document.body.appendChild(el);
+  }
+  el.textContent=msg||'Hotovo';
+  el.style.zIndex='2147483647';
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer=setTimeout(()=>el.classList.remove('show'), 2200);
+}
 
 // Calc core
 function last4Digits(n){ return Math.abs(n) % 10000; }

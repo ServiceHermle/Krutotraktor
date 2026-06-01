@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_69-hotel-fixed-search-toast';
+const CACHE_VER = 'hdh-code-v3_1_70-toast-front-fix';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',

@@ -552,7 +552,25 @@ tabs.forEach(t => t.addEventListener('click', (e)=>{
   try{ updateLastMachineUI(); }catch(e){}
 })();
 
-function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg||'Hotovo'; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 1400); }
+function toast(msg){
+  let el=document.getElementById('toast');
+  if(!el){
+    el=document.createElement('div');
+    el.id='toast';
+    el.className='toast';
+  }
+  // Keep the toast as the last element in <body> so it is above modal overlays and blur layers on iOS/PWA.
+  if(el.parentElement!==document.body || el !== document.body.lastElementChild){
+    document.body.appendChild(el);
+  }
+  el.textContent=msg||'Hotovo';
+  el.style.zIndex='2147483647';
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer=setTimeout(()=>el.classList.remove('show'), 2200);
+}
 
 // Calc core
 function last4Digits(n){ return Math.abs(n) % 10000; }
