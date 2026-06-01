@@ -3386,6 +3386,60 @@ function normalizePhone(p){
   return s.replace(/[^\d+]/g,'');
 }
 
+function normTextDup(value){
+  return String(value||'')
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/\s+/g,' ')
+    .toLowerCase();
+}
+function normKeyDup(value){
+  return String(value||'')
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/\s+/g,'')
+    .toUpperCase();
+}
+function findDuplicateCustomer(list, data){
+  const name = normTextDup(data?.name);
+  const phone = normalizePhone(data?.phone);
+  const id = data?.id || null;
+  if(!name && !phone) return '';
+  const dupName = name ? list.find(x=>x.id!==id && normTextDup(x.name)===name) : null;
+  if(dupName) return `Zákazník „${dupName.name}“ už v seznamu existuje.`;
+  const dupPhone = phone ? list.find(x=>x.id!==id && normalizePhone(x.contactPhone)===phone) : null;
+  if(dupPhone) return `Telefonní číslo už je uložené u zákazníka „${dupPhone.name||'bez názvu'}“.`;
+  return '';
+}
+function findDuplicateHotel(list, data){
+  const hotel = normTextDup(data?.hotel);
+  const phone = normalizePhone(data?.phone);
+  const id = data?.id || null;
+  if(!hotel && !phone) return '';
+  const dupHotel = hotel ? list.find(x=>x.id!==id && normTextDup(x.hotel)===hotel) : null;
+  if(dupHotel) return `Hotel „${dupHotel.hotel}“ už v seznamu existuje.`;
+  const dupPhone = phone ? list.find(x=>x.id!==id && normalizePhone(x.phone)===phone) : null;
+  if(dupPhone) return `Telefonní číslo už je uložené u hotelu „${dupPhone.hotel||'bez názvu'}“.`;
+  return '';
+}
+function findDuplicateFixed(list, data){
+  const code = normKeyDup(data?.code);
+  const param = normKeyDup(data?.param);
+  const id = data?.id || null;
+  if(code){
+    const dupCode = list.find(x=>x.id!==id && normKeyDup(x.code)===code);
+    if(dupCode) return `Pevný kód „${dupCode.code}“ už v seznamu existuje.`;
+  }
+  if(param){
+    const dupParam = list.find(x=>x.id!==id && normKeyDup(x.param)===param);
+    if(dupParam) return `Parametr „${dupParam.param}“ už v seznamu existuje.`;
+  }
+  return '';
+}
+
+
 // Formats phone numbers for display (adds spaces), while keeping the value human-readable.
 // Example: +420123456789 -> +420123456789, 123456789 -> 123456789
 
@@ -3573,7 +3627,10 @@ document.getElementById('c-add').addEventListener('click', ()=>{
     const name=document.getElementById('f-name').value.trim();
     if(!name){ toast(t("err_enter_name")); return; }
     const list=loadCustomers();
-    list.push({id:uuid(), name, contactName:(document.getElementById('f-contact').value||'').trim(), contactPhone:(document.getElementById('f-phone').value||'').trim(), address:(document.getElementById('f-address').value||'').trim(), note:(document.getElementById('f-note').value||'').trim(), machines:[]});
+    const phone=(document.getElementById('f-phone').value||'').trim();
+    const dup=findDuplicateCustomer(list,{name, phone});
+    if(dup){ toast(dup); return; }
+    list.push({id:uuid(), name, contactName:(document.getElementById('f-contact').value||'').trim(), contactPhone:phone, address:(document.getElementById('f-address').value||'').trim(), note:(document.getElementById('f-note').value||'').trim(), machines:[]});
     if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
   });
   // iOS shows phone keypad (practical), but it has no space. This formatter adds spaces automatically.
@@ -3619,88 +3676,88 @@ let customersImportMode = 'override';
 document.getElementById('c-import-file').addEventListener('change', (e)=>{
   const file = e.target.files && e.target.files[0];
   if(!file) return;
-
-  const norm = (s)=>String(s||'').trim().toLowerCase();
+  const mergeMachines = (cur, inc)=>{
+    if(!Array.isArray(cur.machines)) cur.machines = [];
+    const mByLabel = new Map(cur.machines.map(m=>[normTextDup(m.label), m]).filter(x=>x[0]));
+    inc.machines.forEach(im=>{
+      const mk = normTextDup(im.label);
+      if(mk && mByLabel.has(mk)){
+        const em = mByLabel.get(mk);
+        if((em.number==null || Number.isNaN(em.number)) && im.number!=null && !Number.isNaN(im.number)) em.number = im.number;
+        return;
+      }
+      if(!mk && im.number!=null && cur.machines.some(em=>em.number===im.number)) return;
+      const added = { id: im.id || uuid(), label: im.label, number: (im.number!=null && !Number.isNaN(im.number)) ? im.number : null };
+      cur.machines.push(added);
+      if(mk) mByLabel.set(mk, added);
+    });
+  };
+  const mergeCustomer = (cur, inc)=>{
+    if(!cur.contactName && inc.contactName) cur.contactName = inc.contactName;
+    if(!cur.contactPhone && inc.contactPhone) cur.contactPhone = inc.contactPhone;
+    if(!cur.address && inc.address) cur.address = inc.address;
+    if(!cur.note && inc.note) cur.note = inc.note;
+    mergeMachines(cur, inc);
+  };
   const reader = new FileReader();
   reader.onload = (ev)=>{
     try{
       const incomingRaw = JSON.parse(ev.target.result);
       if(!Array.isArray(incomingRaw)) throw new Error('Neplatný formát');
-
       const incoming = incomingRaw.map(c=>({
         id: c.id || uuid(),
         name: String(c.name||'').trim(),
         contactName: String(c.contactName||c.contact||'').trim(),
         contactPhone: String(c.contactPhone||c.phone||'').trim(),
+        address: String(c.address||'').trim(),
         note: String(c.note||'').trim(),
-        machines: Array.isArray(c.machines) ? c.machines.map(m=>({
-          id: m.id || uuid(),
-          label: String(m.label||'').trim(),
-          number: m.number ? parseInt(m.number,10) : null
-        })) : []
+        machines: Array.isArray(c.machines) ? c.machines.map(m=>({ id: m.id || uuid(), label: String(m.label||'').trim(), number: m.number ? parseInt(m.number,10) : null })) : []
       })).filter(c=>c.name);
-
+      const cleanIncoming = [];
+      const incomingByName = new Map();
+      const incomingByPhone = new Map();
+      let duplicateCount = 0;
+      incoming.forEach(inc=>{
+        const nameKey = normTextDup(inc.name);
+        const phoneKey = normalizePhone(inc.contactPhone);
+        const cur = (nameKey && incomingByName.get(nameKey)) || (phoneKey && incomingByPhone.get(phoneKey));
+        if(cur){ duplicateCount++; mergeCustomer(cur, inc); return; }
+        cleanIncoming.push(inc);
+        if(nameKey) incomingByName.set(nameKey, inc);
+        if(phoneKey) incomingByPhone.set(phoneKey, inc);
+      });
       if(customersImportMode === 'override'){
-        if(saveCustomers(incoming)){
+        if(saveCustomers(cleanIncoming)){
           renderCustomers(document.getElementById('c-search').value);
-          toast('Import hotov (Override)');
+          toast(`Import hotov (Override)${duplicateCount ? ` – sloučeno ${duplicateCount} duplicit` : ''}`);
         }
       }else{
-        // UPDATE: merge by customer name + machine label (case-insensitive)
         const existing = loadCustomers();
-        const byName = new Map(existing.map(c=>[norm(c.name), c]));
-
-        incoming.forEach(inc=>{
-          const key = norm(inc.name);
-          const cur = byName.get(key);
-          if(!cur){
-            // new customer
-            existing.push(inc);
-            byName.set(key, inc);
-            return;
-          }
-
-          // fill missing meta fields only (do not overwrite existing)
-          if(!cur.contactName && inc.contactName) cur.contactName = inc.contactName;
-          if(!cur.contactPhone && inc.contactPhone) cur.contactPhone = inc.contactPhone;
-          if(!cur.address && inc.address) cur.address = inc.address;
-          if(!cur.note && inc.note) cur.note = inc.note;
-
-          // merge machines
-          if(!Array.isArray(cur.machines)) cur.machines = [];
-          const mByLabel = new Map(cur.machines.map(m=>[norm(m.label), m]));
-          inc.machines.forEach(im=>{
-            const mk = norm(im.label);
-            if(mk && mByLabel.has(mk)) {
-              const em = mByLabel.get(mk);
-              // optionally fill number if missing
-              if((em.number==null || Number.isNaN(em.number)) && im.number!=null && !Number.isNaN(im.number)) em.number = im.number;
-              return;
-            }
-            // fallback: match by number if label empty
-            if(!mk && im.number!=null){
-              const existsByNum = cur.machines.some(em=>em.number===im.number);
-              if(existsByNum) return;
-            }
-            cur.machines.push({
-              id: im.id || uuid(),
-              label: im.label,
-              number: (im.number!=null && !Number.isNaN(im.number)) ? im.number : null
-            });
-            if(mk) mByLabel.set(mk, cur.machines[cur.machines.length-1]);
-          });
-  // iOS numeric/phone keyboard has no space key – format with spaces automatically
-  setTimeout(()=>attachPhoneFormatter(document.getElementById('f-phone')), 0);
+        const byName = new Map();
+        const byPhone = new Map();
+        existing.forEach(c=>{
+          const nk = normTextDup(c.name);
+          const pk = normalizePhone(c.contactPhone);
+          if(nk) byName.set(nk, c);
+          if(pk) byPhone.set(pk, c);
         });
-
+        let addedCount = 0;
+        let mergedCount = duplicateCount;
+        cleanIncoming.forEach(inc=>{
+          const nameKey = normTextDup(inc.name);
+          const phoneKey = normalizePhone(inc.contactPhone);
+          const cur = (nameKey && byName.get(nameKey)) || (phoneKey && byPhone.get(phoneKey));
+          if(cur){ mergedCount++; mergeCustomer(cur, inc); return; }
+          existing.push(inc); addedCount++;
+          if(nameKey) byName.set(nameKey, inc);
+          if(phoneKey) byPhone.set(phoneKey, inc);
+        });
         if(saveCustomers(existing)){
           renderCustomers(document.getElementById('c-search').value);
-          toast('Import hotov (Update)');
+          toast(`Import hotov (Update) – přidáno ${addedCount}${mergedCount ? `, sloučeno ${mergedCount} duplicit` : ''}`);
         }
       }
-    }catch(err){
-      alert('Import selhal: ' + err.message);
-    }
+    }catch(err){ alert('Import selhal: ' + err.message); }
     e.target.value = '';
   };
   reader.readAsText(file);
@@ -3740,9 +3797,13 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
       t("dlg_edit_customer_title"),
       body,
       (close)=>{
-        c.name=document.getElementById('f-name').value.trim();
+        const name=document.getElementById('f-name').value.trim();
+        const phone=(document.getElementById('f-phone').value||'').trim();
+        const dup=findDuplicateCustomer(list,{id:c.id, name, phone});
+        if(dup){ toast(dup); return; }
+        c.name=name;
         c.contactName=(document.getElementById('f-contact').value||'').trim();
-        c.contactPhone=(document.getElementById('f-phone').value||'').trim();
+        c.contactPhone=phone;
         c.address=(document.getElementById('f-address').value||'').trim();
         c.note=(document.getElementById('f-note').value||'').trim();
         if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
@@ -3802,7 +3863,7 @@ document.getElementById('c-list').addEventListener('click',(e)=>{
   if(act==='del-c'){ const id=trg.getAttribute('data-id'); if(!confirm(t("confirm_delete_customer"))) return; if(saveCustomers(list.filter(c=>c.id!==id))){ renderCustomers(document.getElementById('c-search').value); toast(t("toast_deleted")); } return; }
   if(act==='edit-c'){ const id=trg.getAttribute('data-id'); const c=list.find(x=>x.id===id);
     openDialog(t("dlg_edit_customer_title"), `<label>${t("label_name")}</label><input id="f-name" value="${escapeHtml(c.name)}"><label>${t("label_contact")}</label><input id="f-contact" value="${escapeHtml(c.contactName||"")}"><label>${t("label_phone")}</label><input id="f-phone" inputmode="tel" value="${escapeHtml(c.contactPhone||"")}"><label>${t("label_address")}</label><input id="f-address" value="${escapeHtml(c.address||"")}"><label>${t("label_note")}</label><input id="f-note" value="${escapeHtml(c.note||"")}">`, (close)=>{
-      c.name=document.getElementById('f-name').value.trim(); c.contactName=(document.getElementById('f-contact').value||'').trim(); c.contactPhone=(document.getElementById('f-phone').value||'').trim(); c.address=(document.getElementById('f-address').value||'').trim(); c.note=document.getElementById('f-note').value.trim(); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
+      const name=document.getElementById('f-name').value.trim(); const phone=(document.getElementById('f-phone').value||'').trim(); const dup=findDuplicateCustomer(list,{id:c.id, name, phone}); if(dup){ toast(dup); return; } c.name=name; c.contactName=(document.getElementById('f-contact').value||'').trim(); c.contactPhone=phone; c.address=(document.getElementById('f-address').value||'').trim(); c.note=document.getElementById('f-note').value.trim(); if(saveCustomers(list)){ renderCustomers(document.getElementById('c-search').value); close(); toast(t("toast_saved")); }
     });
     attachPhoneFormatter(document.getElementById('f-phone'));
     return; }
@@ -3983,6 +4044,8 @@ if(hDlgSave){
     if(!city || !hotel){ toast(t('err_enter_name')); return; }
 
     const list = loadHotels();
+    const dup = findDuplicateHotel(list, {id:hDlgId, hotel, phone});
+    if(dup){ toast(dup); return; }
     if(hDlgId){
       const it = list.find(x=>x.id===hDlgId);
       if(it){ it.city=city; it.hotel=hotel; it.phone=phone; it.contact=contact; it.note=note; }
@@ -4144,6 +4207,8 @@ if(fAddBtn){
       if(!desc){ toast('Vyplňte popis'); return; }
       if((hasCode && hasParam) || (!hasCode && !hasParam)) { toast('Vyplňte buď kód nebo parametr'); return; }
       const list = loadFixed();
+      const dup = findDuplicateFixed(list, { code: hasCode ? code : '', param: hasParam ? param : '' });
+      if(dup){ toast(dup); return; }
       list.push({ id: uuid(), label: '', code: hasCode ? code : '', param: hasParam ? param : '', description: desc, type: (hasParam ? 'param' : 'fixed') });
       if(saveFixed(list)){
         dlg.close();
@@ -4218,6 +4283,8 @@ if(fListRoot){
         const hasParam = !!param;
         if(!desc){ toast('Vyplňte popis'); return; }
         if((hasCode && hasParam) || (!hasCode && !hasParam)) { toast('Vyplňte buď kód nebo parametr'); return; }
+        const dup = findDuplicateFixed(cur, { id, code: hasCode ? code : '', param: hasParam ? param : '' });
+        if(dup){ toast(dup); return; }
         it.label = '';
         it.code  = hasCode ? code : '';
         it.description = desc;
@@ -4288,65 +4355,66 @@ if(fImportInput){
   fImportInput.addEventListener('change', (e)=>{
     const file = e.target.files && e.target.files[0];
     if(!file) return;
-
     const norm = (s)=>String(s||'').trim();
-    const normKey = (s)=>String(s||'').trim().toLowerCase();
-
     const reader = new FileReader();
     reader.onload = (ev)=>{
       try{
         const raw = JSON.parse(ev.target.result);
         if(!Array.isArray(raw)) throw new Error('Neplatný formát');
-
-        // Normalize + remove exact duplicates inside incoming
-        const seen = new Set();
-        const incoming = raw.map(k=>({
-          id: k.id || uuid(),
-          label: norm(k.label||k.name),
-          code: norm(k.code),
-          description: norm(k.description||k.desc)
-        })).filter(k=>k.label && k.code).filter(k=>{
-          const key = (k.label+'|'+k.code).toLowerCase();
-          if(seen.has(key)) return false;
-          seen.add(key);
-          return true;
+        const incoming = raw.map(k=>{
+          const code = norm(k.code);
+          const param = norm(k.param);
+          const desc = norm(k.description||k.desc||k.label||k.name);
+          const hasParam = !!param || String(k.type||'').toLowerCase()==='param' || String(k.type||'').toLowerCase()==='parameter';
+          return { id: k.id || uuid(), label: '', code: hasParam ? '' : code, param: hasParam ? (param || code) : '', description: desc, type: hasParam ? 'param' : 'fixed' };
+        }).filter(k=>(k.code || k.param) && k.description);
+        const cleanIncoming = [];
+        const byCode = new Map();
+        const byParam = new Map();
+        let duplicateCount = 0;
+        incoming.forEach(inc=>{
+          const ck = normKeyDup(inc.code);
+          const pk = normKeyDup(inc.param);
+          const cur = (ck && byCode.get(ck)) || (pk && byParam.get(pk));
+          if(cur){ duplicateCount++; if(!cur.description && inc.description) cur.description = inc.description; return; }
+          cleanIncoming.push(inc);
+          if(ck) byCode.set(ck, inc);
+          if(pk) byParam.set(pk, inc);
         });
-
         if(fixedImportMode === 'override'){
           if(!confirm('Import přepíše existující pevné kódy. Pokračovat?')) return;
-          if(saveFixed(incoming)){
+          if(saveFixed(cleanIncoming)){
             renderFixed(document.getElementById('f-search')?document.getElementById('f-search').value:'');
-            toast('Import hotov (Override)');
+            toast(`Import hotov (Override)${duplicateCount ? ` – sloučeno ${duplicateCount} duplicit` : ''}`);
           }
         }else{
-          // UPDATE: merge by label (case-insensitive), add only missing
           const existing = loadFixed();
-          const byLabel = new Map(existing.map(k=>[normKey(k.label), k]));
-
-          incoming.forEach(inc=>{
-            const key = normKey(inc.label);
-            if(!key) return;
-            const cur = byLabel.get(key);
-            if(!cur){
-              existing.push(inc);
-              byLabel.set(key, inc);
-              return;
-            }
-            // do not overwrite existing; only fill missing fields
-            if(!cur.code && inc.code) cur.code = inc.code;
-            if(!cur.description && inc.description) cur.description = inc.description;
+          const existingByCode = new Map();
+          const existingByParam = new Map();
+          existing.forEach(k=>{
+            const ck = normKeyDup(k.code);
+            const pk = normKeyDup(k.param);
+            if(ck) existingByCode.set(ck, k);
+            if(pk) existingByParam.set(pk, k);
           });
-
+          let addedCount = 0;
+          let mergedCount = duplicateCount;
+          cleanIncoming.forEach(inc=>{
+            const ck = normKeyDup(inc.code);
+            const pk = normKeyDup(inc.param);
+            const cur = (ck && existingByCode.get(ck)) || (pk && existingByParam.get(pk));
+            if(cur){ mergedCount++; if(!cur.description && inc.description) cur.description = inc.description; return; }
+            existing.push(inc); addedCount++;
+            if(ck) existingByCode.set(ck, inc);
+            if(pk) existingByParam.set(pk, inc);
+          });
           if(saveFixed(existing)){
             renderFixed(document.getElementById('f-search')?document.getElementById('f-search').value:'');
-            toast('Import hotov (Update)');
+            toast(`Import hotov (Update) – přidáno ${addedCount}${mergedCount ? `, sloučeno ${mergedCount} duplicit` : ''}`);
           }
         }
-      }catch(err){
-        alert('Import selhal: ' + (err && err.message ? err.message : err));
-      }finally{
-        fImportInput.value = '';
-      }
+      }catch(err){ alert('Import selhal: ' + (err && err.message ? err.message : err)); }
+      finally{ fImportInput.value = ''; }
     };
     reader.readAsText(file);
   });
@@ -4504,6 +4572,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
         let N=document.getElementById("machine")?.value||"";
 
         let customers=loadCustomersLS();
+        const dup=findDuplicateCustomer(customers,{name, phone});
+        if(dup){ alert(dup); return; }
         let newCust={
             id:"c"+Date.now(),
             name,

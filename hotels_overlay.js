@@ -88,29 +88,55 @@
   function normKey(s){
     return (s??"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   }
-
+  function normPhone(s){
+    return (s??"").toString().trim().replace(/[^\d+]/g,"");
+  }
+  function mergeHotelFields(cur, inc){
+    if(!cur.phone && inc.phone) cur.phone = inc.phone;
+    if(!cur.address && inc.address) cur.address = inc.address;
+    if(!cur.notes && inc.notes) cur.notes = inc.notes;
+    if(!cur.city && inc.city) cur.city = inc.city;
+  }
+  function dedupeHotels(list){
+    const out = [];
+    const byName = new Map();
+    const byPhone = new Map();
+    let merged = 0;
+    list.forEach(h=>{
+      const nk = normKey(h.name);
+      const pk = normPhone(h.phone);
+      const cur = (nk && byName.get(nk)) || (pk && byPhone.get(pk));
+      if(cur){ merged++; mergeHotelFields(cur, h); return; }
+      const item = {city:h.city||"", name:h.name||"", address:h.address||"", phone:h.phone||"", notes:h.notes||""};
+      out.push(item);
+      if(nk) byName.set(nk, item);
+      if(pk) byPhone.set(pk, item);
+    });
+    return {items:out, merged};
+  }
   function mergeHotels(existing, incoming){
-    // UPDATE: merge by city+name (case-insensitive). Only fill missing fields.
-    const byKey = new Map();
+    const byName = new Map();
+    const byPhone = new Map();
     existing.forEach(h=>{
-      const k = normKey(h.city)+'|'+normKey(h.name);
-      if(k !== '|') byKey.set(k, h);
+      const nk = normKey(h.name);
+      const pk = normPhone(h.phone);
+      if(nk) byName.set(nk, h);
+      if(pk) byPhone.set(pk, h);
     });
-
+    let added = 0;
+    let merged = 0;
     incoming.forEach(inc=>{
-      const k = normKey(inc.city)+'|'+normKey(inc.name);
-      if(k === '|') return;
-      const cur = byKey.get(k);
-      if(!cur){
-        existing.push({city:inc.city, name:inc.name, address:inc.address||"", phone:inc.phone||"", notes:inc.notes||""});
-        byKey.set(k, existing[existing.length-1]);
-        return;
-      }
-      if(!cur.phone && inc.phone) cur.phone = inc.phone;
-      if(!cur.address && inc.address) cur.address = inc.address;
-      if(!cur.notes && inc.notes) cur.notes = inc.notes;
+      const nk = normKey(inc.name);
+      const pk = normPhone(inc.phone);
+      const cur = (nk && byName.get(nk)) || (pk && byPhone.get(pk));
+      if(cur){ merged++; mergeHotelFields(cur, inc); return; }
+      const item = {city:inc.city||"", name:inc.name||"", address:inc.address||"", phone:inc.phone||"", notes:inc.notes||""};
+      existing.push(item);
+      added++;
+      if(nk) byName.set(nk, item);
+      if(pk) byPhone.set(pk, item);
     });
-    return existing;
+    return {items:existing, added, merged};
   }
 
 let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")}));
@@ -265,14 +291,22 @@ let hotels = load().map(h=>({address:"", ...h, address:(h.address||h.addr||"")})
             const incoming = parseHotelsPayload(String(ev.target.result||''));
             if(hotelsImportMode === 'override'){
               if(!confirm('Import přepíše existující hotely. Pokračovat?')) return;
-              hotels = incoming;
+              const clean = dedupeHotels(incoming);
+              hotels = clean.items;
+              save(hotels);
+              closeEditor();
+              render();
+              toast(`Import hotov (Override)${clean.merged ? ` – sloučeno ${clean.merged} duplicit` : ''}`);
             }else{
-              hotels = mergeHotels(load(), incoming);
+              const clean = dedupeHotels(incoming);
+              const result = mergeHotels(load(), clean.items);
+              hotels = result.items;
+              save(hotels);
+              closeEditor();
+              render();
+              const mergedTotal = clean.merged + result.merged;
+              toast(`Import hotov (Update) – přidáno ${result.added}${mergedTotal ? `, sloučeno ${mergedTotal} duplicit` : ''}`);
             }
-            save(hotels);
-            closeEditor();
-            render();
-            toast(hotelsImportMode === 'override' ? 'Import hotov (Override)' : 'Import hotov (Update)');
           }catch(err){
             alert('Import selhal: ' + (err && err.message ? err.message : err));
           }finally{

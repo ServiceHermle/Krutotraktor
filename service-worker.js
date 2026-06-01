@@ -1,4 +1,4 @@
-const CACHE_VER = 'hdh-code-v3_1_65-contact-clean';
+const CACHE_VER = 'hdh-code-v3_1_67-import-duplicate-check';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
